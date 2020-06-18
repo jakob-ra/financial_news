@@ -2,7 +2,9 @@ import pandas as pd
 import nltk
 import en_core_web_sm
 from fuzzywuzzy import process
-from multiprocessing import  Pool
+from multiprocessing import pool
+from google_match import google_KG_match
+
 # from transformers import pipeline, TokenClassificationPipeline, TFAutoModelForTokenClassification, AutoTokenizer
 # from nltk.tag import StanfordNERTagger
 # from nltk.tokenize import word_tokenize
@@ -10,18 +12,7 @@ from multiprocessing import  Pool
 # import tensorflow_hub as hub
 
 # read Thomson SDC RND database
-relevant_colums = [6,13,26]
-column_names = ['date', 'text', 'participants'] # this extracts the PARENT COMPANY participants
-df = pd.read_excel('SDC_RND_2015_2020.xlsx', skiprows=1, usecols=relevant_colums, names=column_names)
-
-# keep only date (not time)
-df['date'] = df['date'].dt.date
-
-# separate multiline Participants cell into tuple
-df['participants'] = df['participants'].str.split('\n')
-
-# replace new line character \n with space in deal text
-df['text'] = df['text'].str.replace('\n', ' ')
+pd.read_parquet('rnd_fin.parquet.gzip')
 
 # spacy implementation
 # Load model
@@ -53,10 +44,10 @@ companies = pd.read_excel('Orbis_US_public.xlsx', names=['name', 'BvDID', 'ISIN'
 for char in ['.', ',']:
     companies['name'] = companies['name'].str.replace(char, '') # remove punctuation
 
-companies['tokens'] = companies['name'].str.split()
-words = companies.tokens.tolist()
-words = [word for list_ in words for word in list_] # unstack list of lists
-print(pd.DataFrame(nltk.FreqDist(words).most_common(50), columns=['Word', 'Frequency']))
+# companies['tokens'] = companies['name'].str.split()
+# words = companies.tokens.tolist()
+# words = [word for list_ in words for word in list_] # unstack list of lists
+# print(pd.DataFrame(nltk.FreqDist(words).most_common(50), columns=['Word', 'Frequency']))
 
 # def match(str2match, options):
 #     """ Returns a match in list of names that has a similarity ratio of at least 0.99 (fuzzywuzzy) with
@@ -67,37 +58,52 @@ print(pd.DataFrame(nltk.FreqDist(words).most_common(50), columns=['Word', 'Frequ
 #
 #     return min(matches, key=len) # return shortest match
 
+# str2Match = "apple inc"
+# strOptions = ["Apple Inc.","apple park","apple incorporated","iphone", "apple", "Apple Incorporated",
+#     "APPLE INC"]
 
-str2Match = "apple inc"
-strOptions = ["Apple Inc.","apple park","apple incorporated","iphone", "apple", "Apple Incorporated",
-    "APPLE INC"]
-
-def match(str2match , options, threshold=0.99):
+def match(str2match , options, threshold=99):
     best_match = process.extractOne(str2match, options)
+
     if best_match[1] > threshold:
         return best_match[0]
     else:
         return None
 
 firm_names = companies.name.to_list() # firm name database to match on
-df['matched'] = df['entities'].apply(lambda list: [match(name,firm_names) for name in list])
+import copy
+small = copy.deepcopy(df.head(10))
+# small['matched'] = small['entities'].apply(lambda list: [match(name,firm_names) for name in list])
 
-import numpy as np
-def match_df(df):
-    df['matched'] = df['entities'].apply(lambda list: [match(name, firm_names) for name in list])
+# Google Knowledge Graph Matching
+api_key = open('google_api_key.txt', 'r').read()
+small['matched'] = small['entities'].apply(lambda list: [google_KG_match(name, api_key, type='Corporation')
+    for name in list])
 
-def parallelize_df(df, func, n_cores=12):
-    df_split = np.array_split(df, n_cores)
-    pool = Pool(n_cores)
-    df = pd.concat(pool.map(func, df_split))
-    pool.close()
-    pool.join()
-    return df
+names = [item for sublist in small.entities.to_list() for item in sublist]
+for name in names:
+    print(name)
+    print(google_KG_match(name, api_key, type='Corporation'))
 
-df = parallelize_df(df, match_df)
+# def match_df(df):
+#     df['matched'] = df['entities'].apply(lambda list: [match(name, firm_names) for name in list])
+#
+#     return df
+#
+# def parallelize_df(df, func, n_cores=12):
+#     df_split = np.array_split(df, n_cores)
+#     pool = Pool(n_cores)
+#     df = pd.concat(pool.map(func, df_split))
+#     pool.close()
+#     pool.join()
+#     return df
+#
+# if __name__ == 'name':
+#     small = parallelize_df(small, match_df)
+
 
 # read Reuters financial news database
-news = pd.read_parquet('reuters.parquet.gzip')
+# news = pd.read_parquet('reuters.parquet.gzip')
 
 # delete city and source
 # news['Article'] = news['Article'].str.split('(Reuters) - ').str[-1]
@@ -106,10 +112,10 @@ news = pd.read_parquet('reuters.parquet.gzip')
 # news['Article'] = news['Article'].str.replace(r"\'", "\'")
 
 # small data set to run fast experiments
-news = news.head(1000)
-
-# save recognized organizations in new column
-news['entities'] = news.Article.apply(get_entities)
+# news = news.head(1000)
+#
+# # save recognized organizations in new column
+# news['entities'] = news.Article.apply(get_entities)
 
 
 

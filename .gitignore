@@ -1,0 +1,15 @@
+
+reuters.parquet.gzip
+rnd_fin.parquet.gzip
+SDC_RND_1962_2012.xlsx
+SDC_RND_2010_2016.xls
+SDC_RND_2015_2020.xlsx
+~$Orbis_US_public.xlsx
+~$SDC_RND_1962_2012.xlsx
+~$SDC_RND_2015_2020.xlsx
+Orbis_US_public.csv
+Orbis_US_public.txt
+Orbis_US_public.xlsx
+financial_data.parquet.gzip
+google_api_key.txt
+__pycache__/google_match.cpython-37.pyc
