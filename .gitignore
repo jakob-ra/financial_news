@@ -13,3 +13,4 @@ Orbis_US_public.xlsx
 financial_data.parquet.gzip
 google_api_key.txt
 __pycache__/google_match.cpython-37.pyc
+*.gzip
