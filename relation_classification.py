@@ -3,6 +3,7 @@ import uuid
 import nltk
 import swifter
 import spacy
+import matplotlib.pyplot as plt
 pd.options.mode.chained_assignment = None
 
 # set random state
@@ -11,7 +12,7 @@ rs = 42
 ## construct knowledge base (kb)
 
 # read Thomson SDC RND database
-kb = pd.read_parquet('rnd_fin.parquet.gzip')
+kb = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/rnd_fin.parquet.gzip')
 
 # give unique alliance IDs
 kb['alliance_id'] = kb['date'].apply(lambda x: uuid.uuid4())
@@ -19,37 +20,28 @@ kb['alliance_id'] = kb['date'].apply(lambda x: uuid.uuid4())
 ## construct corpus
 
 # read news articles
-reuters = pd.read_parquet('reuters.parquet.gzip')
-bloomberg = pd.read_parquet('bloomberg.parquet.gzip')
-
-corpus = reuters.append(bloomberg)
-corpus = corpus[['Date', 'Link', 'Article','Headline']]
-corpus = corpus[corpus.Article.str.len() > 5] # remove empty articles
-
-# sort out dates
-corpus['Date'] = pd.to_datetime(corpus['Date'], utc=True, infer_datetime_format=True)
-corpus.sort_values(by='Date', inplace=True)
-corpus['Date'] = corpus['Date'].dt.date # keep only date not time
-corpus.rename(columns={'Date': 'date'}, inplace=True)
-
-# remove city and source tag (only Reuters articles have them)
-corpus['Article'] = corpus['Article'].apply(lambda str: str.split('(Reuters) - ')[-1])
-
-# Add headline as sentence to text
-corpus['text'] = corpus['Headline'] + '. ' + corpus['Article']
-corpus.drop(columns=['Headline','Article'], inplace=True)
+corpus = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
 
 corpus_t = corpus.sample(n=100) # small sample
 
-## common database to train and evaluate on
+## construct common database to train and evaluate on
 db = kb[['date', 'text','alliance_id']].append(corpus_t)
+
+## spacy solution
+
+nlp = spacy.load('en_core_web_sm') # spacy model
+sentencizer = nlp.create_pipe("sentencizer")
+example = 'This is the first sentence. Another short sentence starts here. Now we are in the third sentence.'
+nlp.add_pipe(sentencizer)
+
+doc = nlp(example)
+print(doc.sents)
 
 # split into sentences
 db['text'] = db['text'].apply(lambda x: nltk.sent_tokenize(x))
 db = db.explode('text')
 db.reset_index(drop=True, inplace=True)
 
-nlp = spacy.load('en_core_web_sm') # spacy model
 
 def get_orgs(text):
     '''
@@ -142,13 +134,10 @@ learner.score(X_test, y_test)
 learner.predict(['Microsoft and Google announced a collaboration on the development of new computers.'])
 
 
-# distribution of deal text lengths
-# import matplotlib.pyplot as plt
-# kb.text.str.len().hist()
-# plt.show()
-
 corpus['pred'] = text_clf.predict(corpus.text)
 
 corpus[corpus.pred == 1].text.to_list()
 
 bloomberg.Link.iloc[0]
+
+
