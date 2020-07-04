@@ -53,6 +53,7 @@ news['article'] = news['article'].apply(lambda str: str.split('(Reuters) - ')[-1
 news['text'] = news['headline'] + '. ' + news['article']
 news.drop(columns=['headline','article'], inplace=True)
 news = news[news.text.str.len() > 5] # remove empty articles
+news.reset_index(drop=True, inplace=True)
 
 news.to_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
 

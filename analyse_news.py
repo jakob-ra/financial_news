@@ -22,24 +22,23 @@ from sklearn.model_selection import train_test_split
 # set random state
 rs = 42
 
-# read Thomson SDC RND database
-rnd = pd.read_parquet('rnd_fin.parquet.gzip')
+# read Thomson SDC kb database
+kb = pd.read_parquet('rnd_fin.parquet.gzip')
 
 # read news articles
-reuters = pd.read_parquet('reuters.parquet.gzip')
-bloomberg = pd.read_parquet('bloomberg.parquet.gzip')
+corpus = pd.read_parquet('news.parquet.gzip')
 
 # check news corpus for the word 'alliance'
-# reuters['sentences'] = reuters.Article.str.split('.') # not ideal, should use ntlk.sent_tokenize
-# alliance = reuters[reuters.Article.str.find('alliance') != -1]
+# corpus['sentences'] = corpus.Article.str.split('.') # not ideal, should use ntlk.sent_tokenize
+# alliance = corpus[corpus.Article.str.find('alliance') != -1]
 # alliance['rel_sentences'] = alliance['sentences'].apply(lambda list: [s for s in list if 'alliance' in s])
 
-# reuters[reuters.Article.str.find('Apple') != -1]
+# corpus[corpus.Article.str.find('Apple') != -1]
 
 import copy
 
 ## positive examples
-pos = pd.DataFrame(rnd.text)
+pos = pd.DataFrame(kb.text)
 pos['label'] = 1
 
 # select first sentence from pos
@@ -51,14 +50,7 @@ pos['first_sentence'] = pos.text.apply(lambda x: nltk.sent_tokenize(x)[0])
 
 # randomly sample from news corpus until we have balance
 n_pos = len(pos)
-neg = reuters[['Article','Headline']].sample(n=n_pos, random_state=rs)
-
-# remove city and source tag
-neg['Article'] = neg['Article'].apply(lambda str: str.split('(Reuters) - ')[-1])
-
-# Add headline as sentence to text
-neg['text'] = neg['Headline'] + '. ' + neg['Article']
-neg.drop(columns=['Headline','Article'], inplace=True)
+neg = corpus[['Article','Headline']].sample(n=n_pos, random_state=rs)
 
 # label negative
 neg['label'] = -1
@@ -72,6 +64,7 @@ neg['sentences'] = neg.text.apply(lambda x: nltk.sent_tokenize(x))
 neg_sentences = pd.DataFrame([sentence for list in neg.sentences.to_list() for sentence in list],
     columns=['first_sentence'])
 neg_sentences['label'] = -1
+
 # neg_sentences = neg_sentences.sample(n=n_pos, random_state=rs)
 
 full = pos[['first_sentence', 'label']].append(neg_sentences)
@@ -118,8 +111,8 @@ neg_sentences[neg_sentences.prediction == 1].first_sentence.to_list()
 pos['prediction'] = text_clf.predict(pos.first_sentence)
 pos[pos.prediction == -1].text.to_list()
 
-reuters['prediction'] = text_clf.predict(reuters['Article'])
-reuters[reuters.prediction == 1]
+corpus['prediction'] = text_clf.predict(corpus['Article'])
+corpus[corpus.prediction == 1]
 
 ## huggingface
 from transformers import DistilBertTokenizerFast
@@ -174,7 +167,7 @@ df['orgs'] = df.text.apply(get_orgs)
 
 # remove 'co', 'AG', etc. (Schwenkler & Zheng, wikipedia.org/wiki/List_of_legal_entity_types_by_country)
 remove_tokens = ['co', 'inc', 'ag', 'gmbh', 'ltd', 'lp', 'lpc', 'llc', 'pllc', 'llp', 'plc', 'ltd/plc',
-    'corp', 'ab', 'cos', 'cia', 'sa', 'sas', 'reuters', 'reuter', 'based', 'rrb']
+    'corp', 'ab', 'cos', 'cia', 'sa', 'sas', 'corpus', 'reuter', 'based', 'rrb']
 
 # other way: find word tokens that are most common in database of company names
 # companies = pd.read_excel('Orbis_US_public.xlsx', names=['name', 'BvDID', 'ISIN', 'ticker', 'vat', 'city',
@@ -229,11 +222,11 @@ remove_tokens = ['co', 'inc', 'ag', 'gmbh', 'ltd', 'lp', 'lpc', 'llc', 'pllc', '
 #     small = parallelize_df(small, match_df)
 
 
-# read Reuters financial news database
-# news = pd.read_parquet('reuters.parquet.gzip')
+# read corpus financial news database
+# news = pd.read_parquet('corpus.parquet.gzip')
 
 # delete city and source
-# news['Article'] = news['Article'].str.split('(Reuters) - ').str[-1]
+# news['Article'] = news['Article'].str.split('(corpus) - ').str[-1]
 
 # delete special characters
 # news['Article'] = news['Article'].str.replace(r"\'", "\'")

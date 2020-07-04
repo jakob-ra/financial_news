@@ -23,3 +23,11 @@ plt.xticks(rotation=45)
 plt.title('Number of news articles per month')
 # plt.locator_params(nbins=30)
 plt.show()
+
+# Time distribution of kb deals
+plt.figure(figsize=(20,10))
+kb.groupby(pd.to_datetime(kb.date).dt.to_period('M')).date.count().plot(kind="bar")
+plt.xticks(rotation=45)
+plt.title('Number of alliances in KB per month')
+# plt.locator_params(nbins=10)
+plt.show()

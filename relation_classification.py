@@ -22,7 +22,7 @@ kb['alliance_id'] = kb['date'].apply(lambda x: uuid.uuid4())
 # read news articles
 corpus = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
 
-corpus_t = corpus.sample(n=100) # small sample
+corpus_t = corpus.sample(n=1000) # small sample
 
 ## construct common database to train and evaluate on
 db = kb[['date', 'text','alliance_id']].append(corpus_t)
@@ -30,12 +30,12 @@ db = kb[['date', 'text','alliance_id']].append(corpus_t)
 ## spacy solution
 
 nlp = spacy.load('en_core_web_sm') # spacy model
-sentencizer = nlp.create_pipe("sentencizer")
-example = 'This is the first sentence. Another short sentence starts here. Now we are in the third sentence.'
-nlp.add_pipe(sentencizer)
-
-doc = nlp(example)
-print(doc.sents)
+# sentencizer = nlp.create_pipe("sentencizer")
+# example = 'This is the first sentence. Another short sentence starts here. Now we are in the third sentence.'
+# nlp.add_pipe(sentencizer)
+#
+# doc = nlp(example)
+# print(doc.sents)
 
 # split into sentences
 db['text'] = db['text'].apply(lambda x: nltk.sent_tokenize(x))
@@ -138,6 +138,8 @@ corpus['pred'] = text_clf.predict(corpus.text)
 
 corpus[corpus.pred == 1].text.to_list()
 
-bloomberg.Link.iloc[0]
+len(corpus[corpus.pred == 1].text.to_list())
+
+# bloomberg.Link.iloc[0]
 
 
