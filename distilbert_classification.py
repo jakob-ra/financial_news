@@ -1,11 +1,12 @@
 ## huggingface
-from transformers import DistilBertTokenizerFast, DistilBertForTokenClassification
+from transformers import DistilBertTokenizerFast, DistilBertForTokenClassification, DistilBertForSequenceClassification
 import torch
 
 distil_bert = 'distilbert-base-cased'
 tokenizer = DistilBertTokenizerFast.from_pretrained(distil_bert, do_lower_case=False, add_special_tokens=True,
                                                 max_length=256, pad_to_max_length=True)
 token_clf = DistilBertForTokenClassification.from_pretrained(distil_bert)
+sequence_clf = DistilBertForSequenceClassification.from_pretrained(distil_bert)
 
 sentence = 'Apple and Microsoft plan to form a joint venture for the development of cloud-based computing ' \
            'infrastructure.'

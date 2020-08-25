@@ -2,10 +2,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # read Thomson SDC RND database
-kb = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/rnd_fin.parquet.gzip')
+kb = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/kb.parquet.gzip')
 
 # read news articles
 corpus = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
+
+# most frequent participants
+kb.participants.explode().value_counts()[:20]
+
+# most frequent sources
+kb.source.value_counts()[:30]
 
 # distribution of deal text lengths
 import matplotlib.pyplot as plt
