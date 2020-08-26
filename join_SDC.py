@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import glob
-from datetime import datetime
+from datetime import timedelta
 
 ### Joins all years of SDC data together
 
@@ -14,47 +14,71 @@ sdc = pd.concat((pd.read_excel(f, skiprows=3) for f in all_sdc))
 sdc.columns = sdc.columns.str.replace(' ', '')
 sdc.columns = sdc.columns.str.replace('\n', '')
 sdc.columns = sdc.columns.str.replace('-', '')
-sdc.columns = sdc.columns.str.replace('.1', '')
-
-# fix dates that are wrongly parsed as far in the future
-sdc.loc[sdc['AllianceDateAnnounced'] > pd.Timestamp(2050, 1, 1), 'AllianceDateAnnounced'] -= \
-    timedelta(days=365.25*100)
-
-pd.to_datetime(sdc['AllianceDateAnnounced'])
-date_columns = ['AllianceDateAnnounced', 'DateEffective', 'DateAllianceTerminated']
+sdc.columns = sdc.columns.str.replace('.1', 'Short')
 
 # fix dates
-wrong_years = [2063 + i for i in range(10)]
+date_columns = ['AllianceDateAnnounced', 'DateEffective', 'DateAllianceTerminated']
 for col in date_columns:
-    # sdc[col] = sdc[col].astype('str')
-    # sdc[col] = sdc[col].str.replace(' 00:00:00', '')
-    # for year in wrong_years:
-    #     sdc[col] = sdc[col].str.replace(str(year), str(year-100))
+    sdc[col] = sdc[col].astype('str')
+    sdc[col] = sdc[col].str.replace(' 00:00:00', '')
+    sdc[col] = pd.to_datetime(sdc[col], errors='coerce')
+    # some dates are parsed as wrong century
+    sdc.loc[sdc[col] > pd.Timestamp(2050, 1, 1), col] -= timedelta(
+        days=365.25 * 100)
+    sdc[col] = sdc[col].dt.date
+
+# sort by date announced
+sdc.sort_values('AllianceDateAnnounced', inplace=True)
+
+# save as excel file
+for col in date_columns:
+    sdc[col] = sdc[col].astype('str')
+sdc.to_excel(sdc_path + '/Full/SDC_Strategic_Alliances_Full.xlsx', index=False)
+for col in date_columns:
     sdc[col] = pd.to_datetime(sdc[col], errors='coerce')
 
-sdc.AllianceDateAnnounced.iloc[0]
+## Format further and save as pickle
+cols = sdc.columns
+participant_columns = [6,7,9,10,11,12,13,21,68,69,70,71,72,73,74,75,76,77]
+participant_columns = cols[participant_columns]
+flag_columns = [15,19,20,23,24,27,29,30,31,32,35,38,39,45,48,50,51,52,55,56,57,58,59,60,65,67]
+flag_columns = cols[flag_columns]
+text_columns = ['DealText','ParticipantBusinessDescriptionLong',
+    'LongBusinessDescription', 'ActivityDescription',
+    'CapitalizationText', 'ApplicationText']
+other_list_columns = ['ActivityDescription', 'Source', 'SourceShort']
 
-# keep only date (not time)
-sdc['AllianceDateAnnounced'] = sdc['AllianceDateAnnounced'].dt.date
+# separate multiline Participant cells and other list columns into lists
+for col in participant_columns:
+    sdc[col] = sdc[col].str.split('\n')
 
-# separate multiline Participants cell into list
-sdc['participants'] = sdc['participants'].str.split('\n')
-sdc['parent_participants'] = sdc['parent_participants'].str.split('\n')
-sdc['participant_country'] = sdc['participant_country'].str.split('\n')
+# separate other list columns into lists
+for col in other_list_columns:
+    sdc[col] = sdc[col].str.split('\n')
 
-# replace new line character \n with space in deal text
-sdc['text'] = sdc['text'].str.replace('\n', ' ')
+# format texts
+for col in text_columns:
+    # convert to string
+    sdc[col] = sdc[col].astype('str')
+    # replace new line character \n with space in texts
+    sdc[col] = sdc[col].str.replace('\n', ' ')
+    # remove double spaces
+    sdc[col] = sdc[col].str.replace('  ', ' ')
 
-# remove double spaces
-sdc['text'] = sdc['text'].str.replace('  ', ' ')
+## fix flag columns - some have wrong values (likely corresponding to other columns)
+print({c: sdc[c].unique() for c in sdc[flag_columns]})
 
-# add source tag
-sdc['source'] = 'ThomsonSDC'
+# set correct entries to 1/0
+flag_valid_entries = dict(yes=1, Yes=1, Y=1, y=1, No=0, no=0,N=0, n=0)
+sdc[flag_columns] = sdc[flag_columns].replace(flag_valid_entries)
 
-sdc['AllianceDateAnnounced'].iloc[0]
+# convert to numeric and set wrong entries nan
+for col in flag_columns:
+    sdc[col] = pd.to_numeric(sdc[col], errors='coerce')
 
-py_date = xlrd.xldate.xldate_as_datetime(sdc['AllianceDateAnnounced'].iloc[0])
+# check that we are only left with values in (0,1,nan)
+print(pd.concat([pd.Series(sdc[c].unique()) for c in sdc[flag_columns]]).unique())
 
-sdc.columns
+sdc.to_pickle(sdc_path + '/Full/SDC_Strategic_Alliances_Full.pkl')
 
-pd.read_excel(all_sdc[0], skiprows=3, usecols=[0])
+
