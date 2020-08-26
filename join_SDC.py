@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import glob
 from datetime import timedelta
+import numpy as np
+import datetime
 
 ### Joins all years of SDC data together
 
@@ -75,9 +77,16 @@ sdc[flag_columns] = sdc[flag_columns].replace(flag_valid_entries)
 # convert to numeric and set wrong entries nan
 for col in flag_columns:
     sdc[col] = pd.to_numeric(sdc[col], errors='coerce')
+    sdc.loc[sdc[col] > 1, col] = np.nan
 
 # check that we are only left with values in (0,1,nan)
 print(pd.concat([pd.Series(sdc[c].unique()) for c in sdc[flag_columns]]).unique())
+
+# remove rows with no date or text
+sdc.dropna(subset=['AllianceDateAnnounced', 'DealText'], how='any', inplace=True)
+
+# filter for years >=1985
+sdc = sdc[sdc['AllianceDateAnnounced'].dt.date >= datetime.date(1985, 1, 1)]
 
 sdc.to_pickle(sdc_path + '/Full/SDC_Strategic_Alliances_Full.pkl')
 
