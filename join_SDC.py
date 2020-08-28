@@ -82,6 +82,22 @@ for col in flag_columns:
 # check that we are only left with values in (0,1,nan)
 print(pd.concat([pd.Series(sdc[c].unique()) for c in sdc[flag_columns]]).unique())
 
+## FILTERING
+
+# sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
+
+# drop observations with missing values in flags
+sdc.dropna(subset=flag_columns, inplace=True)
+
+# filter for only completed or pending status
+sdc = sdc[sdc.Status.isin(['Completed/Signed', 'Pending'])]
+
+# some incorrect deal texts seem to belong to the application/purpose column. Example text 'To build a ...'
+print(sdc[sdc.DealText.str.startswith('To ')].DealText.size)
+
+# filter out these wrong deal texts
+sdc = sdc[~sdc.DealText.str.startswith('To ')]
+
 # remove rows with no date or text
 sdc.dropna(subset=['AllianceDateAnnounced', 'DealText'], how='any', inplace=True)
 
