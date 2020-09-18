@@ -115,7 +115,13 @@ news['article'] = news['article'].apply(lambda str: str.split('(Reuters) - ')[-1
 # Add headline as sentence to text
 news['text'] = news['headline'] + '. ' + news['article']
 news.drop(columns=['headline','article'], inplace=True)
-news = news[news.text.str.len() > 5] # remove empty articles
+
+# remove empty articles
+news = news[news.text.str.len() > 5]
+
+# get rid of useless articles
+news = news[~news.text.str.startswith('TRADING TO RESUME AT')]
+
 news.reset_index(drop=True, inplace=True)
 
 news.to_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
