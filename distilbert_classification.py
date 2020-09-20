@@ -22,7 +22,7 @@ test = db.sample(n=10)
 token_clf(tokenizer.encode_plus(sentence))
 tokenizer.batch_encode_plus(test.text.to_list())
 
-
+kb
 ## spacy
 def get_sequences_with_2_orgs(text, dist=150):
     ''' Uses spacy NER to identify organisations. If two organizations are detected within dist

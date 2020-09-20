@@ -90,7 +90,7 @@ print(pd.concat([pd.Series(sdc[c].unique()) for c in sdc[flag_columns]]).unique(
 sdc.dropna(subset=flag_columns, inplace=True)
 
 # filter for only completed or pending status
-sdc = sdc[sdc.Status.isin(['Completed/Signed', 'Pending'])]
+sdc = sdc[sdc.Status.isin(['Completed/Signed', 'Pending', 'Terminated'])]
 
 # some incorrect deal texts seem to belong to the application/purpose column. Example text 'To build a ...'
 print(sdc[sdc.DealText.str.startswith('To ')].DealText.size)
