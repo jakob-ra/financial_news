@@ -219,7 +219,18 @@ plt.title('Article lengths')
 plt.locator_params(nbins=20)
 plt.show()
 
-len(corpus[corpus.words < 500])
+# plot distribution of participants
+part_counts = kb.Participants.str.len().value_counts(
+    normalize=True).sort_index()
+part_counts_larger_10 = part_counts.iloc[11:].sum()
+part_counts = part_counts.iloc[:11]
+part_counts = part_counts.append(pd.Series({'>10': part_counts_larger_10}))
+part_counts.plot(kind='bar')
+plt.xlabel('Number of participants')
+plt.ylabel('Share of deals')
+plt.savefig('PartDist.png')
+plt.show()
+
 # convert all plots to grayscale
 plots_path = '/Users/Jakob/Documents/Github/financial_news'
 all_plots = glob.glob(os.path.join(plots_path, "*.png"))
@@ -227,125 +238,6 @@ all_plots = [x for x in all_plots if not x.endswith('_gray.png')]
 for plot in all_plots:
     gray_plot = Image.open(plot).convert("L")
     gray_plot.save(plot.replace('.png', '') + '_gray' + '.png')
-
-
-# convert SDC to proper format
-sdc['Deal'] = 1 # flag all SDC examples as positive
-sdc.loc[sdc.Status == 'Terminated', 'Deal'] = 0 # except for the terminated ones
-
-labels = ['Deal', 'Status', 'JointVentureFlag', 'MarketingAgreementFlag', 'ManufacturingAgreementFlag',
-    'ResearchandDevelopmentAgreementFlag', 'LicensingFlag', 'SupplyAgreementFlag',
-    'ExplorationAgreementFlag', 'TechnologyTransfer']
-
-kb = sdc[['AllianceDateAnnounced', 'DealNumber', 'DealText'] + labels].copy()
-
-# make column names easier to work with
-kb.columns = kb.columns.str.replace('Flag', '')
-kb.columns = kb.columns.str.replace('Agreement', '')
-kb.rename(columns={'Status': 'Pending', 'DealNumber': 'ID', 'AllianceDateAnnounced': 'Date', 'DealText': \
-    'Text'}, inplace=True)
-
-# recode status
-kb['Pending'].replace('Pending', 1, inplace=True)
-kb['Pending'].replace('Completed/Signed', 0, inplace=True)
-kb['Pending'].replace('Terminated', 0, inplace=True)
-
-# get organizations
-import spacy
-
-# Load model
-nlp = spacy.load('en_core_web_sm') # spacy model
-
-def get_orgs(text):
-    '''
-    This function takes a text. Uses the Spacy model.
-    The model will tokenize, POS-tag and recognize the entities named in the text.
-    Returns a list of entities in the text that were recognized as organizations.
-    '''
-    # Apply the model
-    tags = nlp(text)
-    entities = [ent.text.replace('\'', '') for ent in tags.ents if ent.label_=='ORG'] # also remove apostrophes
-    entitie_positions = [ent.start for ent in tags.ents if ent.label_=='ORG']
-    # Return the list of entities recognized as organizations
-    return entities, entitie_positions
-
-get_orgs('Apple and Microsoft plan to form a joint venture for the development of cloud-based '
-             'computing infrastrucutre.')
-
-# save recognized organizations in new column
-kb['orgs'] = kb.Text.apply(get_orgs)
-
-kb.to_pickle('/Users/Jakob/Documents/financial_news_data/kb.pkl')
-kb = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/kb.pkl')
-
-# merge with negative examples from corpus
-# corpus_sample = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/corpus_sample.parquet.gzip')
-news = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
-news.rename(columns={'date': 'Date', 'link': 'ID', 'text': 'Text'}, inplace=True)
-
-# this takes ~9 hours
-news['orgs'] = news.Text.apply(get_orgs)
-
-news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_orgs.pkl')
-news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_orgs.pkl')
-
-# remove year 2012 from KB and Corpus
-kb_fil = kb[pd.to_datetime(kb.Date).dt.to_period('Y').astype(str) != '2012']
-news_fil = news[pd.to_datetime(news.Date).dt.to_period('Y').astype(str) != '2012']
-
-# remove articles with keywords to get good negative examples
-keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and development',
-    'manufacturing agreement', 'licensing agreement', 'marketing agreement', 'exploration agreement']
-
-import re
-neg = news_fil[~news_fil.Text.str.contains('|'.join(keywords), flags=re.IGNORECASE)]
-
-# fit length (in sentences) distribution to kb dealtext length
-import numpy as np
-lengths_dist = kb.Text.str.split('.').str.len().value_counts(normalize=True)
-np.random.choice(lengths_dist.index, p=lengths_dist.values)
-
-# reduce article length to match the examples in KB (in terms of sentences)
-neg['Text'] =  neg.Text.apply(lambda x: ' '.join(re.split(r'(?<=[.:;])\s', x)[:np.random.choice(
-    lengths_dist.index, p=lengths_dist.values)]))
-
-neg = neg[neg.Text.str.split('.').str.len() < 50]
-
-# randomly sample documents as negative examples
-random_neg = neg.sample(n=len(kb)-len(kb[kb.Deal == 0])).copy()
-random_neg.columns
-kb.columns
-full = kb_fil.append(neg)
-full.fillna(0, inplace=True)
-
-full.to_pickle('/Users/Jakob/Documents/financial_news_data/full.pkl')
-full = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/full.pkl')
-
-# train-test split
-test_size = 0.5
-test = full.sample(frac=test_size, random_state=42)
-train = full[~full.Text.isin(test.Text)]
-
-# reduce training size for testing purposes
-# test = test.sample(n=100)
-# train = train.sample(n=100)
-
-# save as csv
-test.to_csv('/Users/Jakob/Documents/financial_news_data/model/data/test.csv')
-train.to_csv('/Users/Jakob/Documents/financial_news_data/model/data/train.csv')
-
-# sdc = full[full.Deal == 1].copy()
-# sdc.drop(columns='Deal', inplace=True)
-# sdc.drop(columns=['Marketing', 'Manufacturing', 'Licensing', 'Supply', 'Exploration',
-#     'TechnologyTransfer'],
-#     inplace=True)
-#
-# multi-label stratified split
-# from skmultilearn.model_selection import iterative_train_test_split
-# X = sdc.Text
-# y = sdc[['Pending', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment', 'Licensing',
-#     'Supply', 'Exploration', 'TechnologyTransfer']]
-# X_train, X_test, y_train, y_test = iterative_train_test_split(X,y, test_size=0.1)
 
 # find most common bigrams
 # from collections import Counter
@@ -396,32 +288,32 @@ train.to_csv('/Users/Jakob/Documents/financial_news_data/model/data/train.csv')
 # keywords = extract_topn_from_vector(feature_names,sorted_items,100)
 
 # Tokenizer demonstration
-from transformers import BertTokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-sent = "Siemens AG and Atos SE formed a strategic alliance to jointly develop new IT products."
-print(tokenizer.tokenize(sent))
-tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sent))
-
-sdc.DealText.sample().values
-sdc.columns
-
-sdc.colum
-
-sdc[sdc.DealText.str.len()<100].DealText.sample().values
-sdc[sdc.DealText.str.contains('Siemens')].DealText.sample().values
-
-# Attention demonstration
-from transformers import BertTokenizer, BertModel
-
-model = BertModel.from_pretrained('bert-large-cased', output_attentions=True)
-tokenizer = BertTokenizer.from_pretrained('bert-large-cased', do_lower_case=True)  # C
-
-from bertviz import head_view
-
-def show_head_view(model, tokenizer, sentence):  # B
-    input_ids = tokenizer.encode(sentence, return_tensors='pt', add_special_tokens=True)  # C
-    attention = model(input_ids)[-1]  # D
-    tokens = tokenizer.convert_ids_to_tokens(list(input_ids[0]))
-    head_view(attention, tokens)
-
-show_head_view(model, tokenizer, sent)
+# from transformers import BertTokenizer
+# tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+# sent = "Siemens AG and Atos SE formed a strategic alliance to jointly develop new IT products."
+# print(tokenizer.tokenize(sent))
+# tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sent))
+#
+# sdc.DealText.sample().values
+# sdc.columns
+#
+# sdc.colum
+#
+# sdc[sdc.DealText.str.len()<100].DealText.sample().values
+# sdc[sdc.DealText.str.contains('Siemens')].DealText.sample().values
+#
+# # Attention demonstration
+# from transformers import BertTokenizer, BertModel
+#
+# model = BertModel.from_pretrained('bert-large-cased', output_attentions=True)
+# tokenizer = BertTokenizer.from_pretrained('bert-large-cased', do_lower_case=True)  # C
+#
+# from bertviz import head_view
+#
+# def show_head_view(model, tokenizer, sentence):  # B
+#     input_ids = tokenizer.encode(sentence, return_tensors='pt', add_special_tokens=True)  # C
+#     attention = model(input_ids)[-1]  # D
+#     tokens = tokenizer.convert_ids_to_tokens(list(input_ids[0]))
+#     head_view(attention, tokens)
+#
+# show_head_view(model, tokenizer, sent)
