@@ -126,6 +126,8 @@ news.reset_index(drop=True, inplace=True)
 
 news.to_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
 
+# news = pd.read_parquet('/Users/Jakob/Documents/financial_news_data/news.parquet.gzip')
+
 # create small sample for negative examples for classifier training
 corpus_sample = news.sample(n=20000) # small sample
 

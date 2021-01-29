@@ -104,6 +104,43 @@ sdc.dropna(subset=['AllianceDateAnnounced', 'DealText'], how='any', inplace=True
 # filter for years >=1985
 sdc = sdc[sdc['AllianceDateAnnounced'].dt.date >= datetime.date(1985, 1, 1)]
 
+# SAVE
 sdc.to_pickle(sdc_path + '/Full/SDC_Strategic_Alliances_Full.pkl')
 
+sdc = pd.read_pickle(sdc_path + '/Full/SDC_Strategic_Alliances_Full.pkl')
 
+# filter for Swiss
+sdc = pd.read_excel(sdc_path + '/Full/SDC_Strategic_Alliances_Full.xlsx')
+
+sdc_switz = sdc[(sdc['ParticipantNation'].apply(lambda x: str(x)).str.contains('Switzerland')) |
+                (sdc['ParticipantUltimateParentNation'].apply(lambda x: str(x)).str.contains('Switzerland'))]
+
+sdc_switz.reset_index(inplace=True, drop=True)
+
+sdc_switz.to_excel(sdc_path + '/Full/SDC_Swiss_Firms.xlsx')
+
+sdc = pd.read_pickle(sdc_path + '/Full/SDC_Strategic_Alliances_Full.pkl')
+
+participant_identifiers = ['ParticipantsinVenture/Alliance(ShortName)', 'Parti.CUSIP', 'ParticipantNation']
+parent_identifiers = ['ParticipantUltimateParentName', 'UltimateParentCUSIP', \
+    'ParticipantUltimateParentNation']
+participants = sdc[participant_identifiers]
+participants.columns = ['Name', 'CUSIP', 'Nation']
+parents = sdc[parent_identifiers]
+parents.columns = ['Name', 'CUSIP', 'Nation']
+participants = participants.append(parents)
+
+participants = participants[participants.Name.str.len() == participants.CUSIP.str.len()]
+participants = participants[participants.Name.str.len() == participants.Nation.str.len()]
+participants = participants[participants.CUSIP.str.len() == participants.Nation.str.len()]
+
+firms = pd.concat([participants.Name.explode(), participants.CUSIP.explode(),
+    participants.Nation.explode()], axis=1)
+
+firms.drop_duplicates(inplace=True)
+
+firms.to_csv(sdc_path + '/Full/Firm_List.csv', index=False)
+
+# filter swiss
+firms_swiss = firms[firms.Nation == 'Switzerland']
+firms_swiss.to_csv(sdc_path + '/Full/Firm_List_Switzerland.csv', index=False)
