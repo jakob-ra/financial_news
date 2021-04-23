@@ -15,6 +15,74 @@ rc('savefig', **{'dpi': 150, 'bbox': 'tight', 'format': 'png'})
 # read Thomson SDC RND database
 sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
 
+# keyword extraction
+# from rake_nltk import Rake
+#
+# r = Rake() # Uses stopwords for english from NLTK, and all puntuation characters.
+#
+# r.extract_keywords_from_text(' '.join(sdc.DealText.values))
+#
+# r.get_ranked_phrases()[:20] # To get keyword phrases ranked highest to lowest.
+
+#
+# from sklearn.feature_extraction.text import CountVectorizer
+#
+# cv = CountVectorizer(max_df=0.9,min_df=2, stop_words='english')
+# dtm  = cv.fit_transform(sdc['DealText'])
+#
+# from sklearn.decomposition import LatentDirichletAllocation
+# lda = LatentDirichletAllocation(n_components=5,random_state=101)
+#
+# lda_fit  = lda.fit(dtm)
+#
+# # understanding each topics top 10 common words
+# for id_value, value in enumerate(lda_fit.components_):
+#    print(f"The topic would be {id_value}")
+#   print([cv.get_feature_names()[index] for index in value.argsort()   [-10:]])
+#    print("\n")
+
+import re
+
+def pre_process(text):
+    # lowercase
+    text = text.lower()
+
+    # remove tags
+    text = re.sub("", "", text)
+
+    # remove special characters and digits
+    text = re.sub("(\\d|\\W)+", " ", text)
+
+    text = ' '.join([w for w in text.split() if len(w)>1]) # remove one letter words
+    return text
+
+sdc.DealText.sample().values
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+sdc['cleaned_text'] = sdc.DealText.apply(lambda x: pre_process(x))
+
+vectorizer = TfidfVectorizer(ngram_range = (1, 2), stop_words='english', max_df=0.2, max_features=50000)
+vectorizer = TfidfVectorizer(ngram_range = (2, 3), max_features=50000)
+df = corpus.text.sample(10000).apply(lambda x: pre_process(x))
+
+for flag in plot_cross_flags:
+    deal_texts = ' '.join(sdc.loc[sdc[flag] == 1, 'cleaned_text'].values)
+    df = df.append(pd.Series(deal_texts))
+
+vectorizer.fit(df)
+features = vectorizer.transform(df.iloc[10000:])
+scores = (features.toarray())
+feature_names = vectorizer.get_feature_names()
+
+data = []
+for col, term in enumerate(feature_names):
+    data.append((term, features[8,col] ))
+ranking = pd.DataFrame(data, columns = ['term','rank'])
+terms = (ranking.sort_values('rank', ascending = False))
+for term in terms.term[:200]:
+    print(term)
+
 # plot deal text length (in words)
 sdc.DealText.str.split(' ').str.len().hist()
 plt.show()

@@ -21,3 +21,18 @@ results = pd.DataFrame(client.results)
 html = results.html.iloc[0]
 
 print(html2text(html))
+
+
+import warcio
+
+from warcio.archiveiterator import ArchiveIterator
+
+segment_path = '/Users/Jakob/Downloads/segment1'
+
+with open(segment_path, 'rb') as stream:
+    for record in ArchiveIterator(stream):
+        text = str(record.content_stream().read().decode('utf-8'))
+        if 'corona' in text:
+            print(text)
+
+import warc
