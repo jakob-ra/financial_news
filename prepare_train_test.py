@@ -2,9 +2,17 @@ import pandas as pd
 import re
 import spacy
 import numpy as np
+from itertools import permutations
+from tqdm import tqdm
+tqdm.pandas()
 
 # read Thomson SDC RND database
 sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
+
+
+sdc[['DealText', 'ParticipantsinVenture/Alliance(ShortName)', 'ParticipantsinVenture/Alliance(LongNamShortLine)',
+     'ParticipantsinVenture/Alliance(LongName3Lines)']].sample().values
+
 
 # there are 12 observations that are not tagged as SA or JV
 len(sdc) - sdc[['StrategicAlliance', 'JointVentureFlag']].any(axis=1).sum()
@@ -24,7 +32,8 @@ labels = ['Deal', 'Status', 'JointVentureFlag', 'MarketingAgreementFlag', 'Manuf
     'ResearchandDevelopmentAgreementFlag', 'LicensingFlag', 'SupplyAgreementFlag',
     'ExplorationAgreementFlag', 'TechnologyTransfer']
 
-kb = sdc[['AllianceDateAnnounced', 'DealNumber', 'DealText'] + labels].copy()
+kb = sdc[['AllianceDateAnnounced', 'DealNumber', 'DealText', 'ParticipantsinVenture/Alliance(ShortName)'] + labels].copy()
+kb.rename(columns={'ParticipantsinVenture/Alliance(ShortName)': 'Participants'}, inplace=True)
 
 # make column names easier to work with
 kb.columns = kb.columns.str.replace('Flag', '')
@@ -36,6 +45,104 @@ kb.rename(columns={'Status': 'Pending', 'DealNumber': 'ID', 'AllianceDateAnnounc
 kb['Pending'].replace('Pending', 1, inplace=True)
 kb['Pending'].replace('Completed/Signed', 0, inplace=True)
 kb['Pending'].replace('Terminated', 0, inplace=True)
+
+kb.reset_index(inplace=True)
+
+text = 'United Energy Ltd and Westcoast Energy Australia planned to form a joint venture.'
+
+# take positive examples
+kb = kb[(kb.Deal) & (kb.Pending == 0)]
+# with at least 2 participants
+kb = kb[kb.Participants.str.len() > 1]
+
+
+
+
+kb = kb.sample(100)
+
+flags = ['JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
+       'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
+## does it work for multiple relation extraction?
+kb[flags] = kb[flags].astype('bool')
+kb['StrategicAlliance'] = ~kb.JointVenture # every deal that is not a JV is a SA
+flags += ['StrategicAlliance']
+
+def match_entities(df):
+    participants = df.Participants
+    nlp = spacy.blank('en')
+    ruler = nlp.add_pipe("entity_ruler")
+    patterns = [{"label": "ORG", "pattern": participant} for participant in participants]
+    ruler.add_patterns(patterns)
+    doc = nlp(df.Text)
+    tokens = []
+    for ent in doc.ents:
+        tokens.append(
+                {'text'       : ent.text, 'start': ent.start_char, 'end': ent.end_char,
+                 'token_start': ent.start, 'token_end': ent.end, 'entityLabel': ent.label_})
+
+    return tokens
+
+kb['tokens'] = kb.progress_apply(match_entities, axis=1)
+
+# df = pd.DataFrame({'Text': ['Prenetics Ltd and Caterair decided to form a joint venture. Prenetics Ltd will hold.'],
+#                    'Participants': [['Prenetics Ltd', 'Caterair']]})
+
+#
+# kb = kb[kb.tokens.str.len() == kb.Participants.str.len()] # keep the exact matches
+#
+# test_df = kb.sample()
+# participants = test_df.tokens.iloc[0]
+# # take only first mentions of participants
+# participants = pd.DataFrame(participants)
+# participants = participants.drop_duplicates(subset=['text'], keep='first')
+#
+# participant_names = participants.text.to_list()
+#
+# relations = []
+# for flag in flags: # cycle through flags
+#     if test_df[flag].iloc[0]: # for true flags, append relation between each two-way permutation of participants
+#         for permut in permutations(participant_names):
+#             start_child = participants[participants.text == permut[0]].token_start.iloc[0]
+#             start_head = participants[participants.text == permut[1]].token_start.iloc[0]
+#             relations.append({"child": start_child, "head": start_head, "relationLabel": flag})
+
+
+def match_relations(df):
+    participants = df.tokens
+    # take only first mentions of participants
+    participants = pd.DataFrame(participants)
+    participants = participants.drop_duplicates(subset=['text'], keep='first')
+    participant_names = participants.text.to_list()
+    participants.set_index('text', inplace=True)
+
+    relations = []
+    for flag in flags:  # cycle through flags
+        if df[flag]:  # for true flags, append relation between each two-way permutation of participants
+            for permut in permutations(participant_names):
+                start_child = participants.loc[permut[0]].token_start
+                start_head = participants.loc[permut[1]].token_start
+                relations.append({"child": start_child, "head": start_head, "relationLabel": flag})
+
+    return relations
+
+kb['relations'] = kb.progress_apply(match_relations, axis=1)
+
+kb['document'] = kb.Text
+
+kb_dict_format = kb[['document', 'tokens', 'relations']].to_dict('records')
+textfile = open('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.txt', "w")
+textfile.write(str(kb_dict_format))
+
+# {"text": "The up-regulation of IL-1beta message could be mediated by the latent membrane protein-1, EBV nuclear proteins 2, 3, 4, and 6 genes.",
+# "spans": [{"text": "IL-1beta", "start": 21, "token_start": 5, "token_end": 5, "end": 29, "type": "span", "label": "GGP"}],
+# "meta": {"source": "BioNLP 2011 Genia Shared Task, PMID-9878621.txt"},
+# "_input_hash": -400334998,
+# "_task_hash": 1861007191,
+# "tokens": [{"text": "The", "start": 0, "end": 3, "id": 0, "ws": true, "disabled": true}],
+# "_session_id": null,
+# "_view_id": "relations",
+# "relations": [{"head": 14, "child": 5, "head_span": {"start": 63, "end": 88, "token_start": 12, "token_end": 14, "label": "GGP"}, "child_span": {"start": 21, "end": 29, "token_start": 5, "token_end": 5, "label": "GGP"}, "color": "#ffd882", "label": "Pos-Reg"}],
+# "answer": "accept"}
 
 # Load spacy model
 nlp = spacy.load('en_core_web_sm') # spacy model
@@ -135,12 +242,8 @@ kb.reset_index(inplace=True, drop=True)
 kb['orgs_positions'] = kb.orgs.apply(lambda x: x[1]).copy()
 kb['orgs'] = kb.orgs.apply(lambda x: x[0]).copy()
 
-# get back participants column from SDC
-df_participants = sdc[['DealNumber', 'ParticipantsinVenture/Alliance(ShortName)']]
-df_participants.columns = ['ID', 'Participants']
 # remove KB entries with less than two identified participants
-df_participants = df_participants[df_participants.Participants.str.len() >= 2]
-kb = kb.merge(df_participants, how='left', on=['ID'])
+kb = kb[kb.Participants.str.len() >= 2]
 kb.dropna(subset=['Participants'], inplace=True)
 
 for col in ['orgs', 'Participants']:
@@ -158,17 +261,24 @@ for col in ['orgs', 'Participants']:
         for x in list])
 
     # strip whitespace from both sides
-    kb[col] = kb.orgs.apply(lambda list: [x.strip() for x in list])
+    kb[col] = kb[col].apply(lambda list: [x.strip() for x in list])
+
+kb.orgs.sample().values
 
 # determine share of recognized participants
-kb['recognized_participants'] = kb.apply(lambda kb: len(set(kb.orgs) & set(kb.Participants)), axis=1)
-kb['share_recognized_participants'] = kb.recognized_participants/kb.orgs.str.len() # get share
+kb['recognized_participants'] = kb.Participants.apply(lambda x: len(set(x)))
+# kb['recognized_participants'] = kb.apply(lambda kb: len(set(kb.orgs)) == set(kb.Participants)), axis=1)
+# kb['share_recognized_participants'] = kb.recognized_participants/kb.orgs.str.len() # get share
 print(kb.share_recognized_participants.mean()) # take mean over all KB entries
 
+kb['recognized_participants'] = kb.orgs.apply(set) == kb.Participants.apply(set)
+kb.recognized_participants.mean()
+
+
 # remove periods after legal identifiers in order to get better sentence splits
-legal_ident = ['co', 'inc', 'ag', 'gmbh', 'ltd', 'lp', 'lpc', 'llc', 'pllc', 'llp', 'plc', 'ltd/plc', 'corp',
-    'ab', 'cos', 'cia', 'sa', 'as', 'sas', 'corpus', 'reuter', 'reuters', 'based', 'rrb', 'rrb',
-    'corporation', 'and']
+# legal_ident = ['co', 'inc', 'ag', 'gmbh', 'ltd', 'lp', 'lpc', 'llc', 'pllc', 'llp', 'plc', 'ltd/plc', 'corp',
+#     'ab', 'cos', 'cia', 'sa', 'as', 'sas', 'corpus', 'reuter', 'reuters', 'based', 'rrb', 'rrb',
+#     'corporation', 'and']
 
 
 # sdc.drop(columns='Deal', inplace=True)
