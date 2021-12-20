@@ -6,12 +6,23 @@ from itertools import permutations
 from tqdm import tqdm
 tqdm.pandas()
 
+np.random.seed(42) # set random seed
+
+share_train, share_test, share_dev = .6, .2, .2
+
 # read Thomson SDC RND database
 sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
 
+sdc['DealNumber'] = sdc.DealNumber.astype(str)
+sdc['DealNumber'] = sdc.DealNumber.apply(lambda x: x.split('.')[0])
 
-sdc[['DealText', 'ParticipantsinVenture/Alliance(ShortName)', 'ParticipantsinVenture/Alliance(LongNamShortLine)',
-     'ParticipantsinVenture/Alliance(LongName3Lines)']].sample().values
+sdc.drop_duplicates(subset=['DealText'], inplace=True)
+
+sdc.set_index('DealNumber', inplace=True, drop=False)
+
+# check different name columns
+# sdc[['DealText', 'ParticipantsinVenture/Alliance(ShortName)', 'ParticipantsinVenture/Alliance(LongNamShortLine)',
+#      'ParticipantsinVenture/Alliance(LongName3Lines)']].sample().values
 
 
 # there are 12 observations that are not tagged as SA or JV
@@ -46,8 +57,6 @@ kb['Pending'].replace('Pending', 1, inplace=True)
 kb['Pending'].replace('Completed/Signed', 0, inplace=True)
 kb['Pending'].replace('Terminated', 0, inplace=True)
 
-kb.reset_index(inplace=True)
-
 text = 'United Energy Ltd and Westcoast Energy Australia planned to form a joint venture.'
 
 # take positive examples
@@ -55,25 +64,21 @@ kb = kb[(kb.Deal) & (kb.Pending == 0)]
 # with at least 2 participants
 kb = kb[kb.Participants.str.len() > 1]
 
-
-
-
-kb = kb.sample(100)
-
 flags = ['JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
        'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
 ## does it work for multiple relation extraction?
 kb[flags] = kb[flags].astype('bool')
 kb['StrategicAlliance'] = ~kb.JointVenture # every deal that is not a JV is a SA
-flags += ['StrategicAlliance']
+flags = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
+       'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
 
-def match_entities(df):
-    participants = df.Participants
+
+def match_entities(entities, text):
     nlp = spacy.blank('en')
     ruler = nlp.add_pipe("entity_ruler")
-    patterns = [{"label": "ORG", "pattern": participant} for participant in participants]
+    patterns = [{"label": "ORG", "pattern": entity} for entity in entities]
     ruler.add_patterns(patterns)
-    doc = nlp(df.Text)
+    doc = nlp(text)
     tokens = []
     for ent in doc.ents:
         tokens.append(
@@ -82,42 +87,27 @@ def match_entities(df):
 
     return tokens
 
-kb['tokens'] = kb.progress_apply(match_entities, axis=1)
+kb['tokens'] = kb.progress_apply(lambda x: match_entities(x.Participants, x.Text), axis=1)
 
-# df = pd.DataFrame({'Text': ['Prenetics Ltd and Caterair decided to form a joint venture. Prenetics Ltd will hold.'],
-#                    'Participants': [['Prenetics Ltd', 'Caterair']]})
-
-#
-# kb = kb[kb.tokens.str.len() == kb.Participants.str.len()] # keep the exact matches
-#
-# test_df = kb.sample()
-# participants = test_df.tokens.iloc[0]
-# # take only first mentions of participants
-# participants = pd.DataFrame(participants)
-# participants = participants.drop_duplicates(subset=['text'], keep='first')
-#
-# participant_names = participants.text.to_list()
-#
-# relations = []
-# for flag in flags: # cycle through flags
-#     if test_df[flag].iloc[0]: # for true flags, append relation between each two-way permutation of participants
-#         for permut in permutations(participant_names):
-#             start_child = participants[participants.text == permut[0]].token_start.iloc[0]
-#             start_head = participants[participants.text == permut[1]].token_start.iloc[0]
-#             relations.append({"child": start_child, "head": start_head, "relationLabel": flag})
+# keep the exact matches
+kb = kb[kb.tokens.apply(lambda tokens: set([token['text'] for token in tokens])) == kb.Participants.apply(set)]
+kb = kb[kb.tokens.apply(lambda x: set(token['text'] for token in x)).str.len()>1]
 
 
-def match_relations(df):
-    participants = df.tokens
+def match_relations(row):
+    participants = row.tokens
     # take only first mentions of participants
     participants = pd.DataFrame(participants)
     participants = participants.drop_duplicates(subset=['text'], keep='first')
     participant_names = participants.text.to_list()
     participants.set_index('text', inplace=True)
 
+    if len(participant_names) < 2:
+        raise ValueError('Alliances with less than two participants in the provided records.')
+
     relations = []
     for flag in flags:  # cycle through flags
-        if df[flag]:  # for true flags, append relation between each two-way permutation of participants
+        if row[flag]:  # for true flags, append relation between each two-way permutation of participants
             for permut in permutations(participant_names):
                 start_child = participants.loc[permut[0]].token_start
                 start_head = participants.loc[permut[1]].token_start
@@ -129,9 +119,30 @@ kb['relations'] = kb.progress_apply(match_relations, axis=1)
 
 kb['document'] = kb.Text
 
-kb_dict_format = kb[['document', 'tokens', 'relations']].to_dict('records')
-textfile = open('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.txt', "w")
-textfile.write(str(kb_dict_format))
+kb['meta'] = kb.ID.apply(lambda x: {'source': 'Thomson SDC alliances - Deal Number ' + str(x)})
+
+# split into train, test, dev
+kb = kb.sample(frac=1) # shuffle data set
+train, dev, test = np.split(kb, [int(share_train*len(kb)), int((share_train+share_dev)*len(kb))])
+
+def update_meta(meta: dict, new_key: str, value):
+    meta[new_key] = value
+
+    return meta
+
+kb.loc[train.index, 'meta'] = kb.loc[train.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'train'))
+kb.loc[dev.index, 'meta'] = kb.loc[dev.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'dev'))
+kb.loc[test.index, 'meta'] = kb.loc[test.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'test'))
+
+kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
+                                                orient='records', lines=True)
+
+kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
+                          orient='records', lines=True)
+
+kb.sample(100).to_json('/Users/Jakob/Documents/Github/relation_extraction_firm_alliances/assets/SDC_training_dict.json',
+                                                orient='records', lines=True)
+
 
 # {"text": "The up-regulation of IL-1beta message could be mediated by the latent membrane protein-1, EBV nuclear proteins 2, 3, 4, and 6 genes.",
 # "spans": [{"text": "IL-1beta", "start": 21, "token_start": 5, "token_end": 5, "end": 29, "type": "span", "label": "GGP"}],
@@ -292,3 +303,26 @@ kb.recognized_participants.mean()
 # y = sdc[['Pending', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment', 'Licensing',
 #     'Supply', 'Exploration', 'TechnologyTransfer']]
 # X_train, X_test, y_train, y_test = iterative_train_test_split(X,y, test_size=0.1)
+
+
+
+# df = pd.DataFrame({'Text': ['Prenetics Ltd and Caterair decided to form a joint venture. Prenetics Ltd will hold.'],
+#                    'Participants': [['Prenetics Ltd', 'Caterair']]})
+
+#
+#
+# test_df = kb.sample()
+# participants = test_df.tokens.iloc[0]
+# # take only first mentions of participants
+# participants = pd.DataFrame(participants)
+# participants = participants.drop_duplicates(subset=['text'], keep='first')
+#
+# participant_names = participants.text.to_list()
+#
+# relations = []
+# for flag in flags: # cycle through flags
+#     if test_df[flag].iloc[0]: # for true flags, append relation between each two-way permutation of participants
+#         for permut in permutations(participant_names):
+#             start_child = participants[participants.text == permut[0]].token_start.iloc[0]
+#             start_head = participants[participants.text == permut[1]].token_start.iloc[0]
+#             relations.append({"child": start_child, "head": start_head, "relationLabel": flag})
