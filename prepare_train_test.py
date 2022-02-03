@@ -69,9 +69,10 @@ flags = ['JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
 ## does it work for multiple relation extraction?
 kb[flags] = kb[flags].astype('bool')
 kb['StrategicAlliance'] = ~kb.JointVenture # every deal that is not a JV is a SA
+# flags = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
+#        'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
 flags = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
-       'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
-
+       'Licensing']
 
 def match_entities(entities, text):
     nlp = spacy.blank('en')
@@ -139,9 +140,103 @@ kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/
 
 kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
                           orient='records', lines=True)
+def remove_relations(input, remove_type: list):
+    output = []
+    for relation in input:
+        if relation['relationLabel'] not in remove_type:
+            output.append(relation)
 
-kb.sample(100).to_json('/Users/Jakob/Documents/Github/relation_extraction_firm_alliances/assets/SDC_training_dict.json',
+    return output
+
+kb['relations'] = kb.relations.apply(
+        lambda x: remove_relations(x, ['Supply', 'Exploration', 'TechnologyTransfer']))
+
+kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
                                                 orient='records', lines=True)
+
+kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
+                          orient='records', lines=True)
+
+# kb = kb[kb.meta.apply(lambda x: x['split'] == 'test')]
+# kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_test.json',
+#                                                 orient='records', lines=True)
+
+def extract_relations(input):
+    output = []
+    for relation in input:
+        output.append(relation['relationLabel'])
+
+    return set(output)
+
+kb['relation_types'] = kb.relations.apply(extract_relations)
+
+# create balance by random undersampling+
+rare_flags = {'Marketing', 'Manufacturing', 'Licensing', 'ResearchandDevelopment'}
+kb = kb[kb.relation_types.apply(lambda x: len(x.intersection(rare_flags))) > 0] # focus on examples with rare flags
+# kb = kb[kb.relation_types.apply(lambda x: len(x.intersection({'StrategicAlliance', 'Manufacturing'}))) < 2] # remove
+
+# drop some marketing & SA examples
+kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Marketing'}].sample(3000).index)
+kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Manufacturing'}].sample(1000).index)
+kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Licensing'}].sample(1000).index)
+
+kb.relation_types.explode().value_counts()
+kb.relations.sample().values
+kb.relation_types.value_counts()
+
+## add neg examples from news
+news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_orgs.pkl')
+
+# fit length (in sentences) distribution to kb dealtext length
+lengths_dist = kb.document.str.split('.').str.len().value_counts(normalize=True)
+
+# reduce article length to match the examples in KB (in terms of sentences)
+news['Text'] =  news.Text.apply(lambda x: ' '.join(re.split(r'(?<=[.:;])\s', x)[:np.random.choice(
+    lengths_dist.index, p=lengths_dist.values)]))
+news = news[news.Text.str.split('.').str.len() < 50].copy()
+
+news = news.sample(len(kb))
+
+# remove articles with keywords to get good negative examples
+keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and development',
+    'manufacturing agreement', 'licensing agreement', 'marketing agreement', 'exploration agreement',
+    'alliance venture', 'form joint', 'Formed joint', 'Signed agreement', 'Planned to form',
+    'Agreement disclosed', 'venture agreement', 'entered strategic', 'marketing rights', 'Marketing services',
+    'Agreed to manufacture', 'development services', 'Research and development', 'Alliance to develop',
+    'granted license', 'granted licensing rights', 'exclusive rights', 'License to manufacture',
+    'distribution agreement', 'alliance distribution', 'exploration services', 'marketing services',
+    'alliance to manufacture', 'alliance to wholesale', 'Agreement to manufacture and market',
+    'Agreement to jointly develop', 'Venture to jointly develop']
+
+news = news[~news.Text.str.contains('|'.join(keywords), flags=re.IGNORECASE)]
+
+news['orgs'] = news.orgs.apply(lambda x: x[0])
+news = news[news.orgs.str.len() > 1] # take only docs with at least two orgs
+news['tokens'] = news.progress_apply(lambda x: match_entities(x.orgs, x.Text), axis=1)
+
+
+news['meta'] = news.apply(lambda x: {'source': f'Reuters News Dataset - Article ID {str(x.ID)} - {str(x.Date)}'}, axis=1)
+news.drop(columns=['Date', 'ID', 'orgs'], inplace=True)
+news.rename(columns={'Text': 'document'}, inplace=True)
+news['relations'] = news.meta.apply(lambda x: [])
+
+news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
+
+kb = kb.append(news)
+
+# split into train, test, dev
+kb.reset_index(drop=True)
+kb = kb.sample(frac=1) # shuffle data set
+train, dev, test = np.split(kb, [int(share_train*len(kb)), int((share_train+share_dev)*len(kb))])
+
+kb.loc[train.index, 'meta'] = kb.loc[train.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'train'))
+kb.loc[dev.index, 'meta'] = kb.loc[dev.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'dev'))
+kb.loc[test.index, 'meta'] = kb.loc[test.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'test'))
+
+
+kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_balanced_negative.json',
+                                                orient='records', lines=True)
+
 
 
 # {"text": "The up-regulation of IL-1beta message could be mediated by the latent membrane protein-1, EBV nuclear proteins 2, 3, 4, and 6 genes.",

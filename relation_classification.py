@@ -159,3 +159,5 @@ newpos.text.to_list()
 #     return [ent.text.replace('\'', '') for ent in tags.ents if ent.label_=='ORG'] # also remove apostrophes
 
 # sentence = 'Microsoft and Google announced a collaboration on the development of new computers.'
+
+
