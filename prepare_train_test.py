@@ -157,6 +157,9 @@ kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/
 kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
                           orient='records', lines=True)
 
+
+# kb.relations.apply(lambda relations: [relation['relationLabel'] for relation in relations]).explode().value_counts()
+
 # kb = kb[kb.meta.apply(lambda x: x['split'] == 'test')]
 # kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_test.json',
 #                                                 orient='records', lines=True)
@@ -221,6 +224,8 @@ news.rename(columns={'Text': 'document'}, inplace=True)
 news['relations'] = news.meta.apply(lambda x: [])
 
 news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
+
+news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
 
 kb = kb.append(news)
 
