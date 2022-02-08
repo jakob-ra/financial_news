@@ -230,8 +230,8 @@ news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_o
 kb = kb.append(news)
 
 # split into train, test, dev
+kb = kb.sample(frac=1)
 kb.reset_index(drop=True)
-kb = kb.sample(frac=1) # shuffle data set
 train, dev, test = np.split(kb, [int(share_train*len(kb)), int((share_train+share_dev)*len(kb))])
 
 kb.loc[train.index, 'meta'] = kb.loc[train.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'train'))
@@ -242,7 +242,10 @@ kb.loc[test.index, 'meta'] = kb.loc[test.index, 'meta'].apply(lambda x: update_m
 kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_balanced_negative.json',
                                                 orient='records', lines=True)
 
+test = kb[kb.meta.apply(lambda x: x['split'] == 'test')].sample(1000)
 
+test = test[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_balanced_negative_small_test.json',
+                                                orient='records', lines=True)
 
 # {"text": "The up-regulation of IL-1beta message could be mediated by the latent membrane protein-1, EBV nuclear proteins 2, 3, 4, and 6 genes.",
 # "spans": [{"text": "IL-1beta", "start": 21, "token_start": 5, "token_end": 5, "end": 29, "type": "span", "label": "GGP"}],

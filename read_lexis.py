@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from ast import literal_eval
 
 path = 'C:/Users/Jakob/Documents/LexisNexis firm alliances new/'
 
@@ -46,7 +47,13 @@ df['content'] = df.content.str.strip()
 # export
 df.to_csv(os.path.join('C:/Users/Jakob/Documents', 'lexisnexis_firm_alliances_combined_new.csv.gzip'), index=False, compression='gzip')
 
-df = pd.read_csv(os.path.join(path, 'lexisnexis_firm_alliances_combined_new.csv.gzip'), compression='gzip')
+df = pd.read_csv(os.path.join('C:/Users/Jakob/Documents', 'lexisnexis_firm_alliances_combined_new.csv.gzip'), compression='gzip')
+
+# turn these columns into lists
+list_tags = ['subject', 'country', 'city', 'person', 'industry', 'company']
+for tag in list_tags:
+    df[tag] = df[tag].apply(literal_eval)
+
 
 df.groupby(df.publication_date.dt.to_period('Y')).size()
 
@@ -75,6 +82,20 @@ df.company.explode().value_counts().head(20)
 df.subject.explode().value_counts().head(20)
 
 df.industry.explode().value_counts().head(20)
+
+df.company.explode().value_counts()
+
+
+# focus on news mentioning at least 2 companies
+df = df[df.company.str.len() > 1]
+
+from langdetect import detect
+
+# keep only docs with at least one sentence
+df = df[df.content.str.split('. ').str.len() > 1]
+
+# run language detection on first 100 chars
+df['lang'] = df.content.apply(lambda x: detect(x[:100]))
 
 
 # rename
