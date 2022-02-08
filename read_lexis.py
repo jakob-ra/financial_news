@@ -54,7 +54,7 @@ list_tags = ['subject', 'country', 'city', 'person', 'industry', 'company']
 for tag in list_tags:
     df[tag] = df[tag].apply(literal_eval)
 
-
+df['publication_date'] = df.publication_date.apply(pd.to_datetime)
 df.groupby(df.publication_date.dt.to_period('Y')).size()
 
 df[df.publication_date > pd.to_datetime('01-01-2010')].size()
