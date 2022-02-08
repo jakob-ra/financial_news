@@ -54,13 +54,14 @@ list_tags = ['subject', 'country', 'city', 'person', 'industry', 'company']
 for tag in list_tags:
     df[tag] = df[tag].apply(literal_eval)
 
+# format dates
 df['publication_date'] = df.publication_date.apply(pd.to_datetime)
+
+# explore date
 df.groupby(df.publication_date.dt.to_period('Y')).size()
-
-df[df.publication_date > pd.to_datetime('01-01-2010')].size()
-
+df[df.publication_date > pd.to_datetime('01-01-2010')].size
 # find gaps in time
-df.loc[df.publication_date.diff() > pd.Timedelta("1 days")].publication_date
+df.loc[df.sort_values('publication_date').publication_date.diff() > pd.Timedelta("1 days")].publication_date
 
 import matplotlib.pyplot as plt
 
@@ -82,9 +83,6 @@ df.company.explode().value_counts().head(20)
 df.subject.explode().value_counts().head(20)
 
 df.industry.explode().value_counts().head(20)
-
-df.company.explode().value_counts()
-
 
 # focus on news mentioning at least 2 companies
 df = df[df.company.str.len() > 1]
