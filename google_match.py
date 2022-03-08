@@ -18,7 +18,7 @@ def google_KG_match(query, api_key, type=None):
     # res['score'] = int(best_response['resultScore'])
 
     return best_response
-
+#
 # api_key = open('google_api_key.txt', 'r').read()
 # print(google_KG_match('biogen idec', api_key, type='Corporation'))
 # print(google_KG_match('columbia university medical center', api_key, type='Corporation'))
