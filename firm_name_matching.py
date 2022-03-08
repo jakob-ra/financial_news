@@ -142,7 +142,45 @@ df.reset_index(inplace=True)
 df.columns = ['company', 'count']
 
 res_lexis = firm_name_matching(df, orbis, clean_lookup=False)
-res_lexis_no_match = res[res._merge == 'left_only']
+res_lexis_no_match = res_lexis[res_lexis._merge == 'left_only']
+
+## google lookup on residual
+from google_match import google_KG_match
+
+api_key = open('google_api_key.txt', 'r').read()
+
+res_lexis_no_match_google = res_lexis_no_match.head(1000).copy(deep=True)
+res_lexis_no_match_google['google_res'] = res_lexis_no_match_google.company_x.apply(str).apply(lambda x: google_KG_match(x, api_key, type='Corporation'))
+
+res_df = []
+for index, row in res_lexis_no_match_google.iterrows():
+    google_res = row.google_res
+    if google_res != None:
+        if 'Corporation' in google_res['result']['@type']: #google_res['resultScore'] > 100 and
+            res = pd.json_normalize(google_res)
+            row = pd.DataFrame(row).T
+            res.index = row.index
+
+            res_df.append(res)
+
+
+res_df = pd.concat(res_df)
+res_df = res_lexis_no_match_google.merge(res_df, left_index=True, right_index=True, how='left')
+res_df = res_df[['company_x', 'result.name', 'result.url', 'result.description', 'resultScore']]
+res_df['company'] = res_df['result.name']
+res_df.dropna(subset=['company'], inplace=True)
+res_df = res_df[res_df.company.str.len() > 2]
+res_df = res_df.groupby(res_df.company).agg(lambda x: set(x) if len(set(x)) > 1 else x).reset_index()
+
+res_df = firm_name_matching(res_df, orbis, clean_lookup=False)
+res_df = res_df[res_df._merge == 'both']
+
+
+
+
+
+
+
 
 orbis[orbis.company.str.contains('the')]
 
