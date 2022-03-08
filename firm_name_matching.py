@@ -201,3 +201,6 @@ orbis_names = pd.Series(orbis_names.unique())
 common_tokens = orbis_names.str.split(' ').explode().value_counts()
 common_tokens.head(400).index.values
 
+
+df = pd.read_pickle('C:/Users/Jakob/Documents/lexisnexis_firm_alliances_combined_new.pkl')
+
