@@ -61,7 +61,7 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
 
 
 orbis['company'] = orbis.companyname.swifter.apply(firm_name_clean)
-orbis = orbis.groupby('company').agg(lambda x: set(x))
+orbis = orbis.groupby('company').agg(list)
 orbis.reset_index(inplace=True)
 
 def firm_name_matching(df, df_lookup, firm_name_col='company', clean_lookup=True):
@@ -195,7 +195,8 @@ firms_flashtext.columns = ['name', 'freq']
 freq_names = firms_flashtext[firms_flashtext.freq > 1000]
 freq_names = freq_names[~freq_names.name.isin(res_lexis_group[res_lexis_group['count'] > 500].company_y)]
 freq_names[freq_names.name.isin(res_lexis_group[res_lexis_group['count'] > 500].company_y)].values
-res_lexis_group[res_lexis_group.company_y == 'a'].values
+res_lexis_group[res_lexis_group.company_y == 'total'].values
+
 
 
 
@@ -212,6 +213,7 @@ compustat.sort_values('emp', inplace=True, ascending=False)
 compustat['company'] = compustat.conml
 compustat.drop_duplicates('company', keep='first', inplace=True)
 
+firm_name_matching(compustat, orbis, clean_lookup=False)
 
 
 ## google lookup on residual
