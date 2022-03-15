@@ -64,6 +64,8 @@ orbis['company'] = orbis.companyname.swifter.apply(firm_name_clean)
 orbis = orbis.groupby('company').agg(list)
 orbis.reset_index(inplace=True)
 
+orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+
 def firm_name_matching(df, df_lookup, firm_name_col='company', clean_lookup=True):
     assert not df[firm_name_col].duplicated().any(), 'Firm names to match contain duplicates!'
     assert not df_lookup[firm_name_col].duplicated().any(), 'Lookup firm list contains duplicates!'
