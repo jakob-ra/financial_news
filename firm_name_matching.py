@@ -2,25 +2,33 @@ import pandas as pd
 import swifter
 import re
 import unidecode
+import numpy as np
 
 ## read Orbis firm name list
-# path = 'C:/Users/Jakob/Documents/Orbis/Full/BvD_ID_and_Name.txt'
-# orbis = pd.read_csv(path, sep='\t')
-# # path = 'C:/Users/Jakob/Documents/Orbis/Full/Identifiers.txt'
-# # identifiers = pd.read_csv(path, sep='\t', nrows=100)
-#
-# orbis['company'] = orbis.NAME.apply(str)
-# orbis.drop(columns=['NAME'], inplace=True)
 
+import os
+import glob
+
+path = 'C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22'
+all_orbis = glob.glob(os.path.join(path, "*.xlsx"))
+orbis_europe_15_empl = pd.concat((pd.read_excel(f) for f in all_orbis))
+orbis_europe_15_empl.drop_duplicates('BvD ID number')
+wrong_cols = orbis_europe_15_empl.columns[orbis_europe_15_empl.columns.str.startswith('Unnamed')] + ['List export']
+orbis_europe_15_empl.drop(columns=wrong_cols, inplace=True)
+orbis_europe_15_empl[orbis_europe_15_empl['ISH - BvD ID number'].str.contains('\*').fillna(False)]['ISH - Name'].value_counts().head(25)
+orbis_europe_15_empl['ISH - Name'].value_counts().head(25)
+orbis_europe_15_empl.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
+
+orbis1 = pd.read_csv('C:/Users/Jakob/Documents/Orbis/Full/BvD_ID_and_Name.txt', sep='\t')
 orbis_cols = ['bvdidnumber', 'companyname']
-orbis = pd.read_csv('C:/Users/Jakob/Documents/Orbis/Full/BvD_ID_and_Name.txt', sep='\t')
-orbis.columns = orbis_cols
+orbis1.columns = orbis_cols
+orbis2 = pd.read_csv('C:/Users/Jakob/Downloads/Orbis_Web_US.csv', sep=';', usecols=orbis_cols+['websiteaddress'])
+orbis3 = pd.read_csv('C:/Users/Jakob/Downloads/All_25_BvDID_NAICS.csv', sep=';', usecols=orbis_cols)
+orbis3.dropna(inplace=True)
 
-orbis = orbis.append(pd.read_csv('C:/Users/Jakob/Downloads/Orbis_Web_US.csv', sep=';', usecols=orbis_cols+['websiteaddress']))
-orbis = orbis.append(pd.read_csv('C:/Users/Jakob/Downloads/All_25_BvDID_NAICS.csv', sep=';', usecols=orbis_cols))
-
-orbis.drop_duplicates(inplace=True)
-
+orbis = orbis1.append(orbis2).append(orbis3)
+del orbis1, orbis2, orbis3
+orbis = orbis.drop_duplicates(subset=orbis_cols).reset_index(drop=True)
 
 def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, remove_parentheses=True):
     # make string
@@ -61,10 +69,16 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
 
 
 orbis['company'] = orbis.companyname.swifter.apply(firm_name_clean)
-orbis = orbis.groupby('company').agg(list)
-orbis.reset_index(inplace=True)
+orbis = orbis.groupby('company').agg(list).reset_index()
 
 orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+
+orbis.drop(orbis[orbis.company.isin(['', '&', np.nan, None])].index, inplace=True)
+orbis.company.to_csv('C:/Users/Jakob/Documents/Orbis/firm_lookup_list.csv.gzip', index=False, compression='gzip')
+
+# orbis_common_terms = orbis.company.str.split(' ').explode().value_counts()
+
 
 def firm_name_matching(df, df_lookup, firm_name_col='company', clean_lookup=True):
     assert not df[firm_name_col].duplicated().any(), 'Firm names to match contain duplicates!'
@@ -97,6 +111,17 @@ sdc_comps = sdc.ParticipantUltimateParentName.explode().value_counts()
 sdc_comps = pd.DataFrame(sdc_comps)
 sdc_comps.reset_index(inplace=True)
 sdc_comps.columns = ['company', 'count']
+drop_comps = ['Undisclosed JV Partner', 'Undisclosed Chinese Co', 'Peoples Republic of China', 'Malaysia',
+              'Mynistry of Finance Singapore', 'Singapore', 'Russian Federation',
+              'Undisclosed Japanese Partner', 'Saudi Arabia', 'Indonesia Republic', 'Republic of Korea',
+              'Undisclosed Companies', 'Philippines', 'Algerian Government', 'Undisclosed Japanese Co(s)',
+              'Seeking Partner', 'Vietnam', 'Soviet Union', 'Kazakhstan', 'Undisclosed US Partner',
+              'Uzbekistan', 'Undisclosed Russian Partner', 'Kingdom of Spain', 'Iran', 'Shareholders',
+              'Undisclosed Thai Co', 'Pakistan', 'South Africa', 'Undisclosed Australian Partner',
+              'Republic of Ireland', 'Russian Regional Government', 'Cambodia', 'Ukraine',
+              'Undisclosed American Co', 'Chile', 'Undisclosed']
+sdc_comps = sdc_comps[~sdc_comps.company.str.contains(drop_comps)]
+
 
 res_sdc = firm_name_matching(sdc_comps, orbis, clean_lookup=False)
 res_sdc_no_match = res_sdc[res_sdc._merge == 'left_only']
