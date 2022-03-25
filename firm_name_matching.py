@@ -18,6 +18,8 @@ orbis_europe_15_empl.drop(columns=wrong_cols, inplace=True)
 orbis_europe_15_empl[orbis_europe_15_empl['ISH - BvD ID number'].str.contains('\*').fillna(False)]['ISH - Name'].value_counts().head(25)
 orbis_europe_15_empl['ISH - Name'].value_counts().head(25)
 orbis_europe_15_empl.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
+orbis_europe_15_empl = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
+orbis_europe_15_empl.columns
 
 orbis1 = pd.read_csv('C:/Users/Jakob/Documents/Orbis/Full/BvD_ID_and_Name.txt', sep='\t')
 orbis_cols = ['bvdidnumber', 'companyname']
