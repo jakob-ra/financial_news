@@ -26,7 +26,7 @@ kb['source'] = kb.meta.apply(lambda x: x['source'])
 
 kb = kb[['document', 'entities', 'entity_spans', 'relation']]
 
-# kb = kb[kb.entity_spans.str.len() == 2] # take docs with exactly two entities
+kb = kb[kb.entity_spans.str.len() == 2] # take docs with exactly two entities
 
 kb.to_pickle('/Users/Jakob/Documents/financial_news_data/kb_6class_balanced_neg_examples.pkl', protocol=4)
 

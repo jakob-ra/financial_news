@@ -190,6 +190,8 @@ kb.relation_types.value_counts()
 ## add neg examples from news
 news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_orgs.pkl')
 
+news['orgs'] = news.orgs.apply(lambda x: x[0])
+
 # fit length (in sentences) distribution to kb dealtext length
 lengths_dist = kb.document.str.split('.').str.len().value_counts(normalize=True)
 
@@ -222,19 +224,33 @@ def extract_spans(text, names):
 
 extract_spans('Volkswagen AG and Tesco PLC announced blah.', ['Volkswagen', 'Tesco PLC'])
 
+
 news['ents'] = news.progress_apply(lambda row: extract_spans(row.Text[:400], row.orgs[:10]), axis=1)
 
 ## take only docs with at least two firms before max_len* avg of 3 chars pro token = 384 characters
 max_len_chars = 400
 
 news['ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[1] <= (max_len_chars, max_len_chars)])
+
+def get_unique_entities(ents):
+    seen_ents = []
+    res = []
+    for ent in ents:
+        if ent[0] not in seen_ents:
+            res.append(ent)
+            seen_ents.append(ent[0])
+
+
+    return res
+
+news['ents'] = news.ents.apply(get_unique_entities) # take only unique entities per doc
+
+news['ents'] = news.ents.apply(lambda ents: ents[:2]) # take only exactly two entities per doc
+
 news['spans'] = news.ents.apply(lambda ents: [ent[1] for ent in ents])
 news['orgs'] = news.ents.apply(lambda ents: [ent[0] for ent in ents])
 
-news = news[news.orgs.apply(set).apply(len) > 1]
-
-news = news.sample(len(kb))
-
+news = news[news.orgs.str.len() > 1] # take only docs with at least two unique docs
 
 
 # match via firm list
