@@ -196,9 +196,9 @@ lengths_dist = kb.document.str.split('.').str.len().value_counts(normalize=True)
 # reduce article length to match the examples in KB (in terms of sentences)
 news['Text'] =  news.Text.apply(lambda x: ' '.join(re.split(r'(?<=[.:;])\s', x)[:np.random.choice(
     lengths_dist.index, p=lengths_dist.values)]))
-news = news[news.Text.str.split('.').str.len() < 50].copy()
 
-news = news.sample(len(kb))
+# remove very long articles
+news = news[news.Text.str.split('.').str.len() < 50].copy()
 
 # remove articles with keywords to get good negative examples
 keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and development',
@@ -213,14 +213,59 @@ keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and developm
 
 news = news[~news.Text.str.contains('|'.join(keywords), flags=re.IGNORECASE)]
 
-news['orgs'] = news.orgs.apply(lambda x: x[0])
-news = news[news.orgs.str.len() > 1] # take only docs with at least two orgs
-news['tokens'] = news.progress_apply(lambda x: match_entities(x.orgs, x.Text), axis=1)
+def extract_spans(text, names):
+    pattern = r'|'.join(re.escape(word.strip()) for word in names)
 
+    res = re.finditer(pattern, text, flags=re.IGNORECASE)
+
+    return [(match.group(), match.span()) for match in res]
+
+extract_spans('Volkswagen AG and Tesco PLC announced blah.', ['Volkswagen', 'Tesco PLC'])
+
+news['ents'] = news.progress_apply(lambda row: extract_spans(row.Text[:400], row.orgs[:10]), axis=1)
+
+## take only docs with at least two firms before max_len* avg of 3 chars pro token = 384 characters
+max_len_chars = 400
+
+news['ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[1] <= (max_len_chars, max_len_chars)])
+news['spans'] = news.ents.apply(lambda ents: [ent[1] for ent in ents])
+news['orgs'] = news.ents.apply(lambda ents: [ent[0] for ent in ents])
+
+news = news[news.orgs.apply(set).apply(len) > 1]
+
+news = news.sample(len(kb))
+
+
+
+# match via firm list
+# read firm list
+# firm_list = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
+# firm_list.rename(columns= {'Number of employees\nLast avail. yr': 'emp'}, inplace=True)
+# firm_list['emp'] = pd.to_numeric(firm_list.emp, errors='coerce')
+# firm_list.emp.describe() # focus on big firms
+# firm_list = firm_list[firm_list.emp > 5000]
+#
+# from flashtext import KeywordProcessor
+# keyword_processor = KeywordProcessor()
+# keyword_processor.add_keywords_from_list(firm_list['Company name Latin alphabet'].astype(str).to_list())
+#
+# keyword_processor.extract_keywords('Volkswagen AG and Tesco PLC announced blah.')
+#
+# news['firms'] = news.Text.str[:max_len_chars].progress_apply(lambda x: keyword_processor.extract_keywords(x, span_info=True))
+#
+# news['spans'] = news.firms.apply(lambda ents: [ent[1:] for ent in ents])
+# news['firms'] = news.firms.apply(lambda ents: [ent[0] for ent in ents])
+
+# news['orgs'] = news.orgs.apply(lambda x: x[0])
+#
+# news['tokens'] = news.progress_apply(lambda x: match_entities(x.orgs[:1], x.Text[:400]), axis=1)
+
+news.orgs.explode().value_counts().head(50)
 
 news['meta'] = news.apply(lambda x: {'source': f'Reuters News Dataset - Article ID {str(x.ID)} - {str(x.Date)}'}, axis=1)
 news.drop(columns=['Date', 'ID', 'orgs'], inplace=True)
-news.rename(columns={'Text': 'document'}, inplace=True)
+news.rename(columns={'Text': 'document', 'ents': 'entities', 'spans': 'entity_spans'}, inplace=True)
+
 news['relations'] = news.meta.apply(lambda x: [])
 
 news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
