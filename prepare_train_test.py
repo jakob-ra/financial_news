@@ -72,8 +72,21 @@ def extract_firm_name_and_spans(text, names, clean_names=True):
 
 kb['ents'] = kb.progress_apply(lambda x: extract_firm_name_and_spans(x.Text, x.Participants), axis=1)
 
-kb = kb[kb.ents.apply(len) > 1] # need at least two identified participants
+def clean_unique_entities(ents):
+    seen_ents = []
+    res = []
+    for ent in ents:
+        cleaned_ent = firm_name_clean(ent[0])
+        if cleaned_ent not in seen_ents:
+            res.append(ent + (cleaned_ent,))
+            seen_ents.append(cleaned_ent)
 
+
+    return res
+
+kb['ents'] = kb.ents.apply(clean_unique_entities) # take only unique entities per doc
+
+kb = kb[kb.ents.apply(len) > 1] # need at least two unique identified participants
 
 kb.drop(columns=['Participants'], inplace=True)
 
@@ -95,6 +108,13 @@ kb.drop(columns=['ID'], inplace=True)
 # kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
 #                           orient='records', lines=True)
 
+kb['firms'] = kb.ents.apply(lambda ents: [ent[0] for ent in ents])
+kb['spans'] = kb.ents.apply(lambda ents: [ent[1] for ent in ents])
+kb['cleaned_orgs'] = kb.ents.apply(lambda ents: [ent[2] for ent in ents])
+
+kb.drop(columns=['ents'], inplace=True)
+
+kb = kb[['Date', 'source', 'document', 'firms', 'spans', 'rels']]
 kb.to_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_kb_training.pkl')
 
 
@@ -159,48 +179,36 @@ news['ents'] = news.progress_apply(lambda row: extract_firm_name_and_spans(row.T
 max_len_chars = 800
 news['ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[1] <= (max_len_chars, max_len_chars)])
 
-def clean_unique_entities(ents):
-    seen_ents = []
-    res = []
-    for ent in ents:
-        cleaned_ent = firm_name_clean(ent[0])
-        if cleaned_ent not in seen_ents:
-            res.append(ent + (cleaned_ent,))
-            seen_ents.append(cleaned_ent)
-
-
-    return res
-
 news['ents'] = news.ents.apply(clean_unique_entities) # take only unique entities per doc
 
 
 # filter out firms in orbis
 orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_firm_names.pkl')
-orbis = set(orbis.company.to_list())
-to_remove = ['federal reserve', 'eu', 'fed', 'treasury', 'congress', 'european central bank',
-             'international monetary fund', 'central bank', 'senate', 'white house', 'house', 'sec', 'ecb',
-             'european commission', 'state', 'un', 'bank of england', 'opec', 'supreme court', 'world bank',
-             'pentagon', 'cabinet', 'web service', 'us senate', 'imf', 'defense',
-             'federal reserve bank' 'euro', 'house of representatives', 'bank', 'journal',
-             'us bankruptcy court', 'medicare', 'american international', 'finance', 's&p', 's&p 500',
-             'news', 'united nations', 'nasdaq', 'parliament', 'us treasury department', 'romney', 'draghi',
-             'usda', 'cotton', 'district court', 'army']
-orbis = {elem for elem in orbis if elem not in to_remove}
+orbis = set(orbis.to_list())
 
-pd.Series(list(orbis), name='company').to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_firm_names.pkl')
-
-news['orbis_ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[2] in orbis])
-
-news.orbis_ents.explode().size/news.ents.explode().size
+news['ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[2] in orbis])
 
 news = news[news.ents.apply(len) > 1] # take only docs with at least two unique entities
 news['ents'] = news.ents.apply(lambda ents: ents[:2]) # take only exactly two entities per doc (the first two)
 
-news['orgs'] = news.ents.apply(lambda ents: [ent[0] for ent in ents])
+news['firms'] = news.ents.apply(lambda ents: [ent[0] for ent in ents])
 news['spans'] = news.ents.apply(lambda ents: [ent[1] for ent in ents])
 news['cleaned_orgs'] = news.ents.apply(lambda ents: [ent[2] for ent in ents])
 
+news['source'] = news.apply(lambda x: f'Reuters News Dataset - Article ID {str(x.ID)} - {str(x.Date)}', axis=1)
+news.drop(columns=['Date', 'ID', 'ents', 'sents', 'orgs'], inplace=True)
+news.rename(columns={'Text': 'document'}, inplace=True)
 
+news['rels'] = news.source.apply(lambda x: [])
+
+# select documents where two firms are mentioned in the beginning (first 100 chars)
+# news = news[news.spans.apply(lambda x: x[1][1]) < 100]
+
+news = news.sample(len(kb))
+
+news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
+
+news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
 # match via firm list (flasthext)
 # read firm list
 # firm_list = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
@@ -224,51 +232,6 @@ news['cleaned_orgs'] = news.ents.apply(lambda ents: [ent[2] for ent in ents])
 #
 # news['tokens'] = news.progress_apply(lambda x: match_entities(x.orgs[:1], x.Text[:400]), axis=1)
 
-news['meta'] = news.apply(lambda x: {'source': f'Reuters News Dataset - Article ID {str(x.ID)} - {str(x.Date)}'}, axis=1)
-news.drop(columns=['Date', 'ID', 'ents', 'sents', 'cleaned_orgs'], inplace=True)
-news.rename(columns={'Text': 'document', 'orgs': 'entities', 'spans': 'entity_spans'}, inplace=True)
-
-news['relation'] = news.meta.apply(lambda x: [])
-
-# select documents where two firms are mentioned in the beginning (first 100 chars)
-news = news[news.spans.apply(lambda x: x[1][1]) < 100]
-
-news = news.sample(len(kb))
-
-news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
-
-news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
-
-kb = kb.append(news)
-
-# split into train, test, dev
-kb = kb.sample(frac=1)
-kb.reset_index(drop=True)
-train, dev, test = np.split(kb, [int(share_train*len(kb)), int((share_train+share_dev)*len(kb))])
-
-kb.loc[train.index, 'meta'] = kb.loc[train.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'train'))
-kb.loc[dev.index, 'meta'] = kb.loc[dev.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'dev'))
-kb.loc[test.index, 'meta'] = kb.loc[test.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'test'))
-
-
-kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_balanced_negative.json',
-                                                orient='records', lines=True)
-
-test = kb[kb.meta.apply(lambda x: x['split'] == 'test')].sample(1000)
-
-test = test[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_balanced_negative_small_test.json',
-                                                orient='records', lines=True)
-
-# {"text": "The up-regulation of IL-1beta message could be mediated by the latent membrane protein-1, EBV nuclear proteins 2, 3, 4, and 6 genes.",
-# "spans": [{"text": "IL-1beta", "start": 21, "token_start": 5, "token_end": 5, "end": 29, "type": "span", "label": "GGP"}],
-# "meta": {"source": "BioNLP 2011 Genia Shared Task, PMID-9878621.txt"},
-# "_input_hash": -400334998,
-# "_task_hash": 1861007191,
-# "tokens": [{"text": "The", "start": 0, "end": 3, "id": 0, "ws": true, "disabled": true}],
-# "_session_id": null,
-# "_view_id": "relations",
-# "relations": [{"head": 14, "child": 5, "head_span": {"start": 63, "end": 88, "token_start": 12, "token_end": 14, "label": "GGP"}, "child_span": {"start": 21, "end": 29, "token_start": 5, "token_end": 5, "label": "GGP"}, "color": "#ffd882", "label": "Pos-Reg"}],
-# "answer": "accept"}
 
 # Load spacy model
 nlp = spacy.load('en_core_web_sm') # spacy model

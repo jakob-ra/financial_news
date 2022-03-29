@@ -9,29 +9,20 @@ tqdm.pandas()
 np.random.seed(42) # set random seed
 
 
-kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
-                          orient='records', lines=True)
-
-kb['entities'] = kb.tokens.apply(lambda ents: [ent['text'] for ent in ents])
-kb['entity_spans'] = kb.tokens.apply(lambda ents: [(ent['start'], ent['end']) for ent in ents])
-kb['relation'] = kb.relations.apply(lambda relations: [rel['relationLabel'] for rel in relations])
-kb['relation'] = kb.relation.apply(set).apply(list)
+kb = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_kb_training.pkl')
 
 ## add neg examples from news
 news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
 
-kb['source'] = kb.meta.apply(lambda x: x['source'])
 
-kb = kb[['document', 'entities', 'entity_spans', 'relation']]
-
-kb = kb[kb.entity_spans.str.len() == 2] # take docs with exactly two entities
-
-kb['entities'] = kb.entities.apply(set).apply(list) # remove duplicate entities
-
-kb[kb.entities.apply(len) > 2].entities
-
-kb.append(news)
+# take only first two entities per doc (LUKE can only handle one entity pair as input per example)
+kb['firms'] = kb.firms.apply(lambda x: x[:2])
+kb['spans'] = kb.spans.apply(lambda x: x[:2])
 
 
-kb.to_pickle('/Users/Jakob/Documents/financial_news_data/kb_6class_balanced_neg_examples.pkl', protocol=4)
+df = kb.append(news)
 
+
+df.to_pickle('/Users/Jakob/Documents/financial_news_data/training-data-29-03-22.pkl', protocol=4)
+
+a/sum(a)
