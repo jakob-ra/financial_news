@@ -4,11 +4,11 @@ import spacy
 import numpy as np
 from itertools import permutations
 from tqdm import tqdm
+from firm_name_matching import firm_name_clean
 tqdm.pandas()
+import matplotlib.pyplot as plt
 
 np.random.seed(42) # set random seed
-
-share_train, share_test, share_dev = .6, .2, .2
 
 # read Thomson SDC RND database
 sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
@@ -20,11 +20,6 @@ sdc.drop_duplicates(subset=['DealText'], inplace=True)
 
 sdc.set_index('DealNumber', inplace=True, drop=False)
 
-# check different name columns
-# sdc[['DealText', 'ParticipantsinVenture/Alliance(ShortName)', 'ParticipantsinVenture/Alliance(LongNamShortLine)',
-#      'ParticipantsinVenture/Alliance(LongName3Lines)']].sample().values
-
-
 # there are 12 observations that are not tagged as SA or JV
 len(sdc) - sdc[['StrategicAlliance', 'JointVentureFlag']].any(axis=1).sum()
 # remove them
@@ -33,174 +28,114 @@ sdc = sdc[sdc[['StrategicAlliance', 'JointVentureFlag']].any(axis=1)]
 # combine licensing, exclusive licensing, crosslicensing
 licensing_cols = ['LicensingAgreementFlag', 'ExclusiveLicensingAgreementFlag', 'CrossLicensingAgreement',
     'RoyaltiesFlag']
-sdc['LicensingFlag'] = sdc[licensing_cols].any(axis=1)
-sdc['LicensingFlag'] = sdc['LicensingFlag'].astype(float)
-# convert SDC to proper format
-sdc['Deal'] = 1 # flag all SDC examples as positive
-sdc.loc[sdc.Status == 'Terminated', 'Deal'] = 0 # except for the terminated ones
+sdc['Licensing'] = sdc[licensing_cols].any(axis=1)
+sdc.drop(columns=licensing_cols, inplace=True)
 
-labels = ['Deal', 'Status', 'JointVentureFlag', 'MarketingAgreementFlag', 'ManufacturingAgreementFlag',
-    'ResearchandDevelopmentAgreementFlag', 'LicensingFlag', 'SupplyAgreementFlag',
-    'ExplorationAgreementFlag', 'TechnologyTransfer']
+# A lot of agreements are pending (announced), some are announced to be terminated
+sdc.Status.value_counts()
 
-kb = sdc[['AllianceDateAnnounced', 'DealNumber', 'DealText', 'ParticipantsinVenture/Alliance(ShortName)'] + labels].copy()
-kb.rename(columns={'ParticipantsinVenture/Alliance(ShortName)': 'Participants'}, inplace=True)
+# one hot encode pending and terminated
+sdc['Pending'] = (sdc.Status == 'Pending').astype(int)
+sdc['Terminated'] = (sdc.Status == 'Terminated').astype(int)
 
 # make column names easier to work with
-kb.columns = kb.columns.str.replace('Flag', '')
-kb.columns = kb.columns.str.replace('Agreement', '')
-kb.rename(columns={'Status': 'Pending', 'DealNumber': 'ID', 'AllianceDateAnnounced': 'Date', 'DealText': \
-    'Text'}, inplace=True)
+sdc.columns = sdc.columns.str.replace('Flag', '')
+sdc.columns = sdc.columns.str.replace('Agreement', '')
+sdc.rename(columns={'DealNumber': 'ID', 'AllianceDateAnnounced': 'Date', 'DealText': 'Text',
+                    'ParticipantsinVenture/Alliance(ShortName)': 'Participants'}, inplace=True)
 
-# recode status
-kb['Pending'].replace('Pending', 1, inplace=True)
-kb['Pending'].replace('Completed/Signed', 0, inplace=True)
-kb['Pending'].replace('Terminated', 0, inplace=True)
+labels = ['JointVenture', 'Marketing', 'Manufacturing',
+    'ResearchandDevelopment', 'Licensing', 'Supply',
+    'Exploration', 'TechnologyTransfer', 'Pending', 'Terminated']
 
-text = 'United Energy Ltd and Westcoast Energy Australia planned to form a joint venture.'
+kb = sdc[['Date', 'ID', 'Text', 'Participants'] + labels].copy()
 
-# take positive examples
-kb = kb[(kb.Deal) & (kb.Pending == 0)]
-# with at least 2 participants
+# take examples with at least 2 participants
 kb = kb[kb.Participants.str.len() > 1]
 
-flags = ['JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
-       'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
-## does it work for multiple relation extraction?
-kb[flags] = kb[flags].astype('bool')
+# convert to bool
+kb[labels] = kb[labels].apply(lambda x: pd.to_numeric(x, downcast='integer')).astype(bool)
+
 kb['StrategicAlliance'] = ~kb.JointVenture # every deal that is not a JV is a SA
-# flags = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
-#        'Licensing', 'Supply', 'Exploration', 'TechnologyTransfer']
-flags = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment',
-       'Licensing']
 
-def match_entities(entities, text):
-    nlp = spacy.blank('en')
-    ruler = nlp.add_pipe("entity_ruler")
-    patterns = [{"label": "ORG", "pattern": entity} for entity in entities]
-    ruler.add_patterns(patterns)
-    doc = nlp(text)
-    tokens = []
-    for ent in doc.ents:
-        tokens.append(
-                {'text'       : ent.text, 'start': ent.start_char, 'end': ent.end_char,
-                 'token_start': ent.start, 'token_end': ent.end, 'entityLabel': ent.label_})
+labels = ['StrategicAlliance'] + labels
 
-    return tokens
+def extract_firm_name_and_spans(text, names, clean_names=True):
+    if clean_names:
+        cleaned_names = [firm_name_clean(name) for name in names]
+        names += cleaned_names
+    pattern = r'|'.join(re.escape(word.strip()) for word in names)
 
-kb['tokens'] = kb.progress_apply(lambda x: match_entities(x.Participants, x.Text), axis=1)
+    res = re.finditer(pattern, text, flags=re.IGNORECASE)
 
-# keep the exact matches
-kb = kb[kb.tokens.apply(lambda tokens: set([token['text'] for token in tokens])) == kb.Participants.apply(set)]
-kb = kb[kb.tokens.apply(lambda x: set(token['text'] for token in x)).str.len()>1]
+    return [(match.group(), match.span()) for match in res]
+
+kb['ents'] = kb.progress_apply(lambda x: extract_firm_name_and_spans(x.Text, x.Participants), axis=1)
+
+kb = kb[kb.ents.apply(len) > 1] # need at least two identified participants
 
 
-def match_relations(row):
-    participants = row.tokens
-    # take only first mentions of participants
-    participants = pd.DataFrame(participants)
-    participants = participants.drop_duplicates(subset=['text'], keep='first')
-    participant_names = participants.text.to_list()
-    participants.set_index('text', inplace=True)
+kb.drop(columns=['Participants'], inplace=True)
 
-    if len(participant_names) < 2:
-        raise ValueError('Alliances with less than two participants in the provided records.')
+# get string names of labels
+for label_name in labels:
+    kb[label_name] = kb[label_name].apply(lambda x: [label_name] if x == 1 else [])
+kb['rels'] = kb[labels].sum(axis=1)
+kb.drop(columns=labels, inplace=True)
 
-    relations = []
-    for flag in flags:  # cycle through flags
-        if row[flag]:  # for true flags, append relation between each two-way permutation of participants
-            for permut in permutations(participant_names):
-                start_child = participants.loc[permut[0]].token_start
-                start_head = participants.loc[permut[1]].token_start
-                relations.append({"child": start_child, "head": start_head, "relationLabel": flag})
+# add source tag
+kb['source'] = kb.ID.apply(lambda x: 'Thomson SDC alliances - Deal Number ' + str(x))
 
-    return relations
+kb.rename(columns={'Text': 'document'}, inplace=True)
+kb.drop(columns=['ID'], inplace=True)
 
-kb['relations'] = kb.progress_apply(match_relations, axis=1)
+# kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
+#                           orient='records', lines=True)
 
-kb['document'] = kb.Text
+# kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
+#                           orient='records', lines=True)
 
-kb['meta'] = kb.ID.apply(lambda x: {'source': 'Thomson SDC alliances - Deal Number ' + str(x)})
+kb.to_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_kb_training.pkl')
 
-# split into train, test, dev
-kb = kb.sample(frac=1) # shuffle data set
-train, dev, test = np.split(kb, [int(share_train*len(kb)), int((share_train+share_dev)*len(kb))])
-
-def update_meta(meta: dict, new_key: str, value):
-    meta[new_key] = value
-
-    return meta
-
-kb.loc[train.index, 'meta'] = kb.loc[train.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'train'))
-kb.loc[dev.index, 'meta'] = kb.loc[dev.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'dev'))
-kb.loc[test.index, 'meta'] = kb.loc[test.index, 'meta'].apply(lambda x: update_meta(x, 'split', 'test'))
-
-kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
-                                                orient='records', lines=True)
-
-kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict.json',
-                          orient='records', lines=True)
-def remove_relations(input, remove_type: list):
-    output = []
-    for relation in input:
-        if relation['relationLabel'] not in remove_type:
-            output.append(relation)
-
-    return output
-
-kb['relations'] = kb.relations.apply(
-        lambda x: remove_relations(x, ['Supply', 'Exploration', 'TechnologyTransfer']))
-
-kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
-                                                orient='records', lines=True)
-
-kb = pd.io.json.read_json(path_or_buf='/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class.json',
-                          orient='records', lines=True)
-
-
-# kb.relations.apply(lambda relations: [relation['relationLabel'] for relation in relations]).explode().value_counts()
-
-# kb = kb[kb.meta.apply(lambda x: x['split'] == 'test')]
-# kb[['document', 'tokens', 'relations', 'meta']].to_json('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_training_dict_6class_test.json',
-#                                                 orient='records', lines=True)
-
-def extract_relations(input):
-    output = []
-    for relation in input:
-        output.append(relation['relationLabel'])
-
-    return set(output)
-
-kb['relation_types'] = kb.relations.apply(extract_relations)
-
-# create balance by random undersampling+
-rare_flags = {'Marketing', 'Manufacturing', 'Licensing', 'ResearchandDevelopment'}
-kb = kb[kb.relation_types.apply(lambda x: len(x.intersection(rare_flags))) > 0] # focus on examples with rare flags
-# kb = kb[kb.relation_types.apply(lambda x: len(x.intersection({'StrategicAlliance', 'Manufacturing'}))) < 2] # remove
-
-# drop some marketing & SA examples
-kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Marketing'}].sample(3000).index)
-kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Manufacturing'}].sample(1000).index)
-kb = kb.drop(kb[kb.relation_types == {'StrategicAlliance', 'Licensing'}].sample(1000).index)
-
-kb.relation_types.explode().value_counts()
-kb.relations.sample().values
-kb.relation_types.value_counts()
 
 ## add neg examples from news
 news = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/news_orgs.pkl')
 
-news['orgs'] = news.orgs.apply(lambda x: x[0])
+news['orgs'] = news.orgs.apply(lambda x: x[0]) # take only org names, not their token position
 
 # fit length (in sentences) distribution to kb dealtext length
-lengths_dist = kb.document.str.split('.').str.len().value_counts(normalize=True)
+from nltk.tokenize import sent_tokenize
+lengths_dist_kb = kb.document.apply(sent_tokenize).str.len().value_counts(normalize=True)
+
+# sentence splitting
+news['sents'] = news.Text.swifter.apply(sent_tokenize)
+
+# remove the first sentence (headline) for training purposes
+news['sents'] = news.sents.apply(lambda x: x[1:])
 
 # reduce article length to match the examples in KB (in terms of sentences)
-news['Text'] =  news.Text.apply(lambda x: ' '.join(re.split(r'(?<=[.:;])\s', x)[:np.random.choice(
-    lengths_dist.index, p=lengths_dist.values)]))
+news['sents'] = news.sents.apply(lambda x: x[:np.random.choice(lengths_dist_kb.index, p=lengths_dist_kb.values)])
+
+news['Text'] =  news.sents.apply(lambda x: ' '.join(x))
+
+lengths_dist_news = news.sents.apply(len).value_counts(normalize=True)
+
+# compare
+lengths_dist_kb.to_frame(name='KB').merge(
+        lengths_dist_news.to_frame(name='News'),
+        left_index=True, right_index=True).plot.bar(
+        xlabel='Number of sentences', ylabel='Share of documents')
+plt.show()
+
+# look at text length distribution in terms of characters
+news.Text.apply(len).hist(bins=100)
+plt.show()
+
+news[news.Text.apply(len) < 2500].Text.apply(len).hist(bins=100)
+plt.show()
 
 # remove very long articles
-news = news[news.Text.str.split('.').str.len() < 50].copy()
+news = news[news.Text.apply(len) < 1500].copy()
 
 # remove articles with keywords to get good negative examples
 keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and development',
@@ -215,45 +150,58 @@ keywords = ['joint venture', 'strategic alliance', 'R&D', 'research and developm
 
 news = news[~news.Text.str.contains('|'.join(keywords), flags=re.IGNORECASE)]
 
-def extract_spans(text, names):
-    pattern = r'|'.join(re.escape(word.strip()) for word in names)
+extract_firm_name_and_spans('Volkswagen and Tesco PLC announced blah.', ['Volkswagen AG', 'Tesco PLC'], clean_names=True)
 
-    res = re.finditer(pattern, text, flags=re.IGNORECASE)
-
-    return [(match.group(), match.span()) for match in res]
-
-extract_spans('Volkswagen AG and Tesco PLC announced blah.', ['Volkswagen', 'Tesco PLC'])
+news['ents'] = news.progress_apply(lambda row: extract_firm_name_and_spans(row.Text, row.orgs[:10], clean_names=False), axis=1)
 
 
-news['ents'] = news.progress_apply(lambda row: extract_spans(row.Text[:400], row.orgs[:10]), axis=1)
-
-## take only docs with at least two firms before max_len* avg of 3 chars pro token = 384 characters
-max_len_chars = 400
-
+## take only entities appearing before max_len* avg of 3 chars pro token = 384 characters
+max_len_chars = 800
 news['ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[1] <= (max_len_chars, max_len_chars)])
 
-def get_unique_entities(ents):
+def clean_unique_entities(ents):
     seen_ents = []
     res = []
     for ent in ents:
-        if ent[0] not in seen_ents:
-            res.append(ent)
-            seen_ents.append(ent[0])
+        cleaned_ent = firm_name_clean(ent[0])
+        if cleaned_ent not in seen_ents:
+            res.append(ent + (cleaned_ent,))
+            seen_ents.append(cleaned_ent)
 
 
     return res
 
-news['ents'] = news.ents.apply(get_unique_entities) # take only unique entities per doc
+news['ents'] = news.ents.apply(clean_unique_entities) # take only unique entities per doc
 
-news['ents'] = news.ents.apply(lambda ents: ents[:2]) # take only exactly two entities per doc
 
-news['spans'] = news.ents.apply(lambda ents: [ent[1] for ent in ents])
+# filter out firms in orbis
+orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_firm_names.pkl')
+orbis = set(orbis.company.to_list())
+to_remove = ['federal reserve', 'eu', 'fed', 'treasury', 'congress', 'european central bank',
+             'international monetary fund', 'central bank', 'senate', 'white house', 'house', 'sec', 'ecb',
+             'european commission', 'state', 'un', 'bank of england', 'opec', 'supreme court', 'world bank',
+             'pentagon', 'cabinet', 'web service', 'us senate', 'imf', 'defense',
+             'federal reserve bank' 'euro', 'house of representatives', 'bank', 'journal',
+             'us bankruptcy court', 'medicare', 'american international', 'finance', 's&p', 's&p 500',
+             'news', 'united nations', 'nasdaq', 'parliament', 'us treasury department', 'romney', 'draghi',
+             'usda', 'cotton', 'district court', 'army']
+orbis = {elem for elem in orbis if elem not in to_remove}
+
+pd.Series(list(orbis), name='company').to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_firm_names.pkl')
+
+news['orbis_ents'] = news.ents.apply(lambda ents: [ent for ent in ents if ent[2] in orbis])
+
+news.orbis_ents.explode().size/news.ents.explode().size
+
+news = news[news.ents.apply(len) > 1] # take only docs with at least two unique entities
+news['ents'] = news.ents.apply(lambda ents: ents[:2]) # take only exactly two entities per doc (the first two)
+
 news['orgs'] = news.ents.apply(lambda ents: [ent[0] for ent in ents])
+news['spans'] = news.ents.apply(lambda ents: [ent[1] for ent in ents])
+news['cleaned_orgs'] = news.ents.apply(lambda ents: [ent[2] for ent in ents])
 
-news = news[news.orgs.str.len() > 1] # take only docs with at least two unique docs
 
-
-# match via firm list
+# match via firm list (flasthext)
 # read firm list
 # firm_list = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis-europe-min-15-empl-16-03-22.pkl')
 # firm_list.rename(columns= {'Number of employees\nLast avail. yr': 'emp'}, inplace=True)
@@ -276,13 +224,16 @@ news = news[news.orgs.str.len() > 1] # take only docs with at least two unique d
 #
 # news['tokens'] = news.progress_apply(lambda x: match_entities(x.orgs[:1], x.Text[:400]), axis=1)
 
-news.orgs.explode().value_counts().head(50)
-
 news['meta'] = news.apply(lambda x: {'source': f'Reuters News Dataset - Article ID {str(x.ID)} - {str(x.Date)}'}, axis=1)
-news.drop(columns=['Date', 'ID', 'orgs'], inplace=True)
-news.rename(columns={'Text': 'document', 'ents': 'entities', 'spans': 'entity_spans'}, inplace=True)
+news.drop(columns=['Date', 'ID', 'ents', 'sents', 'cleaned_orgs'], inplace=True)
+news.rename(columns={'Text': 'document', 'orgs': 'entities', 'spans': 'entity_spans'}, inplace=True)
 
-news['relations'] = news.meta.apply(lambda x: [])
+news['relation'] = news.meta.apply(lambda x: [])
+
+# select documents where two firms are mentioned in the beginning (first 100 chars)
+news = news[news.spans.apply(lambda x: x[1][1]) < 100]
+
+news = news.sample(len(kb))
 
 news.to_pickle('/Users/Jakob/Documents/financial_news_data/news_literal_orgs.pkl')
 
