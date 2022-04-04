@@ -25,4 +25,3 @@ df = kb.append(news)
 
 df.to_pickle('/Users/Jakob/Documents/financial_news_data/training-data-29-03-22.pkl', protocol=4)
 
-a/sum(a)

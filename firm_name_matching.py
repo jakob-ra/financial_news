@@ -91,8 +91,9 @@ if __name__ == '__main__':
     orbis['company'] = orbis.companyname.swifter.apply(firm_name_clean)
     orbis = orbis.groupby('company').agg(list).reset_index()
 
-    orbis.drop(orbis[orbis.company.isin(['', '&', np.nan, None])].index, inplace=True)
-
+    # orbis_firm_list = pd.read_csv('https://www.dropbox.com/s/bsq4m09j3ovqsy1/firm_lookup_list.csv.gzip?dl=1',
+    #                     compression='gzip')
+    # orbis_firm_list = set(orbis_firm_list.company.to_list())
     to_remove = ['federal reserve', 'eu', 'fed', 'treasury', 'congress', 'european central bank',
                  'international monetary fund', 'central bank', 'senate', 'white house', 'house', 'sec',
                  'ecb', 'european commission', 'state', 'un', 'bank of england', 'opec', 'supreme court',
@@ -100,9 +101,30 @@ if __name__ == '__main__':
                  'federal reserve bank' 'euro', 'house of representatives', 'bank', 'journal',
                  'us bankruptcy court', 'medicare', 'american international', 'finance', 's&p', 's&p 500',
                  'news', 'united nations', 'nasdaq', 'parliament', 'us treasury department', 'romney',
-                 'draghi', 'usda', 'cotton', 'district court', 'army',
-                 '', '&', np.nan, None]
+                 'draghi', 'usda', 'cotton', 'district court', 'army', '', '&', np.nan, None, 'NYSE',
+                 'Newstex', 'NASDAQ', 'GLOBE NEWSWIRE', 'Zacks Investment Research', 'Reuters', 'ASX',
+                 'Nasdaq', 'TSX', 'LSE', 'JV', 'Thomson Reuters', 'Wall Street Journal', 'OTC', 'M',
+                 'Financial Times', 'The European Commission', 'T', 'NYSE MKT', 'TSXV', 'OTCQB',
+                 'BUSINESS TIMES MALAYSIA', 'fdch', 'WORLDSOURCES', 'WORLD TIMES', 'ASX',
+                 'WORLDSOURCES ONLINE', 'OTCBB', 'ASIA WorldSources Online', 'GLOBE NEWSWIRE',
+                 'AFX', 'PRNewswire-FirstCall', 'ASIA WorldSources', 'Reuters', 'ANSA', 'PR Newswire',
+                 'TSX VENTURE', 'RTTNews', 'ENP Newswire', 'M2 COMMUNICATIONS', 'OTCQB',
+                 'OTC Bulletin Board', 'Xinhua', 'CSE', '-', 'Joint Venture', 'Alliance News',
+                 'Interfax', 'JAKARTA POST', 'SeeNews', 'EU', 'Company', 'Asia Pulse', 'dpa-AFX',
+                 'JAKARTA POST ASIA WorldSources', 'XFN-ASIA', 'Financial Times', 'FDA', 'News Corp',
+                 'WORLD TIMES', 'RWE Australian Business News', 'TSXV', 'AAP', 'BUSINESS TIMES',
+                 'TSE', 'AP', 'HT Digital Content Services', 'ASIA WorldSources Online', 'EPA',
+                 'AIM', 'TSX VENTURE', 'Government', 'ICB', 'ICB', 'European Union', 'RWE Aust Business News',
+                 'JAKARTA POST INDONESIA', 'NRL', 'Newsfile', '']
+    # to_remove = [firm_name_clean(firm) for firm in to_remove]
+    # orbis_firm_list = orbis_firm_list.difference(set(to_remove))
+    # orbis_firm_list = pd.DataFrame(orbis_firm_list).squeeze()
+    # orbis_firm_list.to_csv('C:/Users/Jakob/Documents/Orbis/firm_lookup_list.csv.gzip', index=False, compression='gzip')
+
     orbis.drop(orbis[orbis.company.isin(to_remove)].index, inplace=True)
+
+    # drop firm names with only one character
+    orbis.drop(orbis[orbis.company.str.len() < 2].index, inplace=True)
 
     orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
 
