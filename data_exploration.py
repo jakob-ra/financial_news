@@ -12,6 +12,9 @@ rc('savefig', **{'dpi': 150, 'bbox': 'tight', 'format': 'png'})
 
 # matplotlib.rcParams.keys()
 
+# plot output folder
+output_path = '/Users/Jakob/Documents/financial_news_data/output'
+
 # read Thomson SDC RND database
 sdc = pd.read_pickle('/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
 
@@ -105,7 +108,7 @@ plt.figure(figsize=(10,7))
 sdc['ParticipantNation'].explode().value_counts()[:20].plot(kind="bar")
 plt.xticks(rotation=45, ha='right')
 plt.xlabel('Participant Nation')
-plt.savefig('PartCountries.png')
+plt.savefig(os.path.join(output_path, 'PartCountries.png'))
 plt.show()
 
 # most frequent activities
@@ -119,7 +122,7 @@ plt.figure(figsize=(10,7))
 sdc['ParticipantIndustry'].explode().value_counts()[:20].plot(kind="bar")
 plt.xticks(rotation=45, ha='right')
 plt.xlabel('Participant Industry')
-plt.savefig('PartIndustries.png')
+plt.savefig(os.path.join(output_path, 'PartIndustries.png'))
 plt.show()
 
 # most frequent sources
@@ -144,7 +147,7 @@ plt.xticks(rotation=45, ha='right')
 # plt.title('Number of recorded deals per year')
 # plt.locator_params(nbins=30)
 plt.xlabel('Deal Year')
-plt.savefig('dealsovertime.png')
+plt.savefig(os.path.join(output_path, 'PartIndustries.png'))
 plt.show()
 
 
@@ -207,7 +210,7 @@ sns.heatmap(flag_cooc, xticklabels=flag_cooc.columns, yticklabels=flag_cooc.colu
     annot=True, ax=ax, fmt='g', cmap='Greys')
 # sns.set_palette('Greys')
 plt.xticks(rotation=45, ha='right')
-plt.savefig('co_occur.png')
+plt.savefig(os.path.join(output_path, 'co_occur.png'))
 plt.show()
 #
 # # technology transfer and marketing orthogonal to other classifications, drop it
@@ -300,8 +303,7 @@ plt.savefig('PartDist.png')
 plt.show()
 
 # convert all plots to grayscale
-plots_path = '/Users/Jakob/Documents/Github/financial_news'
-all_plots = glob.glob(os.path.join(plots_path, "*.png"))
+all_plots = glob.glob(os.path.join(output_path, "*.png"))
 all_plots = [x for x in all_plots if not x.endswith('_gray.png')]
 for plot in all_plots:
     gray_plot = Image.open(plot).convert("L")
