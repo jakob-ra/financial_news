@@ -9,7 +9,6 @@ tqdm.pandas()
 import matplotlib.pyplot as plt
 
 df = pd.read_pickle('/Users/Jakob/Downloads/lexisnexis.pkl')
-df = pd.read_pickle('/Users/Jakob/Downloads/lexis_2017_with_org_preds_spacy.pkl', protocol=4)
 
 np.random.seed(42) # set random seed
 
