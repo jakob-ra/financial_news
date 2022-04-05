@@ -11,9 +11,7 @@ df = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/lexisnexis_preds
 df.drop(columns=['index_x', 'index_y'], inplace=True)
 
 
-df = df[['publication', 'publication_date', 'firms', 'rels_pred']]
-
-df.publication.str.split(',').str.len().describe()
+df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
 
 # Time distribution of deals
 plt.figure(figsize=(10,7))
@@ -35,4 +33,42 @@ plt.title('Number of deals per year')
 plt.show()
 
 # most important participants
+to_plot = df.firms.explode().value_counts()
+to_plot.head(50).plot(kind='bar')
+plt.xticks(rotation=45, ha='right', size=6)
+plt.title('Most frequent deal participants')
+plt.tight_layout()
+plt.show()
+
+# most important countries
+to_plot = df.country.explode().value_counts()
+to_plot.head(50).plot(kind='bar')
+plt.xticks(rotation=45, ha='right', size=6)
+plt.title('Most frequent countries')
+plt.tight_layout()
+plt.show()
+
+# most important industries
+to_plot = df.industry.explode().value_counts()
+to_plot.head(50).plot(kind='bar')
+plt.xticks(rotation=45, ha='right', size=6)
+plt.title('Most frequent industries')
+plt.tight_layout()
+plt.show()
+
+# most important sources
+df['publication'] = df.publication.str.split('\'')
+df['publication'] = df.publication.apply(lambda x: x[1] if len(x) > 1 else x[0])
+to_plot = df.publication.value_counts()
+to_plot.head(50).iloc[::-1].plot(kind='barh')
+plt.title('Most frequent sources')
+plt.yticks(rotation=45, ha='right', size=6)
+plt.tight_layout()
+plt.show()
+
+
+rels = df[['publication_date', 'firms', 'rels_pred']].copy()
+rels['firm_a'] = rels.firms.str[0]
+rels['firm_b'] = rels.firms.str[1]
+rels.drop(columns=['firms'], inplace=True)
 
