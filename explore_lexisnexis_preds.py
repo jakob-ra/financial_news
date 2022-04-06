@@ -5,11 +5,14 @@ import glob
 import numpy as np
 import pandas as pd
 
+from firm_name_matching import firm_name_clean
+
 output_path = '/Users/Jakob/Documents/financial_news_data/output/lexis_preds'
 
 important_labels = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing',
                     'ResearchandDevelopment', 'Licensing']
 
+# read lexis nexis articles with detected orgs and relations
 df = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/lexisnexis_preds_robust_vortex_99.pkl')
 
 df.drop(columns=['index_x', 'index_y'], inplace=True)
@@ -17,9 +20,12 @@ df.drop(columns=['index_x', 'index_y'], inplace=True)
 
 df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
 
+
+## Exploratory plots
+
 # Time distribution of deals
 plt.figure(figsize=(10,7))
-df.groupby(df.publication_date.dt.to_period('M')).size().plot(kind="bar")
+df.groupby(df.publication_date.dt.to_period('Y')).size().plot(kind="bar")
 plt.xticks(rotation=45, ha='right')
 plt.title('Number of recorded deals per year')
 plt.locator_params(nbins=30)
@@ -71,7 +77,10 @@ plt.tight_layout()
 plt.show()
 
 
-# replace firm names with ORBIS ID (ID of LARGEST firm with that name in terms of employees)
+
+
+## Match with ORBIS to replace firm names with BvD ID
+
 orbis_path = '/Users/Jakob/Documents/Orbis/lexis_firms_matched_orbis'
 all_orbis = glob.glob(os.path.join(orbis_path, "*.xlsx"))
 
@@ -81,7 +90,7 @@ orbis.drop(columns=['Unnamed: 0'], inplace=True)
 
 orbis.dropna(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=True)
 
-# orbis['BvD ID number'] = orbis['BvD ID number'].ffill()
+# orbis['BvD ID number'] = orbis['BvD ID number'].ffill() # for aggregating the multi-line NACE codes
 # orbis['Company name Latin alphabet'] = orbis['Company name Latin alphabet'].ffill()
 #
 # orbis.drop_duplicates(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=True)
@@ -89,19 +98,9 @@ orbis.dropna(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=Tr
 def isnull(val):
     nan_strings = ['', 'NaN', 'NA', 'na', 'n.a.', 'nan']
     return pd.isnull(val) or val in nan_strings
-#
-# def agg_list(vals):
-#     res = [val for val in vals if not isnull(val)]
-#     if len(res) == 1:
-#         return res[0]
-#     else:
-#         return res
 
 orbis = orbis.groupby(['Company name Latin alphabet', 'BvD ID number']).agg(list)
 orbis.reset_index(inplace=True)
-
-orbis.to_pickle('orbis_michael_preprocessed.pkl')
-orbis = pd.read_pickle('orbis_michael_preprocessed.pkl')
 
 def first_not_null_in_list(vals: list):
     for val in vals:
@@ -112,13 +111,13 @@ def first_not_null_in_list(vals: list):
 for col in orbis.columns[2:]:
     orbis[col] = orbis[col].apply(first_not_null_in_list)
 
-from firm_name_matching import firm_name_clean
 orbis['cleaned_name'] = orbis['Company name Latin alphabet'].apply(firm_name_clean)
 
 # sort by size (employees) first, then value added, then number of NA columns
 orbis['count_na'] = orbis.isnull().sum(1)
 orbis.sort_values(by=['Number of employees\n2020', 'Added value\nth USD 2020', 'count_na'],
                           inplace=True, ascending=False)
+
 # now keep only the biggest firms / firms with most complete records among those with the same name
 orbis.drop_duplicates(subset=['cleaned_name'], keep='first', inplace=True)
 
@@ -128,6 +127,8 @@ lexis_firm_names_clean = df.firms.explode().apply(firm_name_clean).value_counts(
 
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
+
+name_ids = names_ids[names_ids['BvD ID number'].isnull()]
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
 df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
@@ -148,7 +149,15 @@ rels = rels[rels.rels_pred.apply(lambda rels: 'Terminated' not in rels)]
 # remove firms where both participants are the same
 rels = rels[rels.firm_a != rels.firm_b]
 
-rels.rels_pred.explode().value_counts()
+# remove duplicate relationships (same participants, same type, similar timeframe +-1 year)
 
+
+
+orbis.to_csv(os.path.join(output_path, 'rel_database', 'lexis_orbis_match.csv'), index=False)
+
+# save separate csvs for each relation type
+for rel_name in important_labels:
+    rels[rels.rels_pred.apply(lambda rels: rel_name in rels)].drop(columns=['rels_pred']).to_csv(
+            os.path.join(output_path, 'rel_database', f'{rel_name}_LexisNexis.csv'), index=False)
 
 
