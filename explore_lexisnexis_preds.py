@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import glob
 
 output_path = '/Users/Jakob/Documents/financial_news_data/output/lexis_preds'
 
@@ -67,8 +69,19 @@ plt.tight_layout()
 plt.show()
 
 
+# replace firm names with ORBIS ID (ID of LARGEST firm with that name in terms of employees)
+orbis_path = '/Users/Jakob/Documents/Orbis/lexis_firms_matched_orbis'
+all_orbis = glob.glob(os.path.join(orbis_path, "*.xlsx"))
+
+orbis = pd.concat((pd.read_excel(f) for f in all_orbis), ignore_index=True)
+
+
+orbis = pd.read_excel(all_orbis[0])
+
+
+
+
 rels = df[['publication_date', 'firms', 'rels_pred']].copy()
 rels['firm_a'] = rels.firms.str[0]
 rels['firm_b'] = rels.firms.str[1]
 rels.drop(columns=['firms'], inplace=True)
-
