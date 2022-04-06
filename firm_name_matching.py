@@ -91,9 +91,6 @@ if __name__ == '__main__':
     orbis['company'] = orbis.companyname.swifter.apply(firm_name_clean)
     orbis = orbis.groupby('company').agg(list).reset_index()
 
-    # orbis_firm_list = pd.read_csv('https://www.dropbox.com/s/bsq4m09j3ovqsy1/firm_lookup_list.csv.gzip?dl=1',
-    #                     compression='gzip')
-    # orbis_firm_list = set(orbis_firm_list.company.to_list())
     to_remove = ['federal reserve', 'eu', 'fed', 'treasury', 'congress', 'european central bank',
                  'international monetary fund', 'central bank', 'senate', 'white house', 'house', 'sec',
                  'ecb', 'european commission', 'state', 'un', 'bank of england', 'opec', 'supreme court',
@@ -115,12 +112,9 @@ if __name__ == '__main__':
                  'WORLD TIMES', 'RWE Australian Business News', 'TSXV', 'AAP', 'BUSINESS TIMES',
                  'TSE', 'AP', 'HT Digital Content Services', 'ASIA WorldSources Online', 'EPA',
                  'AIM', 'TSX VENTURE', 'Government', 'ICB', 'ICB', 'European Union', 'RWE Aust Business News',
-                 'JAKARTA POST INDONESIA', 'NRL', 'Newsfile', '']
-    # to_remove = [firm_name_clean(firm) for firm in to_remove]
-    # orbis_firm_list = orbis_firm_list.difference(set(to_remove))
-    # orbis_firm_list = pd.DataFrame(orbis_firm_list).squeeze()
-    # orbis_firm_list.to_csv('C:/Users/Jakob/Documents/Orbis/firm_lookup_list.csv.gzip', index=False, compression='gzip')
-
+                 'JAKARTA POST INDONESIA', 'NRL', 'Newsfile', '', 'BSE', '', 'NSE', 'isis', 'ase',
+                 'united states navy', 'ule', 'aex']
+    to_remove = [firm_name_clean(elem) for elem in to_remove]
     orbis.drop(orbis[orbis.company.isin(to_remove)].index, inplace=True)
 
     # drop firm names with only one character
@@ -153,7 +147,7 @@ if __name__ == '__main__':
     sdc_comps.reset_index(inplace=True)
     sdc_comps.columns = ['company', 'count']
     drop_comps = ['Undisclosed JV Partner', 'Undisclosed Chinese Co', 'Peoples Republic of China', 'Malaysia',
-                  'Mynistry of Finance Singapore', 'Singapore', 'Russian Federation',
+                  'Ministry of Finance Singapore', 'Singapore', 'Russian Federation',
                   'Undisclosed Japanese Partner', 'Saudi Arabia', 'Indonesia Republic', 'Republic of Korea',
                   'Undisclosed Companies', 'Philippines', 'Algerian Government', 'Undisclosed Japanese Co(s)',
                   'Seeking Partner', 'Vietnam', 'Soviet Union', 'Kazakhstan', 'Undisclosed US Partner',

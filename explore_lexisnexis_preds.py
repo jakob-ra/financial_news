@@ -122,16 +122,18 @@ orbis.sort_values(by=['Number of employees\n2020', 'Added value\nth USD 2020', '
 orbis.drop_duplicates(subset=['cleaned_name'], keep='first', inplace=True)
 
 
-lexis_firm_names_clean = df.firms.explode().apply(firm_name_clean).value_counts()\
+df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
+
+
+lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
     .index.to_frame(name='cleaned_name').reset_index(drop=True)
 
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
 
-name_ids = names_ids[names_ids['BvD ID number'].isnull()]
+# name_ids = names_ids[names_ids['BvD ID number'].isnull()] # look at unmatched
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
-df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
 
 rels = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
 rels['firm_a'] = rels.cleaned_firms.str[0]
@@ -152,6 +154,7 @@ rels = rels[rels.firm_a != rels.firm_b]
 # remove duplicate relationships (same participants, same type, similar timeframe +-1 year)
 
 
+orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis.pkl')
 
 orbis.to_csv(os.path.join(output_path, 'rel_database', 'lexis_orbis_match.csv'), index=False)
 
@@ -161,3 +164,15 @@ for rel_name in important_labels:
             os.path.join(output_path, 'rel_database', f'{rel_name}_LexisNexis.csv'), index=False)
 
 
+orbis.merge(orbis2, left_on='cleaned_name', right_on='company')
+
+orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+orbis_minus_michael = orbis2[~orbis2.company.isin(orbis.cleaned_name)]
+name_ids = name_ids[['cleaned_name']].merge(orbis_minus_michael[['company', 'bvdidnumber']],
+                                         left_on='cleaned_name', right_on='company', how='left')
+name_ids.dropna()
+orbis_minus_michael.columns
+
+{'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries', 'ge': 'general electric', 'vw': 'volkswagen',
+ 'ibm': 'international business machines', 'l&t': 'larsen & toubro', 'ril': 'reliance industries limited',
+ 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
