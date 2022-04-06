@@ -176,3 +176,5 @@ orbis_minus_michael.columns
 {'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries', 'ge': 'general electric', 'vw': 'volkswagen',
  'ibm': 'international business machines', 'l&t': 'larsen & toubro', 'ril': 'reliance industries limited',
  'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
+
+pd.read_csv("C:/Users/Jakob/Downloads/orbis_financials/Industry-Global_financials_and_ratios.part001/Industry-Global_financials_and_ratios.txt", nrows=1000)
