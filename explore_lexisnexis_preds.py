@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import glob
+import numpy as np
+import pandas as pd
 
 output_path = '/Users/Jakob/Documents/financial_news_data/output/lexis_preds'
 
@@ -75,13 +77,78 @@ all_orbis = glob.glob(os.path.join(orbis_path, "*.xlsx"))
 
 orbis = pd.concat((pd.read_excel(f) for f in all_orbis), ignore_index=True)
 
+orbis.drop(columns=['Unnamed: 0'], inplace=True)
 
-orbis = pd.read_excel(all_orbis[0])
+orbis.dropna(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=True)
+
+# orbis['BvD ID number'] = orbis['BvD ID number'].ffill()
+# orbis['Company name Latin alphabet'] = orbis['Company name Latin alphabet'].ffill()
+#
+# orbis.drop_duplicates(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=True)
+
+def isnull(val):
+    nan_strings = ['', 'NaN', 'NA', 'na', 'n.a.', 'nan']
+    return pd.isnull(val) or val in nan_strings
+#
+# def agg_list(vals):
+#     res = [val for val in vals if not isnull(val)]
+#     if len(res) == 1:
+#         return res[0]
+#     else:
+#         return res
+
+orbis = orbis.groupby(['Company name Latin alphabet', 'BvD ID number']).agg(list)
+orbis.reset_index(inplace=True)
+
+orbis.to_pickle('orbis_michael_preprocessed.pkl')
+orbis = pd.read_pickle('orbis_michael_preprocessed.pkl')
+
+def first_not_null_in_list(vals: list):
+    for val in vals:
+        if not isnull(val):
+            return val
+    return np.nan
+
+for col in orbis.columns[2:]:
+    orbis[col] = orbis[col].apply(first_not_null_in_list)
+
+from firm_name_matching import firm_name_clean
+orbis['cleaned_name'] = orbis['Company name Latin alphabet'].apply(firm_name_clean)
+
+# sort by size (employees) first, then value added, then number of NA columns
+orbis['count_na'] = orbis.isnull().sum(1)
+orbis.sort_values(by=['Number of employees\n2020', 'Added value\nth USD 2020', 'count_na'],
+                          inplace=True, ascending=False)
+# now keep only the biggest firms / firms with most complete records among those with the same name
+orbis.drop_duplicates(subset=['cleaned_name'], keep='first', inplace=True)
+
+
+lexis_firm_names_clean = df.firms.explode().apply(firm_name_clean).value_counts()\
+    .index.to_frame(name='cleaned_name').reset_index(drop=True)
+
+names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
+                                         on='cleaned_name', how='left')
+names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
+
+df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
+
+rels = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
+rels['firm_a'] = rels.cleaned_firms.str[0]
+rels['firm_b'] = rels.cleaned_firms.str[1]
+rels.drop(columns=['cleaned_firms'], inplace=True)
+
+rels['firm_a'] = rels.firm_a.map(names_ids)
+rels['firm_b'] = rels.firm_b.map(names_ids)
+
+rels.dropna(inplace=True)
+
+# remove terminated
+rels = rels[rels.rels_pred.apply(lambda rels: 'Terminated' not in rels)]
+
+# remove firms where both participants are the same
+rels = rels[rels.firm_a != rels.firm_b]
+
+rels.rels_pred.explode().value_counts()
 
 
 
-
-rels = df[['publication_date', 'firms', 'rels_pred']].copy()
-rels['firm_a'] = rels.firms.str[0]
-rels['firm_b'] = rels.firms.str[1]
-rels.drop(columns=['firms'], inplace=True)
