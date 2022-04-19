@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import os
 import glob
 import numpy as np
-import pandas as pd
 
 from firm_name_matching import firm_name_clean
 
@@ -116,24 +115,40 @@ orbis['cleaned_name'] = orbis['Company name Latin alphabet'].apply(firm_name_cle
 # sort by size (employees) first, then value added, then number of NA columns
 orbis['count_na'] = orbis.isnull().sum(1)
 orbis.sort_values(by=['Number of employees\n2020', 'Added value\nth USD 2020', 'count_na'],
-                          inplace=True, ascending=False)
+                          inplace=True, ascending=[False, False, True])
 
 # now keep only the biggest firms / firms with most complete records among those with the same name
 orbis.drop_duplicates(subset=['cleaned_name'], keep='first', inplace=True)
 
+orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
+orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
+
 
 df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
-
 
 lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
     .index.to_frame(name='cleaned_name').reset_index(drop=True)
 
+to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries', 'ge': 'general electric', 'vw': 'volkswagen',
+ 'ibm': 'international business machines', 'l&t': 'larsen & toubro',
+ 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
+
+lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.replace(to_replace)
+
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
 
-# name_ids = names_ids[names_ids['BvD ID number'].isnull()] # look at unmatched
-names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
+# look at unmatched
+# unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
+#
+# orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+# unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
+#                                          left_on='cleaned_name', right_on='company', how='left')
+# unmatched.drop(columns=['cleaned_name'], inplace=True)
+# unmatched.bvdidnumber.explode().to_csv(
+#         'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
 
+names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
 rels = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
 rels['firm_a'] = rels.cleaned_firms.str[0]
@@ -151,10 +166,13 @@ rels = rels[rels.rels_pred.apply(lambda rels: 'Terminated' not in rels)]
 # remove firms where both participants are the same
 rels = rels[rels.firm_a != rels.firm_b]
 
-# remove duplicate relationships (same participants, same type, similar timeframe +-1 year)
+# remove duplicate relationships (same participants, same type, same year)
+rels['year'] = rels.publication_date.dt.year
+rels = rels.groupby(['firm_a', 'firm_b', 'year']).agg(list)
+rels.reset_index(inplace=True)
 
-
-orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis.pkl')
+from itertools import chain
+rels['rels_pred'] = rels.rels_pred.apply(chain.from_iterable).apply(list).apply(set).apply(list)
 
 orbis.to_csv(os.path.join(output_path, 'rel_database', 'lexis_orbis_match.csv'), index=False)
 
@@ -173,8 +191,5 @@ name_ids = name_ids[['cleaned_name']].merge(orbis_minus_michael[['company', 'bvd
 name_ids.dropna()
 orbis_minus_michael.columns
 
-{'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries', 'ge': 'general electric', 'vw': 'volkswagen',
- 'ibm': 'international business machines', 'l&t': 'larsen & toubro', 'ril': 'reliance industries limited',
- 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
 
 pd.read_csv("C:/Users/Jakob/Downloads/orbis_financials/Industry-Global_financials_and_ratios.part001/Industry-Global_financials_and_ratios.txt", nrows=1000)
