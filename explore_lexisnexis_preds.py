@@ -19,7 +19,6 @@ df.drop(columns=['index_x', 'index_y'], inplace=True)
 
 df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
 
-
 ## Exploratory plots
 
 # Time distribution of deals
@@ -91,7 +90,7 @@ orbis.dropna(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=Tr
 
 # orbis['BvD ID number'] = orbis['BvD ID number'].ffill() # for aggregating the multi-line NACE codes
 # orbis['Company name Latin alphabet'] = orbis['Company name Latin alphabet'].ffill()
-#
+
 # orbis.drop_duplicates(subset=['Company name Latin alphabet', 'BvD ID number'], inplace=True)
 
 def isnull(val):
@@ -129,9 +128,9 @@ df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for fi
 lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
     .index.to_frame(name='cleaned_name').reset_index(drop=True)
 
-to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries', 'ge': 'general electric', 'vw': 'volkswagen',
- 'ibm': 'international business machines', 'l&t': 'larsen & toubro',
- 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
+to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries',
+              'ge'  : 'general electric', 'vw': 'volkswagen', 'ibm': 'international business machines',
+              'l&t' : 'larsen & toubro', 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
 
 lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.replace(to_replace)
 
@@ -139,17 +138,19 @@ names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']
                                          on='cleaned_name', how='left')
 
 # look at unmatched
-# unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
-#
-# orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
-# unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
-#                                          left_on='cleaned_name', right_on='company', how='left')
-# unmatched.drop(columns=['cleaned_name'], inplace=True)
-# unmatched.bvdidnumber.explode().to_csv(
-#         'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
+unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
+
+orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
+                                         left_on='cleaned_name', right_on='company', how='left')
+unmatched.drop(columns=['cleaned_name'], inplace=True)
+unmatched.bvdidnumber.explode().to_csv(
+        'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
 
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
+
+## create edge list for Michael
 rels = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
 rels['firm_a'] = rels.cleaned_firms.str[0]
 rels['firm_b'] = rels.cleaned_firms.str[1]
@@ -182,14 +183,10 @@ for rel_name in important_labels:
             os.path.join(output_path, 'rel_database', f'{rel_name}_LexisNexis.csv'), index=False)
 
 
-orbis.merge(orbis2, left_on='cleaned_name', right_on='company')
+# orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+# orbis_minus_michael = orbis2[~orbis2.company.isin(orbis.cleaned_name)]
+# name_ids = name_ids[['cleaned_name']].merge(orbis_minus_michael[['company', 'bvdidnumber']],
+#                                          left_on='cleaned_name', right_on='company', how='left')
+# name_ids.dropna()
+# orbis_minus_michael.columns
 
-orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
-orbis_minus_michael = orbis2[~orbis2.company.isin(orbis.cleaned_name)]
-name_ids = name_ids[['cleaned_name']].merge(orbis_minus_michael[['company', 'bvdidnumber']],
-                                         left_on='cleaned_name', right_on='company', how='left')
-name_ids.dropna()
-orbis_minus_michael.columns
-
-
-pd.read_csv("C:/Users/Jakob/Downloads/orbis_financials/Industry-Global_financials_and_ratios.part001/Industry-Global_financials_and_ratios.txt", nrows=1000)
