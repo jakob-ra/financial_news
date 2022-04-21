@@ -3,3 +3,4 @@ google_api_key.txt
 bertviz
 __pycache__/
 *.pyc
+__pycache__/google_match.cpython-39.pyc
