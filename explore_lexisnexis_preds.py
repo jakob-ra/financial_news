@@ -90,35 +90,35 @@ names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']
                                          on='cleaned_name', how='left')
 
 # look at unmatched
-unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
+# unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
+#
+# orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+# unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
+#                                          left_on='cleaned_name', right_on='company', how='left')
+# unmatched.drop(columns=['cleaned_name'], inplace=True)
+# unmatched.bvdidnumber.explode().to_csv(
+#         'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
 
-orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
-unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
-                                         left_on='cleaned_name', right_on='company', how='left')
-unmatched.drop(columns=['cleaned_name'], inplace=True)
-unmatched.bvdidnumber.explode().to_csv(
-        'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
-
-## google lookup on residual
-from google_match import google_KG_match
-from tqdm import tqdm
-tqdm.pandas()
-
-api_key = open('google_api_key.txt', 'r').read()
-
-unmatched['google_res'] = unmatched.company.apply(str).progress_apply(
-    lambda x: google_KG_match(x, api_key, type='Corporation'))
-
-res_df = []
-for index, row in unmatched.iterrows():
-    google_res = row.google_res
-    if google_res != None:
-        if 'Corporation' in google_res['result']['@type']:  # google_res['resultScore'] > 100 and
-            res = pd.json_normalize(google_res)
-            row = pd.DataFrame(row).T
-            res.index = row.index
-
-            res_df.append(res)
+# ## google lookup on residual
+# from google_match import google_KG_match
+# from tqdm import tqdm
+# tqdm.pandas()
+#
+# api_key = open('google_api_key.txt', 'r').read()
+#
+# unmatched['google_res'] = unmatched.company.apply(str).progress_apply(
+#     lambda x: google_KG_match(x, api_key, type='Corporation'))
+#
+# res_df = []
+# for index, row in unmatched.iterrows():
+#     google_res = row.google_res
+#     if google_res != None:
+#         if 'Corporation' in google_res['result']['@type']:  # google_res['resultScore'] > 100 and
+#             res = pd.json_normalize(google_res)
+#             row = pd.DataFrame(row).T
+#             res.index = row.index
+#
+#             res_df.append(res)
 
 
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
@@ -185,7 +185,6 @@ sdc.drop(columns=labels, inplace=True)
 sdc.columns = ['publication_date', 'text', 'firms', 'rels']
 
 import itertools
-list(itertools.combinations(sdc[sdc.firms.str.len() > 2].firms.iloc[0], 2))
 
 # make a row for each two-way combination between participants
 sdc['firms'] = sdc.firms.apply(lambda firms: list(itertools.combinations(firms, 2)))
