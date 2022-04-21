@@ -1,5 +1,5 @@
 google_api_key.txt
 *.gzip
 bertviz
-__pycache__
+__pycache__/
 *.pyc

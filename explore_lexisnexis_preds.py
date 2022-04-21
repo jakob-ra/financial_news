@@ -72,7 +72,7 @@ plt.yticks(rotation=45, ha='right', size=6)
 plt.tight_layout()
 plt.show()
 
-# match with orbis
+## match with orbis
 orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
 
 df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
@@ -89,9 +89,40 @@ lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.rep
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
 
+# look at unmatched
+unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
+
+orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
+unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
+                                         left_on='cleaned_name', right_on='company', how='left')
+unmatched.drop(columns=['cleaned_name'], inplace=True)
+unmatched.bvdidnumber.explode().to_csv(
+        'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
+
+## google lookup on residual
+from google_match import google_KG_match
+from tqdm import tqdm
+tqdm.pandas()
+
+api_key = open('google_api_key.txt', 'r').read()
+
+unmatched['google_res'] = unmatched.company.apply(str).progress_apply(
+    lambda x: google_KG_match(x, api_key, type='Corporation'))
+
+res_df = []
+for index, row in unmatched.iterrows():
+    google_res = row.google_res
+    if google_res != None:
+        if 'Corporation' in google_res['result']['@type']:  # google_res['resultScore'] > 100 and
+            res = pd.json_normalize(google_res)
+            row = pd.DataFrame(row).T
+            res.index = row.index
+
+            res_df.append(res)
+
+
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
-df.cleaned_firms.explode().value_counts()
 
 
 ## compare to SDC
@@ -175,15 +206,7 @@ sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
 
 sdc.sample().values
 
-# look at unmatched
-# unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
-#
-# orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
-# unmatched = unmatched[['cleaned_name']].merge(orbis2[['company', 'bvdidnumber']],
-#                                          left_on='cleaned_name', right_on='company', how='left')
-# unmatched.drop(columns=['cleaned_name'], inplace=True)
-# unmatched.bvdidnumber.explode().to_csv(
-#         'C:/Users/Jakob/Documents/Orbis/bvdids_michael_unmatched_3.csv', index=False)
+
 
 
 

@@ -7,7 +7,10 @@ def google_KG_match(query, api_key, type=None):
     service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
     params = {'query': query, 'limit': 1, 'indent': True, 'key': api_key, 'types': type}
     url = service_url + '?' + urllib.parse.urlencode(params)
-    response = json.loads(urllib.request.urlopen(url).read())
+    try:
+        response = json.loads(urllib.request.urlopen(url).read())
+    except HTTPError as e:
+        print(e)
     best_response = next(iter(response['itemListElement']), None)
     # if best_response != None:
     #     res = best_response['result']['name']
