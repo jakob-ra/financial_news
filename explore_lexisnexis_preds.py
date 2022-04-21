@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-
+import itertools
 from firm_name_matching import firm_name_clean
 
 output_path = '/Users/Jakob/Documents/financial_news_data/output/lexis_preds'
@@ -184,8 +184,6 @@ sdc['rels'] = sdc[labels].sum(axis=1)
 sdc.drop(columns=labels, inplace=True)
 sdc.columns = ['publication_date', 'text', 'firms', 'rels']
 
-import itertools
-
 # make a row for each two-way combination between participants
 sdc['firms'] = sdc.firms.apply(lambda firms: list(itertools.combinations(firms, 2)))
 sdc = sdc.explode('firms')
@@ -198,13 +196,9 @@ df['cleaned_firms'] = df.cleaned_firms.apply(frozenset)
 
 sdc = sdc[sdc.cleaned_firms.str.len() > 1]
 
-sdc.drop(columns=['year'], inplace=True)
+
 
 sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
-
-
-sdc.sample().values
-
 
 
 
