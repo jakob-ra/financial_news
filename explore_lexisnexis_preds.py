@@ -94,7 +94,86 @@ names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 df.cleaned_firms.explode().value_counts()
 
 
+## compare to SDC
+sdc = pd.read_pickle('C:/Users/Jakob/Documents/Thomson_SDC/Full/SDC_Strategic_Alliances_Full.pkl')
 
+sdc['DealNumber'] = sdc.DealNumber.astype(str)
+sdc['DealNumber'] = sdc.DealNumber.apply(lambda x: x.split('.')[0])
+
+sdc.drop_duplicates(subset=['DealNumber'], inplace=True)
+sdc.drop_duplicates(subset=['DealText'], inplace=True)
+
+
+sdc.set_index('DealNumber', inplace=True, drop=True)
+
+# there are 12 observations that are not tagged as SA or JV
+len(sdc) - sdc[['StrategicAlliance', 'JointVentureFlag']].any(axis=1).sum()
+# remove them
+sdc = sdc[sdc[['StrategicAlliance', 'JointVentureFlag']].any(axis=1)]
+
+# combine licensing, exclusive licensing, crosslicensing
+licensing_cols = ['LicensingAgreementFlag', 'ExclusiveLicensingAgreementFlag', 'CrossLicensingAgreement',
+                  'RoyaltiesFlag']
+sdc['Licensing'] = sdc[licensing_cols].any(axis=1)
+sdc.drop(columns=licensing_cols, inplace=True)
+
+# A lot of agreements are pending (announced), some are announced to be terminated
+sdc.Status.value_counts()
+
+# one hot encode pending and terminated
+sdc['Pending'] = (sdc.Status == 'Pending').astype(int)
+sdc['Terminated'] = (sdc.Status == 'Terminated').astype(int)
+
+# make column names easier to work with
+sdc.columns = sdc.columns.str.replace('Flag', '')
+sdc.columns = sdc.columns.str.replace('Agreement', '')
+sdc.rename(columns={'DealNumber'                               : 'ID', 'AllianceDateAnnounced': 'Date',
+                    'DealText'                                 : 'Text',
+                    'ParticipantsinVenture/Alliance(ShortName)': 'Participants'}, inplace=True)
+
+labels = ['JointVenture', 'Marketing', 'Manufacturing', 'ResearchandDevelopment', 'Licensing', 'Supply',
+          'Exploration', 'TechnologyTransfer', 'Pending', 'Terminated']
+
+sdc = sdc[['Date', 'Text', 'Participants'] + labels]
+
+# take examples with at least 2 participants
+sdc = sdc[sdc.Participants.str.len() > 1]
+
+# convert to bool
+sdc[labels] = sdc[labels].apply(lambda x: pd.to_numeric(x, downcast='integer')).astype(bool)
+
+sdc['StrategicAlliance'] = ~sdc.JointVenture  # every deal that is not a JV is a SA
+
+labels = ['StrategicAlliance'] + labels
+
+# get string names of labels
+for label_name in labels:
+    sdc[label_name] = sdc[label_name].apply(lambda x: [label_name] if x == 1 else [])
+sdc['rels'] = sdc[labels].sum(axis=1)
+sdc.drop(columns=labels, inplace=True)
+sdc.columns = ['publication_date', 'text', 'firms', 'rels']
+
+import itertools
+list(itertools.combinations(sdc[sdc.firms.str.len() > 2].firms.iloc[0], 2))
+
+# make a row for each two-way combination between participants
+sdc['firms'] = sdc.firms.apply(lambda firms: list(itertools.combinations(firms, 2)))
+sdc = sdc.explode('firms')
+
+sdc['cleaned_firms'] = sdc.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
+
+# convert to sets
+sdc['cleaned_firms'] = sdc.cleaned_firms.apply(frozenset)
+df['cleaned_firms'] = df.cleaned_firms.apply(frozenset)
+
+sdc = sdc[sdc.cleaned_firms.str.len() > 1]
+
+sdc.drop(columns=['year'], inplace=True)
+
+sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
+
+
+sdc.sample().values
 
 # look at unmatched
 # unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
