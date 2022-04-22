@@ -17,6 +17,9 @@ df.drop(columns=['index_x', 'index_y'], inplace=True)
 
 df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
 
+df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
+
+
 ## Exploratory plots
 
 # Time distribution of deals
@@ -74,8 +77,6 @@ plt.show()
 
 ## match with orbis
 orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
-
-df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
 
 lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
     .index.to_frame(name='cleaned_name').reset_index(drop=True)
@@ -187,6 +188,7 @@ sdc.columns = ['publication_date', 'text', 'firms', 'rels']
 # make a row for each two-way combination between participants
 sdc['firms'] = sdc.firms.apply(lambda firms: list(itertools.combinations(firms, 2)))
 sdc = sdc.explode('firms')
+sdc = sdc[sdc.firms.apply(set).str.len() > 1]
 
 sdc['cleaned_firms'] = sdc.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
 
@@ -196,11 +198,54 @@ df['cleaned_firms'] = df.cleaned_firms.apply(frozenset)
 
 sdc = sdc[sdc.cleaned_firms.str.len() > 1]
 
+df.groupby([''])
 
-
+# merge detected relationships on firm name pairs
 sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
+# take only relationships detected within 1 year of each other
+sdc_merge = sdc_merge[abs(sdc_merge.publication_date_x-sdc_merge.publication_date_y) < pd.Timedelta('1Y')]
+sdc_merge = sdc_merge[['cleaned_firms', 'rels', 'rels_pred']]
+sdc_merge = sdc_merge.groupby('cleaned_firms').agg(sum)
+sdc_merge['rels'] = sdc_merge.rels.apply(frozenset)
+sdc_merge['rels_pred'] = sdc_merge.rels_pred.apply(frozenset)
+
+# precision, reclall, F1 for each relation type
+from sklearn.metrics import recall_score, precision_score, f1_score
+for rel_name in labels:
+    true = sdc_merge.rels.apply(lambda rels: 1 if rel_name in rels else 0)
+    pred = sdc_merge.rels_pred.apply(lambda rels: 1 if rel_name in rels else 0)
+    recall = recall_score(true, pred)
+    precision = precision_score(true, pred)
+    f1 = f1_score(true, pred)
+    print(f'{rel_name}: Recall - {recall:.2f}, Precision - {precision:.2f}, F1 - {f1:.2f}')
+
+df_red = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
+
+df_red = df_red.groupby('cleaned_firms').agg(list)
+df_red['timedeltas'] = df_red.publication_date.apply(lambda )
+def timedeltas_list(timestamps: list):
+    assert type(timestamps[0]) == pd.Timestamp
+    deltas = []
+    for index in range(len(timestamps)):
+        if index == 0:
+            deltas.append(pd.Timedelta(0))
+        else:
+            time_a = timestamps[index-1]
+            deltas.append(time_b - time_a)
 
 
+
+## compare to CATI
+cati = pd.read_pickle("C:/Users/Jakob/Documents/CATI/cati_clean.pkl")
+cati.rename(columns={'Date': 'year'}, inplace=True)
+cati['cleaned_firms'] = cati.Participants.apply(lambda firms: [firm_name_clean(firm) for firm in firms]).apply(frozenset)
+cati.drop(columns=['Participants'], inplace=True)
+df_red['year'] = df_red.publication_date.dt.year
+df_red.drop(columns=['publication_date'], inplace=True)
+cati.drop(columns=['Participants'], inplace=True)
+
+cati_merge = cati.merge(df, on=['cleaned_firms', 'year'])
+sdc_merge.rels_pred.apply(pd.Series)
 
 
 ## create edge list for Michael

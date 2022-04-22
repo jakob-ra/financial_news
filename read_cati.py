@@ -1,7 +1,7 @@
 import pandas as pd
 import itertools
 
-df = pd.read_excel("C:/Users/Jakob/Downloads/CATI/CATI/CATI Year Alliances.xlsx")
+df = pd.read_excel("C:/Users/Jakob/Documents/CATI/CATI Year Alliances.xlsx")
 
 # make one column with list of participants
 part_cols = [col for col in df.columns if "COFI" in col]
@@ -10,6 +10,8 @@ df['Participants'] = df.Participants.apply(lambda vals: [val for val in vals if 
 df.drop(columns=part_cols, inplace=True)
 
 df.rename(columns={'ESTA': 'Date', 'FORMCOOP': 'rel_type'}, inplace=True)
+
+df = df[df.Participants.apply(set).apply(len) > 1]
 
 # make CATI forms of cooperation comparable to SDC
 """ Forms of cooperation in Cati: Joint Research Pact (JRP), Joint Development Agreement (JDA), 
@@ -28,25 +30,26 @@ df.dropna(inplace=True)
 df['rel_type'] = df.rel_type.str.split(r',|, ')
 df = df.explode('rel_type')
 df['rel_type'] = df.rel_type.str.strip()
-df = df.groupby(df.index).agg({'Date': min, 'rel_type': list, 'Participants': sum})
+df = df.groupby(df.index).agg({'Date': min, 'rel_type': list, 'Participants': min})
 df['rel_type'] = df.rel_type.apply(set).apply(list)
 df.Date.describe()
 
 # replace firm name abbreviations with name
-code2name = pd.read_excel("C:/Users/Jakob/Downloads/CATI/CATI/CATI Name Code.xlsx")
+code2name = pd.read_excel("C:/Users/Jakob/Documents/CATI/CATI Name Code.xlsx")
 code2name = code2name.set_index('COD').squeeze().to_dict()
 df = df.explode('Participants')
 df['Participants'] = df.Participants.map(code2name)
 df = df.groupby(df.index).agg({'Date': min, 'rel_type': min, 'Participants': list})
 
-assert df.Participants.apply(set).apply(len).min() == 2
+
 
 # make a row for each two-way combination between participants
 df['Participants'] = df.Participants.apply(lambda firms: list(itertools.combinations(firms, 2)))
 df = df.explode('Participants')
-df['Participants'] = df.Participants.apply(list)
+df['Participants'] = df.Participants.apply(set).apply(list)
+df = df[df.Participants.str.len() > 1]
 
-df.to_pickle("C:/Users/Jakob/Documents/CATI/CATI/CATI Year Alliances.xlsx")
+df.to_pickle("C:/Users/Jakob/Documents/CATI/cati_clean.pkl")
 
 # def agg(vals: list):
 #     res = set(vals)
