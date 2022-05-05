@@ -198,54 +198,71 @@ df['cleaned_firms'] = df.cleaned_firms.apply(frozenset)
 
 sdc = sdc[sdc.cleaned_firms.str.len() > 1]
 
-df.groupby([''])
+sdc['year'] = sdc.publication_date.dt.year
+sdc.drop_duplicates(['cleaned_firms', 'year'])
+
+sdc[['cleaned_firms', 'rels']].groupby('cleaned_firms').agg(sum)
+max_distance = pd.Timedelta('2Y')
+sdc["group_diff"] = df.sort_values(['cleaned_firms', 'publication_date'])\
+                     .groupby("cleaned_firms")["publication_date"]\
+                     .diff()\
+                     .gt(max_distance)\
+                     .cumsum()
 
 # merge detected relationships on firm name pairs
 sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
+sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='inner')
 # take only relationships detected within 1 year of each other
-sdc_merge = sdc_merge[abs(sdc_merge.publication_date_x-sdc_merge.publication_date_y) < pd.Timedelta('1Y')]
+sdc_merge = sdc_merge[abs(sdc_merge.publication_date_x-sdc_merge.publication_date_y) < pd.Timedelta('2Y')]
 sdc_merge = sdc_merge[['cleaned_firms', 'rels', 'rels_pred']]
 sdc_merge = sdc_merge.groupby('cleaned_firms').agg(sum)
 sdc_merge['rels'] = sdc_merge.rels.apply(frozenset)
 sdc_merge['rels_pred'] = sdc_merge.rels_pred.apply(frozenset)
 
-# precision, reclall, F1 for each relation type
 from sklearn.metrics import recall_score, precision_score, f1_score
-for rel_name in labels:
-    true = sdc_merge.rels.apply(lambda rels: 1 if rel_name in rels else 0)
-    pred = sdc_merge.rels_pred.apply(lambda rels: 1 if rel_name in rels else 0)
-    recall = recall_score(true, pred)
-    precision = precision_score(true, pred)
-    f1 = f1_score(true, pred)
-    print(f'{rel_name}: Recall - {recall:.2f}, Precision - {precision:.2f}, F1 - {f1:.2f}')
 
-df_red = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
+from sklearn.dummy import DummyClassifier
+# precision, reclall, F1 for each relation type
 
-df_red = df_red.groupby('cleaned_firms').agg(list)
-df_red['timedeltas'] = df_red.publication_date.apply(lambda )
-def timedeltas_list(timestamps: list):
-    assert type(timestamps[0]) == pd.Timestamp
-    deltas = []
-    for index in range(len(timestamps)):
-        if index == 0:
-            deltas.append(pd.Timedelta(0))
-        else:
-            time_a = timestamps[index-1]
-            deltas.append(time_b - time_a)
+def get_metrics(df: pd.DataFrame, labels: list):
+    for rel_name in labels:
+        true = df.rels.apply(lambda rels: 1 if rel_name in rels else 0)
+        pred = df.rels_pred.apply(lambda rels: 1 if rel_name in rels else 0)
+        recall = recall_score(true, pred)
+        precision = precision_score(true, pred)
+        f1 = f1_score(true, pred)
+        print(f'{rel_name}: Recall - {recall:.2f}, Precision - {precision:.2f}, F1 - {f1:.2f}')
+        dummy_clf = DummyClassifier(strategy="stratified")
+        dummy_clf.fit(pred, true)
+        dummy_preds = dummy_clf.predict(pred)
+        dummy_recall = recall_score(true, dummy_preds)
+        dummy_precision = precision_score(true, dummy_preds)
+        dummy_f1 = f1_score(true, dummy_preds)
+        print(f'{rel_name}: Dummy recall - {dummy_recall:.2f}, Dummy precision - {dummy_precision:.2f}, Dummy F1 - {dummy_f1:.2f}')
 
+
+get_metrics(sdc_merge, labels)
 
 
 ## compare to CATI
 cati = pd.read_pickle("C:/Users/Jakob/Documents/CATI/cati_clean.pkl")
-cati.rename(columns={'Date': 'year'}, inplace=True)
+cati.rename(columns={'Date': 'publication_date', 'rel_type': 'rels'}, inplace=True)
 cati['cleaned_firms'] = cati.Participants.apply(lambda firms: [firm_name_clean(firm) for firm in firms]).apply(frozenset)
 cati.drop(columns=['Participants'], inplace=True)
-df_red['year'] = df_red.publication_date.dt.year
-df_red.drop(columns=['publication_date'], inplace=True)
-cati.drop(columns=['Participants'], inplace=True)
+cati['publication_date'] = cati.publication_date.apply(lambda x: pd.to_datetime(x, format='%Y'))
 
-cati_merge = cati.merge(df, on=['cleaned_firms', 'year'])
-sdc_merge.rels_pred.apply(pd.Series)
+# merge detected relationships on firm name pairs
+cati_merge = cati.merge(df, on=['cleaned_firms'], how='left')
+# take only relationships detected within 1 year of each other
+cati_merge = cati_merge[abs(cati_merge.publication_date_x-cati_merge.publication_date_y) < pd.Timedelta('2Y')]
+cati_merge = cati_merge[['cleaned_firms', 'rels', 'rels_pred']]
+cati_merge = cati_merge.groupby('cleaned_firms').agg(sum)
+cati_merge['rels'] = cati_merge.rels.apply(frozenset)
+cati_merge['rels_pred'] = cati_merge.rels_pred.apply(frozenset)
+
+get_metrics(cati_merge, labels)
+
+
 
 
 ## create edge list for Michael
