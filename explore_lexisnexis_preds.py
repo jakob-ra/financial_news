@@ -64,6 +64,7 @@ plt.xticks(rotation=45, ha='right', size=6)
 plt.title('Most frequent industries')
 plt.tight_layout()
 plt.show()
+let
 
 # most important sources
 df['publication'] = df.publication.str.split('\'')
@@ -305,3 +306,18 @@ for rel_name in important_labels:
 # name_ids.dropna()
 # orbis_minus_michael.columns
 
+
+## read in orbis financials in chunks
+from tqdm import tqdm
+merge_chunks = []
+orbis_reader = pd.read_csv('C:/Users/Jakob/Downloads/orbis_financials/Key_financials-USD.txt',
+                               # nrows=100,
+                               chunksize=100000,
+                               iterator=True,
+                               sep='\\t')
+
+for chunk in tqdm(orbis_reader):
+    merge_chunk = names_ids.merge(chunk, on='BvD ID number')
+    merge_chunks.append(merge_chunk)
+
+orbis_merge = pd.concat(merge_chunks)
