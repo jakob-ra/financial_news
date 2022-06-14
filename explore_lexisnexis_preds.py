@@ -91,6 +91,63 @@ lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.rep
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
 
+names_ids['BvD ID number'].to_csv('/Users/Jakob/Documents/financial_news_data/lexis_alliances_orbis_ids.csv',
+                                  index=False)
+
+## add years before 2012 from KOF Orbis data
+orbis_kof = pd.read_csv('C:/Users/Jakob/Documents/Orbis/orbis_kof_merged_michael.csv')
+orbis_kof['Closing date'] = orbis_kof['Closing date'].apply(pd.to_datetime)
+
+orbis_kof['Closing date'].dt.month.plot(kind='hist')
+plt.show()
+
+orbis_kof['year'] = orbis_kof['Closing date'].dt.year
+orbis_kof.drop(columns='Closing date', inplace=True)
+
+orbis_kof = orbis_kof[orbis_kof['year'] < 2012]
+
+orbis_kof['year'] = orbis_kof.Year.apply(int)
+
+orbis_kof.Year.plot(kind='hist', bins=25)
+plt.show()
+
+orbis_kof.Year.value_counts()
+
+orbis_kof = orbis_kof[orbis_kof['year'] > 1989]
+
+# sort by num of missing values, drop duplicates with more missing values
+orbis_kof = orbis_kof.loc[orbis_kof.isnull().sum(1).sort_values(ascending=True).index]
+orbis_kof.drop_duplicates(['BvD ID number', 'year'], inplace=True, keep='first')
+
+orbis.sort_values(by='count_na', inplace=True)
+orbis.drop_duplicates('BvD ID number', keep='first', inplace=True)
+
+orbis_long = pd.wide_to_long(orbis,
+                stubnames=['Added value\nth USD ', 'Number of employees\n',
+                                  'Research & Development expenses\nth USD ', 'Sales\nth USD '],
+                i='BvD ID number',
+                j='year')
+orbis_long.reset_index(inplace=True)
+orbis_long.columns = orbis_long.columns.map(lambda x: x.split('\n')[0])
+
+orbis_cat = pd.concat([orbis_long, orbis_kof])
+
+orbis_cat.set_index(['BvD ID number', 'year'], inplace=True)
+
+orbis_long['BvD ID number'].isin(orbis_kof['BvD ID number']).sum()/len(orbis_long)
+
+dynamic_cols = ['Added value', 'Number of employees', 'Research & Development expenses', 'Sales']
+
+orbis_cat.sort_index(inplace=True)
+
+orbis_cat[dynamic_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_dynamic.csv')
+
+static_cols = ['Company name Latin alphabet', 'BvD ID number', 'Country ISO code', 'City\nLatin Alphabet',
+       'NACE Rev. 2, core code (4 digits)', 'NACE Rev. 2, secondary code(s)']
+
+orbis.sort_values('BvD ID number', inplace=True)
+orbis[static_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_static.csv', index=False)
+
 # look at unmatched
 # unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
 #
@@ -288,16 +345,19 @@ rels['year'] = rels.publication_date.dt.year
 rels = rels.groupby(['firm_a', 'firm_b', 'year']).agg(list)
 rels.reset_index(inplace=True)
 
-from itertools import chain
-rels['rels_pred'] = rels.rels_pred.apply(chain.from_iterable).apply(list).apply(set).apply(list)
+# from itertools import chain
+# rels['rels_pred'] = rels.rels_pred.apply(chain.from_iterable).apply(list).apply(set).apply(list)
+
+rels = rels.explode('rels_pred')
 
 orbis.to_csv(os.path.join(output_path, 'rel_database', 'lexis_orbis_match.csv'), index=False)
 
 # save separate csvs for each relation type
 for rel_name in important_labels:
-    rels[rels.rels_pred.apply(lambda rels: rel_name in rels)].drop(columns=['rels_pred']).to_csv(
+    rels[rels.rels_pred.apply(lambda rel: rel==rel_name)].drop(columns=['rels_pred']).to_csv(
             os.path.join(output_path, 'rel_database', f'{rel_name}_LexisNexis.csv'), index=False)
 
+rels[rels.rels_pred=='ResearchandDevelopment']
 
 # orbis2 = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/combined_firm_list.pkl')
 # orbis_minus_michael = orbis2[~orbis2.company.isin(orbis.cleaned_name)]

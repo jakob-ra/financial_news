@@ -43,3 +43,15 @@ orbis.sort_values(by=['Number of employees\n2020', 'Added value\nth USD 2020', '
 orbis.drop_duplicates(subset=['cleaned_name'], keep='first', inplace=True)
 
 orbis.to_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
+orbis.to_csv('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.csv', index=False)
+
+orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl')
+
+orbis_financials = pd.read_csv('C:/Users/Jakob/Downloads/orbis_financials/Key_financials-USD.txt',
+                              nrows=100,
+                              sep='\t',
+                              )
+
+df = pd.read_csv('C:/Users/Jakob/Documents/Orbis/Full/BvD_ID_and_Name.txt',
+                               sep='\t')
+
