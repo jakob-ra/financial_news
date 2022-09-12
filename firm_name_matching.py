@@ -23,7 +23,8 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
                              "stores", "limited", "srl", "kk", "gmbh", "pty", "group", "yk", "bhd",
                              "limitada", "holdings", "kg", "bv", "pte", "sas", "ilp", "nl", "genossenschaft",
                              "gesellschaft", "aktiengesellschaft", "ltda", "nv", "oao", "holding", "se",
-                             "oy", "plcnv", "the", "neft", "& co", "&co"]
+                             "oy", "plcnv", "the", "neft", "& co", "&co", "(u.k.)", "uk", "south africa",
+                             "vietnman", "S/a", "& co"]
         pattern = '|'.join(legal_identifiers)
         pattern = '\\b(' + pattern + ')\\b'  # match only word boundaries
         firm_name = re.sub(pattern, '', firm_name)

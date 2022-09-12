@@ -84,7 +84,9 @@ lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
 
 to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries',
               'ge'  : 'general electric', 'vw': 'volkswagen', 'ibm': 'international business machines',
-              'l&t' : 'larsen & toubro', 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke'}
+              'l&t' : 'larsen & toubro', 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke',
+              '(u.k.)': '', '(south Africa)': '', '(pty)': '', 'Merck S/a': 'Merck & Co., Inc.',
+              'Sanofi-aventis (suisse) Sa': 'Sanofi'}
 
 lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.replace(to_replace)
 
@@ -104,14 +106,13 @@ plt.show()
 orbis_kof['year'] = orbis_kof['Closing date'].dt.year
 orbis_kof.drop(columns='Closing date', inplace=True)
 
+orbis_kof_2012 = orbis_kof[orbis_kof['year'] == 2012]
 orbis_kof = orbis_kof[orbis_kof['year'] < 2012]
 
-orbis_kof['year'] = orbis_kof.Year.apply(int)
-
-orbis_kof.Year.plot(kind='hist', bins=25)
+orbis_kof.year.plot(kind='hist', bins=25)
 plt.show()
 
-orbis_kof.Year.value_counts()
+orbis_kof.year.value_counts()
 
 orbis_kof = orbis_kof[orbis_kof['year'] > 1989]
 
@@ -136,9 +137,18 @@ orbis_cat.set_index(['BvD ID number', 'year'], inplace=True)
 
 orbis_long['BvD ID number'].isin(orbis_kof['BvD ID number']).sum()/len(orbis_long)
 
+
 dynamic_cols = ['Added value', 'Number of employees', 'Research & Development expenses', 'Sales']
 
 orbis_cat.sort_index(inplace=True)
+
+# add sales data 2012 from kof separately
+orbis_kof_2012.set_index(['BvD ID number', 'year'], inplace=True)
+orbis_kof_2012.sort_index(inplace=True)
+orbis_kof_2012 = orbis_kof_2012[['Sales']]
+orbis_kof_2012.dropna(inplace=True)
+orbis_kof_2012 = orbis_kof_2012[~orbis_kof_2012.index.duplicated(keep='first')]
+orbis_cat = orbis_cat.fillna(orbis_kof_2012)
 
 orbis_cat[dynamic_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_dynamic.csv')
 
@@ -147,6 +157,7 @@ static_cols = ['Company name Latin alphabet', 'BvD ID number', 'Country ISO code
 
 orbis.sort_values('BvD ID number', inplace=True)
 orbis[static_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_static.csv', index=False)
+
 
 # look at unmatched
 # unmatched = names_ids[names_ids['BvD ID number'].isnull()].copy()
