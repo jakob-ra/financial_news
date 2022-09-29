@@ -36,10 +36,22 @@ to_plot = df.explode('rels_pred').groupby(df.publication_date.dt.to_period('Y'))
 to_plot = to_plot.to_frame(name='count')
 to_plot.reset_index(level='rels_pred', inplace=True)
 to_plot = to_plot.pivot(columns='rels_pred', values='count').fillna(0)
-to_plot[important_labels].plot()
+
+plt.style.use('classic')
+fig, ax = plt.subplots(figsize=(8,5), dpi=300)
+fig.patch.set_facecolor('white')
+to_plot[important_labels].ewm(span=3).mean().plot(ax=ax)
+# to_plot[important_labels].plot(ax=ax)
 plt.xticks(rotation=45, ha='right')
-plt.title('Number of deals per year')
+plt.xlabel('Year', fontsize=16)
+plt.ylabel('Number of agreements', fontsize=16)
+markers = ['s','o', 'D', '^', 'v', '.', '<', '>', 'P']
+for i, line in enumerate(ax.get_lines()):
+    line.set_marker(markers[i])
+plt.legend(loc='upper left', fontsize='medium')
+plt.tight_layout()
 plt.show()
+
 
 # most important participants
 to_plot = df.firms.explode().value_counts()
@@ -100,21 +112,13 @@ names_ids['BvD ID number'].to_csv('/Users/Jakob/Documents/financial_news_data/le
 orbis_kof = pd.read_csv('C:/Users/Jakob/Documents/Orbis/orbis_kof_merged_michael.csv')
 orbis_kof['Closing date'] = orbis_kof['Closing date'].apply(pd.to_datetime)
 
-orbis_kof['Closing date'].dt.month.plot(kind='hist')
-plt.show()
-
 orbis_kof['year'] = orbis_kof['Closing date'].dt.year
 orbis_kof.drop(columns='Closing date', inplace=True)
 
 orbis_kof_2012 = orbis_kof[orbis_kof['year'] == 2012]
 orbis_kof = orbis_kof[orbis_kof['year'] < 2012]
 
-orbis_kof.year.plot(kind='hist', bins=25)
-plt.show()
-
-orbis_kof.year.value_counts()
-
-orbis_kof = orbis_kof[orbis_kof['year'] > 1989]
+orbis_kof.year.value_counts().sort_index()
 
 # sort by num of missing values, drop duplicates with more missing values
 orbis_kof = orbis_kof.loc[orbis_kof.isnull().sum(1).sort_values(ascending=True).index]
@@ -122,6 +126,10 @@ orbis_kof.drop_duplicates(['BvD ID number', 'year'], inplace=True, keep='first')
 
 orbis.sort_values(by='count_na', inplace=True)
 orbis.drop_duplicates('BvD ID number', keep='first', inplace=True)
+
+# convert to 1000s of USD
+money_columns = ['Sales', 'Research & Development expenses', 'Added value']
+orbis_kof[money_columns] = orbis_kof[money_columns]/1000
 
 orbis_long = pd.wide_to_long(orbis,
                 stubnames=['Added value\nth USD ', 'Number of employees\n',
@@ -157,6 +165,82 @@ static_cols = ['Company name Latin alphabet', 'BvD ID number', 'Country ISO code
 
 orbis.sort_values('BvD ID number', inplace=True)
 orbis[static_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_static.csv', index=False)
+
+# R&D network
+rnd = df.explode('rels_pred')
+rnd = rnd[rnd.rels_pred == 'ResearchandDevelopment']
+# MAKE CHART THAT SHOWS INDUSTRY OF R\&D COLLABORATIONS OVER TIME
+rnd.industry.explode().value_counts().head(100)
+
+orbis_static = orbis[static_cols].copy(deep=True)
+orbis_static['cleaned']
+
+orbis_static['cleaned_name'] = orbis_static['Company name Latin alphabet'].apply(firm_name_clean)
+orbis_static = orbis_static[['cleaned_name', 'NACE Rev. 2, core code (4 digits)', 'Country ISO code']]
+orbis_static.columns = ['cleaned_name', 'nace', 'country']
+
+rnd = rnd.reset_index(drop=True).reset_index()
+rnd = rnd.explode('cleaned_firms').merge(orbis_static, left_on='cleaned_firms', right_on='cleaned_name')
+
+rnd['nace-2-digit'] = rnd['nace'].apply(lambda x: str(x)[:2])
+rnd = rnd[rnd['nace-2-digit'] != 'na']
+nace_rev_2 = pd.read_csv('C:/Users/Jakob/Documents/NACE_REV2_2-digit.csv', usecols=['Code', 'Description'],
+                         dtype=str)
+nace_rev_2.set_index('Code', inplace=True)
+rnd['nace-2-digit'] = rnd['nace-2-digit'].replace(nace_rev_2.squeeze().to_dict())
+rnd['year'] = rnd['publication_date'].dt.year
+
+
+# top 5 industries
+top_5 = rnd['nace-2-digit'].value_counts().head(5).index.to_list()
+to_plot = rnd[rnd['nace-2-digit'].isin(top_5)]
+to_plot = to_plot.groupby('year')['nace-2-digit'].value_counts()
+to_plot = to_plot.rename('count').reset_index().pivot(index='year', columns='nace-2-digit', values='count')
+to_plot = to_plot[to_plot.index >= 1990]
+to_plot.index = to_plot.index.map(str)
+
+plt.style.use('classic')
+fig, ax = plt.subplots(figsize=(14,7), dpi=75)
+fig.patch.set_facecolor('white')
+to_plot[top_5].ewm(span=3).mean().plot(ax=ax)
+#to_plot[top_5].plot(ax=ax)
+plt.xticks(rotation=45, ha='right')
+plt.xlabel('Year', fontsize=16)
+plt.ylabel('Announced R&D collaborations ', fontsize=16)
+markers = ['s','o', 'D', '^', 'v', '.', '<', '>', 'P']
+for i, line in enumerate(ax.get_lines()):
+    line.set_marker(markers[i])
+plt.legend(loc='best', fontsize='medium')
+plt.tight_layout()
+ax.margins(x=0.03)
+plt.savefig('/Users/Jakob/Documents/financial_news_data/rnd_industries_over_time.pdf')
+plt.show()
+
+# top 5 countries
+top_5 = rnd['country_y'].value_counts().head(5).index.to_list()
+to_plot = rnd[rnd['country_y'].isin(top_5)]
+to_plot = to_plot.groupby('year')['country_y'].value_counts()
+to_plot = to_plot.rename('count').reset_index().pivot(index='year', columns='country_y', values='count')
+to_plot = to_plot[to_plot.index >= 1990]
+to_plot.index = to_plot.index.map(str)
+
+plt.style.use('classic')
+fig, ax = plt.subplots(figsize=(14,7), dpi=75)
+fig.patch.set_facecolor('white')
+to_plot[top_5].ewm(span=3).mean().plot(ax=ax)
+#to_plot[top_5].plot(ax=ax)
+plt.xticks(rotation=45, ha='right')
+plt.xlabel('Year', fontsize=16)
+plt.ylabel('Announced R&D collaborations ', fontsize=16)
+markers = ['s','o', 'D', '^', 'v', '.', '<', '>', 'P']
+for i, line in enumerate(ax.get_lines()):
+    line.set_marker(markers[i])
+plt.legend(loc='upper left', fontsize='large')
+plt.tight_layout()
+ax.margins(x=0.03)
+plt.savefig('/Users/Jakob/Documents/financial_news_data/rnd_countries_over_time.pdf')
+plt.show()
+
 
 
 # look at unmatched
