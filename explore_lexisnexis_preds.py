@@ -105,6 +105,8 @@ lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.rep
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
 
+print(f'Share of unmatched firms: {names_ids["BvD ID number"].isna().sum()/len(names_ids)}')
+
 names_ids['BvD ID number'].to_csv('/Users/Jakob/Documents/financial_news_data/lexis_alliances_orbis_ids.csv',
                                   index=False)
 
