@@ -19,6 +19,9 @@ df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'in
 
 df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
 
+df.cleaned_firms.explode().value_counts().head(50)
+
+df.cleaned_firms.explode().nunique()
 
 ## Exploratory plots
 
