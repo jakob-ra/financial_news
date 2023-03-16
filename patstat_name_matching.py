@@ -55,6 +55,21 @@ print(', \n'.join([make_sql_compatible(col) + ' ' + replace_dict[str(coltype)] f
 
 tls201 = pd.read_csv('C:/Users/Jakob/Downloads/patstat_global (1)/tls201_part01.csv', nrows=1000)
 
+orbis_patstat = pd.read_csv('C:/Users/Jakob/Downloads/orbis_patents.csv')
+
+print(', \n'.join([make_sql_compatible(col) + ' ' + replace_dict[str(coltype)] for col, coltype in zip(orbis_patstat.columns, orbis_patstat.dtypes)]))
+
+orbis_patstat.country.value_counts()
+
+orbis_patstat.patentpublicationnumber.str.split('(').str[1].str.split(')').str[0].value_counts()
+
+orbis_patstat.patentpublicationnumber = orbis_patstat.patentpublicationnumber.str.split('(').str[0]
+
+orbis_patstat = orbis_patstat[['patentpublicationnumber', 'currentownersbvdid']].copy(deep=True)
+orbis_patstat.dropna(inplace=True)
+orbis_patstat.drop_duplicates(inplace=True)
+
+orbis_patstat.to_parquet('C:/Users/Jakob/Downloads/orbis_patstat.parquet', index=False)
 
 # replace type names
 replace_dict = {'int64': 'integer', 'float64': 'integer', 'object': 'string', 'datetime64[ns]': 'date'}
@@ -99,3 +114,99 @@ ORDER BY a.docdb_family_id, a.appin_auth, t1s211_pat_publn.publn_kind DESC;
 AND appin_auth IN ('US*) # application granting authority is US patent office
 
 
+select count(distinct a.appln_id)
+from tls201_appln as a
+join tls207_pers_appln as pers_appln on a.appln_id = pers_appln.appln_id
+join tls206_person as person on pers_appln.person_id = person.person_id
+where psn_sector='"COMPANY"'
+AND ipr_type ='"PI"'
+AND appln_kind ='"A "'
+AND pers_appln.applt_seq_nr >=1
+AND pers_appln.invt_seq_nr =0
+AND granted = '"Y"'
+
+
+CREATE EXTERNAL TABLE `patstat-global-spring-2021`.`orbis_patstat`
+            (
+            patentpublicationnumber string,
+            currentownersbvdid string
+            )
+STORED AS PARQUET
+LOCATION 's3://patstat-global-spring-2021/orbis_patstat/'
+TBLPROPERTIES ("parquet.compression"="snappy");
+
+
+create table tls201_appln_merged_orbis as
+select * from (select tls201_appln.*, concat(trim(replace(appln_auth, '"', '')), cast(appln_id as varchar), '(', trim(replace(appln_kind, '"', '')), ')') as patentpublicationnumber
+from  tls201_appln) as a
+inner join orbis_patstat as o
+using (patentpublicationnumber)
+
+create table tls201_appln_merged_orbis as
+select * from
+    (select tls201_appln.*,
+    concat(trim(replace(appln_auth, '"', '')), cast(appln_id as varchar)) as patentpublicationnumber
+    from  tls201_appln)
+inner join
+orbis_patstat
+using (patentpublicationnumber)
+
+
+
+
+import awswrangler as wr
+
+query = """SELECT distinct(trim(replace(person_name, '"', ''))) as firm_name 
+           from tls206_person 
+           where psn_sector='"COMPANY"'
+           """
+df = wr.athena.read_sql_query(query, database="patstat-global-spring-2021")
+
+from name_matching.name_matcher import NameMatcher
+
+matcher = NameMatcher(low_memory=False, top_n=5, common_words=False, legal_suffixes=True,
+                      distance_metrics=['editex', 'discounted_levenshtein', 'refined_soundex']) # distance_metrics=['overlap', 'discounted_levenshtein'])
+
+
+
+orbis_lexis = pd.read_csv('C:/Users/Jakob/Downloads/lexis_alliances_orbis_static.csv')
+r_and_d = pd.read_csv('C:/Users/Jakob/Downloads/ResearchandDevelopment_LexisNexis.csv')
+
+r_and_d_firm_ids = set(r_and_d['firm_a'].unique()) | set(r_and_d['firm_b'].unique())
+
+orbis_lexis = orbis_lexis[orbis_lexis['BvD ID number'].isin(r_and_d_firm_ids)]
+
+matcher.load_and_process_master_data('Company name Latin alphabet', orbis_lexis)
+
+res = matcher.match_names(to_be_matched=df.head(10000), column_matching='firm_name')
+
+matches = res[res['score'] > 90]
+
+## split df into batches and use multiprocessing to speed up the process
+import numpy as np
+import ray
+ray.init(ignore_reinit_error=True)
+
+def split_df(df, chunk_size):
+    num_chunks = len(df) // chunk_size + 1
+    return np.array_split(df, num_chunks)
+
+@ray.remote
+def match_names(df, column_matching, column_to_be_matched):
+    matcher = NameMatcher(low_memory=False, top_n=5, common_words=False, legal_suffixes=True,
+                          distance_metrics=['editex', 'discounted_levenshtein',
+                                            'refined_soundex'])
+    matcher.load_and_process_master_data(column_to_be_matched, orbis_lexis)
+    res = matcher.match_names(to_be_matched=df, column_matching=column_matching)
+    matches = res[res['score'] > 90]
+    return matches
+
+def match_names_multiprocessing(df, column_matching, column_to_be_matched, chunk_size=10000):
+    df_batches = split_df(df, chunk_size)
+    futures = [match_names.remote(df, column_matching, column_to_be_matched) for df in df_batches]
+    matches = ray.get(futures)
+    return pd.concat(matches)
+
+matches = match_names_multiprocessing(df, 'firm_name', 'Company name Latin alphabet', chunk_size=100000)
+
+matches[['original_name', '']]
