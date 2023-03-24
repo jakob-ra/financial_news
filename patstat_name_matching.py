@@ -110,8 +110,18 @@ AND person.invt_seq_nr =0 # exclude inventors
 # AND morez.number_applt >= 3
 AND (psn_sector ='COMPANY' OR psn_sector ='COMPANY GOV NON-PROFIT' OR psn_sector .--..COMPANY GOV NON-PROFIT UNIVERSITY' 'JR psn_sector ='COMPANY HOSPITAL' OR psn_sector ='GOV NON-PROFIT' OR psn_sector ='GOV NCN-PROFIT HOSPITAL' :sn_sector =.005/ NON-PROFIT UNIVERSITY' OR psn_sector ='HOSPITAL' OR psn_sector ='UNIVERSITY' :sn_sector =*UNEVERSITY HOSPITAL' OR psn_sector ='UNKNOWN')
 ORDER BY a.docdb_family_id, a.appin_auth, t1s211_pat_publn.publn_kind DESC;
-
 AND appin_auth IN ('US*) # application granting authority is US patent office
+
+SELECT DISTINCT a.appin_id, appin_nr, publn_nr, appin_filing_date. publn_date, appin_title, nb_applicants, person_ctry_code, person_name, psn_sector, psn_name, publn_auth, appin_auth„ docdb_family_id, publn_kind, appin_kind, granted, vore2.nusber_applt
+FROM tls201_appln AS a
+JOIN tls207_pers_appin as person ON a.appin_id = person.appin_id
+JOIN tls206_person ON person.person_id = tls206_person.person_id
+WHERE ipr_type ='PI' # ip right type is patent
+AND appln_kind ='A' # application is granted
+AND person.applt_seq_nr >=1 # retrieves only those persons from TLS207_PERS_APPLN or TLS227_PERS_PUBLN which are applicants.
+AND person.invt_seq_nr =0 # exclude inventors
+ORDER BY a.docdb_family_id, a.appin_auth, t1s211_pat_publn.publn_kind DESC;
+
 
 
 select count(distinct a.appln_id)
@@ -151,9 +161,17 @@ inner join
 orbis_patstat
 using (patentpublicationnumber)
 
+create external table `patstat-global-spring-2021`.`name_bvdid`
+            (
+            bvdid string,
+            firm_name string
+            )
+STORED AS PARQUET
+LOCATION 's3://patstat-global-spring-2021/orbis-name-matching/'
+TBLPROPERTIES ("parquet.compression"="snappy");
 
 
-
+import pandas as pd
 import awswrangler as wr
 
 query = """SELECT distinct(trim(replace(person_name, '"', ''))) as firm_name 
@@ -162,13 +180,6 @@ query = """SELECT distinct(trim(replace(person_name, '"', ''))) as firm_name
            """
 df = wr.athena.read_sql_query(query, database="patstat-global-spring-2021")
 
-from name_matching.name_matcher import NameMatcher
-
-matcher = NameMatcher(low_memory=False, top_n=5, common_words=False, legal_suffixes=True,
-                      distance_metrics=['editex', 'discounted_levenshtein', 'refined_soundex']) # distance_metrics=['overlap', 'discounted_levenshtein'])
-
-
-
 orbis_lexis = pd.read_csv('C:/Users/Jakob/Downloads/lexis_alliances_orbis_static.csv')
 r_and_d = pd.read_csv('C:/Users/Jakob/Downloads/ResearchandDevelopment_LexisNexis.csv')
 
@@ -176,11 +187,16 @@ r_and_d_firm_ids = set(r_and_d['firm_a'].unique()) | set(r_and_d['firm_b'].uniqu
 
 orbis_lexis = orbis_lexis[orbis_lexis['BvD ID number'].isin(r_and_d_firm_ids)]
 
-matcher.load_and_process_master_data('Company name Latin alphabet', orbis_lexis)
+from name_matching.name_matcher import NameMatcher
+#
+# matcher = NameMatcher(low_memory=False, top_n=5, common_words=False, legal_suffixes=True,
+#                       distance_metrics=['editex', 'discounted_levenshtein', 'refined_soundex']) # distance_metrics=['overlap', 'discounted_levenshtein'])
 
-res = matcher.match_names(to_be_matched=df.head(10000), column_matching='firm_name')
-
-matches = res[res['score'] > 90]
+# matcher.load_and_process_master_data('Company name Latin alphabet', orbis_lexis)
+#
+# res = matcher.match_names(to_be_matched=df.head(10000), column_matching='firm_name')
+#
+# matches = res[res['score'] > 90]
 
 ## split df into batches and use multiprocessing to speed up the process
 import numpy as np
@@ -207,6 +223,34 @@ def match_names_multiprocessing(df, column_matching, column_to_be_matched, chunk
     matches = ray.get(futures)
     return pd.concat(matches)
 
-matches = match_names_multiprocessing(df, 'firm_name', 'Company name Latin alphabet', chunk_size=100000)
+matches = match_names_multiprocessing(df, 'firm_name', 'Company name Latin alphabet', chunk_size=10000)
 
-matches[['original_name', '']]
+matches.to_pickle('C:/Users/Jakob/Downloads/matches.pkl')
+
+matches = pd.read_pickle('C:/Users/Jakob/Downloads/matches.pkl')
+
+matches.match_index.max()
+
+matches.reset_index(names='df_index', inplace=True)
+matches.sort_values(by=['df_index', 'score'], inplace=True)
+matches.drop_duplicates(subset=['df_index'], keep='first', inplace=True)
+
+merged = df.merge(matches[['match_index', 'df_index']], left_index=True, right_on='df_index', how='inner')
+merged2 = merged.merge(orbis_lexis.reset_index(drop=True), left_on='match_index', right_index=True) #.drop(columns=['match_index', 'df_index'])
+
+
+matches.match_index.value_counts()
+
+
+from name_matching.run_nm import match_names
+
+orbis_lexis['firm_name'] = orbis_lexis['Company name Latin alphabet']
+matches = match_names(df, orbis_lexis, column_first='firm_name',
+                      column_second='firm_name', case_sensitive=False, punctuation_sensitive=False,
+                      special_character_sensitive=False, threshold=95, low_memory=False, top_n=5,
+                      common_words=False, legal_suffixes=True,
+                      distance_metrics=['editex', 'discounted_levenshtein', 'refined_soundex'])
+
+complete_matched_data = df.merge(matches, how='left', right_index=True, left_index=True).merge(orbis_lexis, how='left', left_on='match_index', right_index=True, suffixes=['', '_matched'])
+complete_matched_data.drop(columns=['name_matching_data', 'original_name', 'match_name', 'score', 'match_index', 'name_matching_data_matched'], inplace=True)
+
