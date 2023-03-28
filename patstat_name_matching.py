@@ -254,3 +254,62 @@ matches = match_names(df, orbis_lexis, column_first='firm_name',
 complete_matched_data = df.merge(matches, how='left', right_index=True, left_index=True).merge(orbis_lexis, how='left', left_on='match_index', right_index=True, suffixes=['', '_matched'])
 complete_matched_data.drop(columns=['name_matching_data', 'original_name', 'match_name', 'score', 'match_index', 'name_matching_data_matched'], inplace=True)
 
+CREATE TABLE merged AS
+SELECT * from
+(select person_name, person_id, TRIM(REPLACE(psn_name, '"', '')) AS patstat_name
+FROM tls206_person
+where psn_sector='"COMPANY"' or han_name='"COMPANY"')
+as p
+INNER JOIN name_bvdid as n
+ON p.patstat_name = n.firm_name;
+
+
+# read orbis granted patent firms
+orbis_granted_patents = pd.read_csv('C:/Users/Jakob/Downloads/Granted Patents Firms/Orbis_PatTitle_PatID_BvDFirmName_BvDID_BvDCountry.csv', nrows=1000, sep=';')
+
+df = wr.s3.read_csv('s3://patstat-global-spring-2021/tls209_appln_ipc/tls209_part01.csv', nrows=1000)
+
+CREATE EXTERNAL TABLE `patstat-global-spring-2021`.`tls209_appln_ipc`
+            (
+            appln_id integer,
+            ipc_class_symbol string,
+            ipc_class_level string,
+            ipc_version string,
+            ipc_value string,
+            ipc_position string,
+            ipc_gener_auth string
+            )
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+LOCATION 's3://patstat-global-spring-2021/tls209_appln_ipc/'
+TBLPROPERTIES ("skip.header.line.count"="1");
+
+
+create table merged_full as
+SELECT DISTINCT a.appln_id,
+                appln_auth,
+                appln_nr,
+                appln_filing_date,
+                appln_kind,
+                granted,
+                nb_applicants,
+                docdb_family_id,
+                bvdid,
+                p.person_id,
+                person_ctry_code,
+                p.person_name,
+                psn_sector,
+                psn_name,
+                han_name
+FROM tls201_appln AS a
+JOIN tls207_pers_appln as person ON a.appln_id = person.appln_id
+JOIN tls206_person as p ON person.person_id = p.person_id
+INNER JOIN merged as m ON TRIM(REPLACE(p.psn_name, '"', '')) = m.firm_name
+where p.psn_sector='"COMPANY"' or p.han_name='"COMPANY"'
+AND person.applt_seq_nr >=1
+AND person.invt_seq_nr =0
+ORDER BY appln_auth, appln_filing_date DESC;
+
+
+query = """SELECT appln_filing_date, appln_kind, granted, psn_name, bvdid, ipc_class_symbol, ipc_class_level from merged_full_ipc"""
+df = wr.athena.read_sql_query(query, database='patstat-global-spring-2021')
+df.to_csv('C:/Users/Jakob/Downloads/patents_lexis_alliance_firms.csv', index=False)
