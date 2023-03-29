@@ -313,3 +313,25 @@ ORDER BY appln_auth, appln_filing_date DESC;
 query = """SELECT appln_filing_date, appln_kind, granted, psn_name, bvdid, ipc_class_symbol, ipc_class_level from merged_full_ipc"""
 df = wr.athena.read_sql_query(query, database='patstat-global-spring-2021')
 df.to_csv('C:/Users/Jakob/Downloads/patents_lexis_alliance_firms.csv', index=False)
+
+df.psn_name.value_counts()
+
+df.ipc_class_symbol.str[:3].value_counts()
+
+df[df.granted == '"Y"']
+
+quote_cols = ['appln_kind', 'granted', 'psn_name']
+
+for col in quote_cols:
+    df[col] = df[col].str.strip('"')
+
+import pandas as pd
+
+df = pd.read_stata('C:/Users/Jakob/Downloads/domainonly.dta')
+df = df[df.domain_all.str.len() > 3].copy(deep=True)
+df.domain_all = df.domain_all.str.strip()
+df.domain_all.to_csv('C:/Users/Jakob/Downloads/swiss-survey-covid-urls.csv', index=False, header=False)
+
+df2 = pd.read_csv('C:/Users/Jakob/Documents/GitHub/cc-download/swiss-survey-urls.csv', header=None)
+
+df.domain_all.isin(df2[0]).sum()
