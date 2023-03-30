@@ -325,13 +325,3 @@ quote_cols = ['appln_kind', 'granted', 'psn_name']
 for col in quote_cols:
     df[col] = df[col].str.strip('"')
 
-import pandas as pd
-
-df = pd.read_stata('C:/Users/Jakob/Downloads/domainonly.dta')
-df = df[df.domain_all.str.len() > 3].copy(deep=True)
-df.domain_all = df.domain_all.str.strip()
-df.domain_all.to_csv('C:/Users/Jakob/Downloads/swiss-survey-covid-urls.csv', index=False, header=False)
-
-df2 = pd.read_csv('C:/Users/Jakob/Documents/GitHub/cc-download/swiss-survey-urls.csv', header=None)
-
-df.domain_all.isin(df2[0]).sum()
