@@ -4,7 +4,7 @@ import os
 import itertools
 from firm_name_matching import firm_name_clean
 
-output_path = '/Users/Jakob/Documents/financial_news_data/output/lexis_preds'
+output_path = '/Users/Jakob/Documents/financialw_news_data/output/lexis_preds'
 
 important_labels = ['StrategicAlliance', 'JointVenture', 'Marketing', 'Manufacturing',
                     'ResearchandDevelopment', 'Licensing']
@@ -97,6 +97,9 @@ orbis = pd.read_pickle('C:/Users/Jakob/Documents/Orbis/orbis_michael_lexis_2.pkl
 lexis_firm_names_clean = df.cleaned_firms.explode().value_counts()\
     .index.to_frame(name='cleaned_name').reset_index(drop=True)
 
+lexis_firm_names = df.firms.explode().value_counts()\
+    .index.to_frame(name='name').reset_index(drop=True)
+
 to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mitsubishi heavy industries',
               'ge'  : 'general electric', 'vw': 'volkswagen', 'ibm': 'international business machines',
               'l&t' : 'larsen & toubro', 'arw': 'arrow electronics', 'BMW': 'bayerische motoren werke',
@@ -104,6 +107,8 @@ to_replace = {'amex': 'american express', 'gsk': 'glaxosmithkline', 'mhi': 'mits
               'Sanofi-aventis (suisse) Sa': 'Sanofi'}
 
 lexis_firm_names_clean['cleaned_name'] = lexis_firm_names_clean.cleaned_name.replace(to_replace)
+
+lexis_firm_names_clean.squeeze().to_csv('C:/Users/Jakob/Downloads/lexis_firm_names_clean.csv', index=False)
 
 names_ids = lexis_firm_names_clean.merge(orbis[['cleaned_name', 'BvD ID number']],
                                          on='cleaned_name', how='left')
@@ -164,6 +169,8 @@ orbis_kof_2012 = orbis_kof_2012[~orbis_kof_2012.index.duplicated(keep='first')]
 orbis_cat = orbis_cat.fillna(orbis_kof_2012)
 
 orbis_cat[dynamic_cols].to_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_dynamic.csv')
+
+orbis_cat = pd.read_csv('C:/Users/Jakob/Documents/Orbis/lexis_alliances_orbis_dynamic.csv')
 
 static_cols = ['Company name Latin alphabet', 'BvD ID number', 'Country ISO code', 'City\nLatin Alphabet',
        'NACE Rev. 2, core code (4 digits)', 'NACE Rev. 2, secondary code(s)']

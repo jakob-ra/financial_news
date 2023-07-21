@@ -103,6 +103,7 @@ df.lang.value_counts()
 
 df.to_pickle(os.path.join('C:/Users/Jakob/Documents/lexisnexis_firm_alliances_combined_new.pkl')
 
+df = pd.read_pickle(os.path.join('C:/Users/Jakob/Documents/lexisnexis_firm_alliances_combined_new.pkl')
 
 
 

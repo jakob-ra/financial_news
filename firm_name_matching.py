@@ -241,6 +241,9 @@ if __name__ == '__main__':
 
     res_lexis_group.to_csv('C:/Users/Jakob/Documents/lexis_firms_matched_orbis.csv', index=False)
 
+    res_lexis_group = pd.read_csv('C:/Users/Jakob/Documents/lexis_firms_matched_orbis.csv')
+    res_lexis_group.company.nunique()
+
 
     from flashtext import KeywordProcessor
     keyword_processor = KeywordProcessor()
