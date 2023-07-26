@@ -1,21 +1,30 @@
-ssh -i "emr.pem" hadoop@ec2-18-207-133-229.compute-1.amazonaws.com
-sudo yum install git
+ssh -i "emr.pem" hadoop@ec2-3-209-56-225.compute-1.amazonaws.com
+sudo yum -y install git pip
 git clone https://github.com/commoncrawl/cc-pyspark
 cd cc-pyspark
-pip install -r requirements.txt
+yes | pip install -r requirements.txt
 
 
 
-spark-submit --conf spark.dynamicAllocation.enabled=false --conf spark.yarn.maxAppAttempts=1 --conf spark.cores.max=4 --conf spark.executor.instances=1 --conf spark.executor.memory=4000m --conf spark.executor.cores=4 --conf spark.executorEnv.PYTHONPATH=/sparkcc.py ./cc_index_word_count.py --input_base_url s3://commoncrawl/  --query "SELECT url, warc_filename, warc_record_offset, warc_record_length FROM ccindex WHERE crawl = 'CC-MAIN-2020-24' AND subset = 'warc' AND url_host_tld = 'is' LIMIT 10" s3a://commoncrawl/cc-index/table/cc-main/warc/ myccindexwordcountoutput --num_output_partitions 1 --output_format json 
+spark-submit --packages org.apache.hadoop:hadoop-aws:3.3.6 --conf spark.dynamicAllocation.enabled=false --conf spark.yarn.maxAppAttempts=1 --conf spark.cores.max=4 --conf spark.executor.instances=1 --conf spark.executor.memory=4000m --conf spark.executor.cores=4 --conf spark.executorEnv.PYTHONPATH=/sparkcc.py ./cc_index_word_count.py --input_base_url s3://commoncrawl/  --query "SELECT url, warc_filename, warc_record_offset, warc_record_length FROM ccindex WHERE crawl = 'CC-MAIN-2020-24' AND subset = 'warc' AND url_host_tld = 'is' LIMIT 10" s3a://commoncrawl/cc-index/table/cc-main/warc/ myccindexwordcountoutput --num_output_partitions 1 --output_format json 
 
 spark-submit --conf spark.dynamicAllocation.enabled=false --conf spark.yarn.maxAppAttempts=1 --conf spark.cores.max=4 --conf spark.executor.instances=1 --conf spark.executor.memory=4000m --conf spark.executor.cores=1 ./server_count.py --num_output_partitions 1 --log_level WARN ./input/test_warc.txt servernames
 
 
 aws emr create-cluster --name "ccdownload" \
+--release-label emr-6.10.0
 --applications Name=Spark \
 --use-default-roles \
 --ec2-attributes KeyName="emr.pem" \
 --instance-count 2 --instance-type c5.xlarge
---steps '[{"Args":["spark-submit","--deploy-mode","cluster","--class","org.apache.spark.examples.SparkPi","/usr/lib/spark/examples/jars/spark-examples.jar","5"],"Type":"CUSTOM_JAR","ActionOnFailure":"CONTINUE","Jar":"command-runner.jar","Properties":"","Name":"Spark application"}]'
+--bootstrap-actions Path="s3://cc-download-orbis-global/scripts/emr-bootstrap-actions.sh"
+--steps Type=Spark,Name="Spark Program",ActionOnFailure=CONTINUE,Args=[--class,org.apache.spark.examples.SparkPi,/usr/lib/spark/examples/jars/spark-examples.jar,10]
 
 --instance-groups InstanceGroupType=PRIMARY,InstanceCount=1,InstanceType=c5a.xlarge InstanceGroupType=CORE,InstanceCount=1,InstanceType=c5.xlarge \
+
+
+USE
+
+--conf spark.sql.parquet.mergeSchema=true 
+
+FOR QUERYING NEW COLUMNS: content_languages etc. but affects performance
