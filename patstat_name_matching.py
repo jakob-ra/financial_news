@@ -254,14 +254,31 @@ matches = match_names(df, orbis_lexis, column_first='firm_name',
 complete_matched_data = df.merge(matches, how='left', right_index=True, left_index=True).merge(orbis_lexis, how='left', left_on='match_index', right_index=True, suffixes=['', '_matched'])
 complete_matched_data.drop(columns=['name_matching_data', 'original_name', 'match_name', 'score', 'match_index', 'name_matching_data_matched'], inplace=True)
 
-CREATE TABLE merged AS
+
+import pandas as pd
+orbis_static = pd.read_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_static.csv')
+orbis_static[['name_internat', 'ID']].drop_duplicates().to_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_static_unique_firm_names.csv', index=False)
+
+CREATE EXTERNAL TABLE `patstat-global-spring-2021`.`name_bvdid_2023` (
+    `firm_name` STRING,
+    `ID` STRING
+)
+ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+LOCATION 's3://alliance-network/unique_names_bvdids_alliances/'
+TBLPROPERTIES (
+    'skip.header.line.count'='1'
+);
+
+CREATE TABLE merged_2023 AS
 SELECT * from
 (select person_name, person_id, TRIM(REPLACE(psn_name, '"', '')) AS patstat_name
 FROM tls206_person
 where psn_sector='"COMPANY"' or han_name='"COMPANY"')
 as p
-INNER JOIN name_bvdid as n
-ON p.patstat_name = n.firm_name;
+INNER JOIN name_bvdid_2023 as n
+ON LOWER(p.patstat_name) = LOWER(n.firm_name);
 
 
 # read orbis granted patent firms
@@ -309,10 +326,38 @@ AND person.applt_seq_nr >=1
 AND person.invt_seq_nr =0
 ORDER BY appln_auth, appln_filing_date DESC;
 
+create table merged_full_ipc_2023 as
+SELECT DISTINCT a.appln_id,
+                appln_auth,
+                appln_nr,
+                appln_filing_date,
+                appln_kind,
+                granted,
+                nb_applicants,
+                docdb_family_id,
+                ID,
+                p.person_id,
+                person_ctry_code,
+                p.person_name,
+                psn_sector,
+                psn_name,
+                han_name,
+                ipc_class_level,
+                ipc_class_symbol
+FROM tls201_appln AS a
+JOIN tls209_appln_ipc as ipc ON a.appln_id = ipc.appln_id
+JOIN tls207_pers_appln as person ON a.appln_id = person.appln_id
+JOIN tls206_person as p ON person.person_id = p.person_id
+INNER JOIN merged_2023 as m ON TRIM(REPLACE(p.psn_name, '"', '')) = m.firm_name
+where p.psn_sector='"COMPANY"' or p.han_name='"COMPANY"'
+AND person.applt_seq_nr >=1
+AND person.invt_seq_nr =0
+ORDER BY appln_auth, appln_filing_date DESC;
 
-query = """SELECT appln_filing_date, appln_kind, granted, psn_name, bvdid, ipc_class_symbol, ipc_class_level from merged_full_ipc"""
+import awswrangler as wr
+query = """SELECT appln_filing_date, appln_kind, granted, psn_name, ID, ipc_class_symbol, ipc_class_level from merged_full_ipc_2023"""
 df = wr.athena.read_sql_query(query, database='patstat-global-spring-2021')
-df.to_csv('C:/Users/Jakob/Downloads/patents_lexis_alliance_firms.csv', index=False)
+df.to_csv('C:/Users/Jakob/Downloads/patents_lexis_alliance_firms_2023.csv', index=False)
 
 df.psn_name.value_counts()
 

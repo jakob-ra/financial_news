@@ -91,3 +91,5 @@ df_dynamic.to_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_dyna
 
 r_and_d_ids = pd.concat([rels[rels.rels_pred =='ResearchandDevelopment'].firm_a, rels[rels.rels_pred =='ResearchandDevelopment'].firm_b]).drop_duplicates()
 means = df_dynamic[df_dynamic.bvdid.isin(r_and_d_ids)].groupby('year').mean()
+
+df_dynamic.sort_values('operating_revenue_turnover', inplace=True, ascending=False)
