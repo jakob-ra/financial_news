@@ -3,3 +3,4 @@ google_api_key.txt
 bertviz
 __pycache__
 *.pyc
+/.idea

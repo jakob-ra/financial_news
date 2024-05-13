@@ -2,10 +2,10 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import cpi
 import plotting
 
-cpi.update()
+# import cpi
+# cpi.update()
 
 df = pd.read_stata('C:/Users/Jakob/Downloads/venture_data_2005_2015.dta')
 df.dropna(subset=['Investment_Date'], inplace=True)

@@ -24,7 +24,11 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
                              "limitada", "holdings", "kg", "bv", "pte", "sas", "ilp", "nl", "genossenschaft",
                              "gesellschaft", "aktiengesellschaft", "ltda", "nv", "oao", "holding", "se",
                              "oy", "plcnv", "the", "neft", "& co", "&co", "(u.k.)", "uk", "south africa",
-                             "vietnman", "S/a", "& co"]
+                             "vietnman", "S/a", "& co", "sdn", "capital", "services", "international", "intl",
+                             "partners", "of", "and", "the", "grp", "management", "investment", "investments",
+                             "global", "a/s", "industries", "pt", "sp", "financial", "fund", "trust",
+                             "ventures", "acquisition", "a", "hldg", "hldgs", "pharm", "pharma", "pharmaceuticals",
+                             "tech", "spa", "medical", "asa", "s", "cp", "enterprises", "public"]
         pattern = '|'.join(legal_identifiers)
         pattern = '\\b(' + pattern + ')\\b'  # match only word boundaries
         firm_name = re.sub(pattern, '', firm_name)
@@ -319,9 +323,6 @@ if __name__ == '__main__':
     res_df.iloc[0]
 
     res_df_matching = firm_name_matching(res_df, orbis, clean_lookup=False)
-
-
-
 
     res_df = res_df[res_df._merge == 'both']
 

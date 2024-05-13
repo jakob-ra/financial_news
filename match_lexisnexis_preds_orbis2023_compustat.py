@@ -93,3 +93,13 @@ r_and_d_ids = pd.concat([rels[rels.rels_pred =='ResearchandDevelopment'].firm_a,
 means = df_dynamic[df_dynamic.bvdid.isin(r_and_d_ids)].groupby('year').mean()
 
 df_dynamic.sort_values('operating_revenue_turnover', inplace=True, ascending=False)
+
+# read rels research and development
+rels = pd.read_csv(os.path.join(output_path, 'rel_database', 'ResearchandDevelopment_LexisNexis.csv'))
+rels_industries = rels.merge(df_static[['bvdid', 'nace_rev_2_core_code_4_digits']], left_on='firm_a', right_on='bvdid', how='left', suffixes=('', '_a'))
+rels_industries = rels_industries.merge(df_static[['bvdid', 'nace_rev_2_core_code_4_digits']], left_on='firm_b', right_on='bvdid', how='left', suffixes=('', '_b'))
+
+# value count of combinations of industries
+rels_industries['nace_rev_2_core_code_2_digits'] = rels_industries.nace_rev_2_core_code_4_digits.str[:2]
+rels_industries['nace_rev_2_core_code_2_digits_b'] = rels_industries.nace_rev_2_core_code_4_digits_b.str[:2]
+rels_industries[(rels_industries.nace_rev_2_core_code_2_digits.str.len()>1) & (rels_industries.nace_rev_2_core_code_2_digits_b.str.len()>1)].groupby(['nace_rev_2_core_code_2_digits', 'nace_rev_2_core_code_2_digits_b'], observed=True).size().sort_values(ascending=False).head(50)
