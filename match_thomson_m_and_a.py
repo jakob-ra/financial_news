@@ -45,6 +45,12 @@ compustat.sort_values('emp', inplace=True, ascending=False)
 compustat['company'] = compustat.conml
 compustat.drop_duplicates('company', keep='first', inplace=True)
 
+compustat_global_sedol_isin = pd.read_excel('C:/Users/Jakob/Documents/compustat-global-sedol-isin.xlsx')
+compustat_global_sedol_isin.columns = ['gvkey', 'fyear', 'datadate', 'isin', 'sedol']
+compustat_global_sedol_isin.dropna(subset=['isin', 'sedol'], inplace=True)
+compustat_global_sedol_isin.drop_duplicates(subset=['gvkey', 'isin', 'sedol'], keep='first', inplace=True)
+df[df.AcquirorCUSIP.str[:6].isin(compustat_global_sedol_isin.sedol.astype(str).str[:6])].TargetCUSIP.str[:6].nunique()
+
 cusip_to_gvkey = compustat.sort_values('emp', ascending=False)[['cusip', 'gvkey']].dropna()
 cusip_to_gvkey['cusip'] = cusip_to_gvkey.cusip.astype(str).str[:6]
 cusip_to_gvkey = cusip_to_gvkey.drop_duplicates(subset='cusip', keep='first').set_index('cusip').squeeze()
@@ -85,6 +91,12 @@ df.drop(columns=['AcquirorNameCompustat', 'TargetNameCompustat', 'AcquirorGvkeyF
 df.dropna(subset=['TargetGvkey', 'AcquirorGvkey'], inplace=True)
 df[['TargetGvkey', 'AcquirorGvkey']] = df[['TargetGvkey', 'AcquirorGvkey']].astype(int)
 df.to_csv('C:/Users/Jakob/Downloads/Thomson_MandA_matched_Compustat.csv', index=False)
+
+df = pd.read_csv('C:/Users/Jakob/Downloads/Thomson_MandA_matched_Compustat.csv')
+
+ids = df[['TargetGvkey', 'AcquirorGvkey']].stack().unique()
+compustat_in_m_and_a = compustat[compustat.gvkey.isin(ids)]
+
 
 ids = lexis_nexis_r_and_d[['firm_a', 'firm_b']].stack().unique()
 test = df[df.AcquirorGvkey.astype(str).isin(ids) & df.TargetGvkey.astype(str).isin(ids)]
@@ -130,7 +142,12 @@ complete_matched_data = pd.merge(pd.merge(test_names, matches, how='left', right
 
 # match with lexis
 df_static = pd.read_pickle('C:/Users/Jakob/Downloads/matching_result_lexis_orbis2023_compustat.pkl')
-lexis_nexis_r_and_d = pd.read_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_dynamic.csv')
+df_dynamic = pd.read_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_dynamic.csv')
+
+df_dynamic.added_value.count()
+df_dynamic.research_and_development_expenses.count()
+
+df_static[(df_static.country_iso_code.str.startswith('CHE')) & (df_static.ussic_primary_code.astype(str).str.startswith('283'))]
 
 cleaned_names_bvdids = df_static[['cleaned_name', 'bvdid']]
 cleaned_names_bvdids = cleaned_names_bvdids[cleaned_names_bvdids.bvdid.isin(lexis_nexis_r_and_d.bvdid)]
@@ -182,3 +199,15 @@ df_static[df_static.ID.isin(ids_in_lexis_nexis_r_and_d)][['ID', 'website_address
 df_static = df_static[df_static.ID.isin(ids_in_lexis_nexis_r_and_d)].copy()
 df_static = df_static[df_static.country_iso_code == 'USA'].copy()
 df_static[df_static.from_compustat.astype(bool)]
+
+
+df.TargetCUSIP = df.TargetCUSIP.astype(str)
+df_dupl_targetcusip = df[df.TargetCUSIP.duplicated(keep=False)].sort_values(['TargetCUSIP', 'DateAnnounced'])
+df_dupl_targetcusip = df_dupl_targetcusip[['DateAnnounced', 'Form', 'TargetCUSIP', 'TargetName', 'AcquirorCUSIP', 'AcquirorName']]
+df_dupl_targetcusip[df_dupl_targetcusip.AcquirorCUSIP == '43065T']
+
+
+df.sort_values('DateAnnounced').drop_duplicates('TargetCUSIP', keep='first')
+
+
+

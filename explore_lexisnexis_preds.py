@@ -79,7 +79,6 @@ plt.xticks(rotation=45, ha='right', size=6)
 plt.title('Most frequent industries')
 plt.tight_layout()
 plt.show()
-let
 
 # most important sources
 df['publication'] = df.publication.str.split('\'')
@@ -185,7 +184,6 @@ rnd = rnd[rnd.rels_pred == 'ResearchandDevelopment']
 rnd.industry.explode().value_counts().head(100)
 
 orbis_static = orbis[static_cols].copy(deep=True)
-orbis_static['cleaned']
 
 orbis_static['cleaned_name'] = orbis_static['Company name Latin alphabet'].apply(firm_name_clean)
 orbis_static = orbis_static[['cleaned_name', 'NACE Rev. 2, core code (4 digits)', 'Country ISO code']]
@@ -376,13 +374,20 @@ sdc["group_diff"] = df.sort_values(['cleaned_firms', 'publication_date'])\
 
 # merge detected relationships on firm name pairs
 sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='left')
-sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='inner')
+import numpy as np
+sdc_merge.loc[abs(sdc_merge.publication_date_x-sdc_merge.publication_date_y) < pd.Timedelta('2Y'), 'publication'] = np.nan
+sdc_merge.publication.value_counts(dropna=False)
+
+# sdc_merge = sdc.merge(df, on=['cleaned_firms'], how='inner')
 # take only relationships detected within 1 year of each other
 sdc_merge = sdc_merge[abs(sdc_merge.publication_date_x-sdc_merge.publication_date_y) < pd.Timedelta('2Y')]
 sdc_merge = sdc_merge[['cleaned_firms', 'rels', 'rels_pred']]
 sdc_merge = sdc_merge.groupby('cleaned_firms').agg(sum)
 sdc_merge['rels'] = sdc_merge.rels.apply(frozenset)
 sdc_merge['rels_pred'] = sdc_merge.rels_pred.apply(frozenset)
+
+full_sdc = sdc[['cleaned_firms', 'rels']].groupby('cleaned_firms').agg(sum)
+full_sdc['rels'] = full_sdc.rels.apply(frozenset)
 
 from sklearn.metrics import recall_score, precision_score, f1_score
 
@@ -407,6 +412,7 @@ def get_metrics(df: pd.DataFrame, labels: list):
 
 
 get_metrics(sdc_merge, labels)
+
 
 
 ## compare to CATI

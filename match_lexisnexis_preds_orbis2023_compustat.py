@@ -15,7 +15,7 @@ df = pd.read_pickle('/Users/Jakob/Documents/financial_news_data/lexisnexis_preds
 df.drop(columns=['index_x', 'index_y'], inplace=True)
 
 
-df = df[['publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
+df = df[['title', 'document', 'publication', 'publication_date', 'firms', 'rels_pred', 'country', 'industry']]
 
 df['cleaned_firms'] = df.firms.apply(lambda firms: [firm_name_clean(firm) for firm in firms])
 
@@ -45,6 +45,36 @@ print(f'Share of unmatched firms: {names_ids["bvdid"].isna().sum()/len(names_ids
 
 names_ids = names_ids.dropna().set_index('cleaned_name').squeeze().to_dict()
 
+
+# save to pickle
+rels = df[['title', 'document', 'publication', 'firms', 'country', 'industry', 'publication_date', 'cleaned_firms', 'rels_pred']].copy()
+rels['firm_a'] = rels.cleaned_firms.str[0]
+rels['firm_b'] = rels.cleaned_firms.str[1]
+rels.drop(columns=['cleaned_firms'], inplace=True)
+
+rels['firm_a'] = rels.firm_a.map(names_ids)
+rels['firm_b'] = rels.firm_b.map(names_ids)
+
+rels.dropna(inplace=True)
+
+# remove terminated
+rels = rels[rels.rels_pred.apply(lambda rels: 'Terminated' not in rels)]
+
+# remove firms where both participants are the same
+rels = rels[rels.firm_a != rels.firm_b]
+
+# remove duplicate relationships (same participants, same type, same year)
+rels['year'] = rels.publication_date.dt.year
+rels = rels.groupby(['firm_a', 'firm_b', 'year']).agg(list)
+rels.reset_index(inplace=True)
+
+from itertools import chain
+rels['rels_pred'] = rels.rels_pred.apply(chain.from_iterable).apply(list).apply(set).apply(list)
+
+rels.to_pickle(os.path.join(output_path, 'lexisnexis_rel_database_full.pkl'))
+
+# save separate csvs for each relation type
+
 ## create edge list for Michael
 rels = df[['publication_date', 'cleaned_firms', 'rels_pred']].copy()
 rels['firm_a'] = rels.cleaned_firms.str[0]
@@ -72,7 +102,6 @@ rels['rels_pred'] = rels.rels_pred.apply(chain.from_iterable).apply(list).apply(
 
 rels = rels.explode('rels_pred')
 
-# save separate csvs for each relation type
 for rel_name in important_labels:
     rels[rels.rels_pred =='ResearchandDevelopment'].drop(columns=['rels_pred']).to_csv(
             os.path.join(output_path, 'rel_database', f'{rel_name}_LexisNexis.csv'), index=False)
