@@ -370,3 +370,5 @@ quote_cols = ['appln_kind', 'granted', 'psn_name']
 for col in quote_cols:
     df[col] = df[col].str.strip('"')
 
+
+df = pd.read_csv('C:/Users/Jakob/Downloads/patents_lexis_alliance_firms_2023.csv')

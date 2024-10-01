@@ -6,7 +6,7 @@ import numpy as np
 import os
 import glob
 
-def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, remove_parentheses=True):
+def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, remove_common_terms=False, remove_parentheses=False):
     # make string
     firm_name = str(firm_name)
     firm_name = unidecode.unidecode(firm_name)
@@ -24,13 +24,18 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
                              "limitada", "holdings", "kg", "bv", "pte", "sas", "ilp", "nl", "genossenschaft",
                              "gesellschaft", "aktiengesellschaft", "ltda", "nv", "oao", "holding", "se",
                              "oy", "plcnv", "the", "neft", "& co", "&co", "(u.k.)", "uk", "south africa",
-                             "vietnman", "S/a", "& co", "sdn", "capital", "services", "international", "intl",
-                             "partners", "of", "and", "the", "grp", "management", "investment", "investments",
-                             "global", "a/s", "industries", "pt", "sp", "financial", "fund", "trust",
-                             "ventures", "acquisition", "a", "hldg", "hldgs", "pharm", "pharma", "pharmaceuticals",
-                             "tech", "spa", "medical", "asa", "s", "cp", "enterprises", "public"]
+                             "vietnman", "S/a", "& co", "sdn", "a/s", "pt", "sp", "a", "hldg", "hldgs",
+                             "spa", "asa", "s", "cp"]
         pattern = '|'.join(legal_identifiers)
         pattern = '\\b(' + pattern + ')\\b'  # match only word boundaries
+        firm_name = re.sub(pattern, '', firm_name)
+    if remove_common_terms:
+        common_terms = ["capital", "services", "international", "intl", "partners", "of", "and", "the",
+                             "grp", "management", "investment", "investments", "global", "industries",
+                             "financial", "fund", "trust", "ventures", "acquisition", "pharm", "pharma",
+                             "pharmaceuticals", "tech", "medical", "enterprises", "public"]
+        pattern = '|'.join(common_terms)
+        pattern = '\\b(' + pattern + ')\\b'
         firm_name = re.sub(pattern, '', firm_name)
     # remove parentheses and anything in them: Bayerische Motoren Werke (BMW) -> Bayerische Motoren Werke
     if remove_parentheses:
@@ -45,6 +50,9 @@ def firm_name_clean(firm_name, lower=True, remove_punc=True, remove_legal=True, 
 
     # strip
     firm_name = firm_name.strip()
+
+    # remove series of spaces
+    firm_name = ' '.join(firm_name.split())
 
     return firm_name
 
