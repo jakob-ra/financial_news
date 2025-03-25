@@ -61,7 +61,7 @@ compustat_global = pd.read_csv('C:/Users/Jakob/Documents/compustat-global.csv.gz
 compustat_na = pd.read_csv('C:/Users/Jakob/Documents/compustat-north-america.csv.gz')
 compustat_na = compustat_na[
     ['gvkey', 'fyear', 'datadate', 'emp', 'revt', 'conm', 'conml', 'cusip', 'loc', 'naics', 'weburl']]
-compustat = compustat_na.append(compustat_global)
+compustat = pd.concat([compustat_na, compustat_global])
 del compustat_na, compustat_global
 
 compustat.dropna(subset=['emp'], inplace=True)
@@ -146,15 +146,23 @@ df_matched = df.dropna(subset=['TargetGvkey', 'AcquirorGvkey']).copy()
 df_matched[['TargetGvkey', 'AcquirorGvkey']] = df_matched[['TargetGvkey', 'AcquirorGvkey']].astype(int)
 df_matched.to_csv('C:/Users/Jakob/Downloads/Thomson_SDC_MandA_matched_Compustat.csv', index=False)
 
+df_matched = pd.read_csv('C:/Users/Jakob/Documents/financial_news_data/Thomson_SDC_MandA_matched_Compustat.csv')
 
+sdc_companies = df_matched[df_matched.columns[4:]].copy()
+sdc_companies.drop(columns=['TargetUltimateParent', 'TargetUltimateParentNation'], inplace=True)
+sdc_companies = pd.concat([sdc_companies[[c for c in sdc_companies.columns if 'Target' in c]].rename(
+    columns=lambda x: x.replace('Target', '')),
+                           sdc_companies[[c for c in sdc_companies.columns if 'Acquiror' in c]].rename(
+                               columns=lambda x: x.replace('Acquiror', ''))])
+sdc_companies = sdc_companies[['Gvkey', 'Name', 'CUSIP', 'Nation']].drop_duplicates()
+sdc_companies.to_csv('C:/Users/Jakob/Documents/financial_news_data/sdc_compustat_companies.csv', index=False)
 
+matching_result_lexis_orbis2023_compustat = pd.read_pickle('C:/Users/Jakob/Documents/financial_news_data/matching_result_lexis_orbis2023_compustat.pkl')
 
-#
 # df = pd.read_csv('C:/Users/Jakob/Downloads/Thomson_MandA_matched_Compustat.csv')
 #
 # ids = df[['TargetGvkey', 'AcquirorGvkey']].stack().unique()
 # compustat_in_m_and_a = compustat[compustat.gvkey.isin(ids)]
-#
 #
 # ids = lexis_nexis_r_and_d[['firm_a', 'firm_b']].stack().unique()
 # test = df[df.AcquirorGvkey.astype(str).isin(ids) & df.TargetGvkey.astype(str).isin(ids)]
@@ -196,11 +204,12 @@ good_matches.match_index.max()
 complete_matched_data = pd.merge(pd.merge(test_names, matches, how='left', right_index=True, left_index=True), adjusted_names, how='left', left_on='match_index_0', right_index=True, suffixes=['', '_matched'])
 
 
-
-
 # match with lexis
-df_static = pd.read_pickle('C:/Users/Jakob/Downloads/matching_result_lexis_orbis2023_compustat.pkl')
-df_dynamic = pd.read_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_dynamic.csv')
+df_static = pd.read_pickle('C:/Users/Jakob/Documents/financial_news_data/matching_result_lexis_orbis2023_compustat.pkl')
+df_dynamic = pd.read_csv('C:/Users/Jakob/Documents/financial_news_data/lexis_match_orbis2023_compustat_dynamic.csv')
+
+# bvdid starting with letters
+df_static[df_static.bvdid.str.match(r'^[a-zA-Z]')].bvdid.drop_duplicates().to_csv('C:/Users/Jakob/Documents/financial_news_data/bvdids_lexis_orbis.csv', index=False)
 
 df_dynamic.added_value.count()
 df_dynamic.research_and_development_expenses.count()
@@ -251,7 +260,7 @@ master_file[' bvd_compustat_id'] = master_file[' bvd_compustat_id'].astype(str).
 
 lexis_nexis_r_and_d = pd.read_csv("C:/Users/Jakob/Documents/financial_news_data/output/lexis_preds_2023/rel_database/ResearchandDevelopment_LexisNexis.csv")
 unique_r_and_d_ids = pd.DataFrame(lexis_nexis_r_and_d[['firm_a', 'firm_b']].stack().unique(), columns=['id']).set_index('id')
-df_static = pd.read_csv('C:/Users/Jakob/Downloads/lexis_match_orbis2023_compustat_static.csv')
+df_static = pd.read_csv('C:/Users/Jakob/Documents/financial_news_data/lexis_match_orbis2023_compustat_static.csv')
 ids_in_lexis_nexis_r_and_d = lexis_nexis_r_and_d[['firm_a', 'firm_b']].stack().unique()
 df_static[df_static.ID.isin(ids_in_lexis_nexis_r_and_d)][['ID', 'website_address']].to_csv('C:/Users/Jakob/Downloads/firms_r_and_d_network_urls.csv', index=False)
 df_static = df_static[df_static.ID.isin(ids_in_lexis_nexis_r_and_d)].copy()
@@ -266,6 +275,7 @@ df_dupl_targetcusip[df_dupl_targetcusip.AcquirorCUSIP == '43065T']
 
 
 df.sort_values('DateAnnounced').drop_duplicates('TargetCUSIP', keep='first')
+
 
 
 

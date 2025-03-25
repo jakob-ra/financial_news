@@ -341,6 +341,14 @@ sdc['StrategicAlliance'] = ~sdc.JointVenture  # every deal that is not a JV is a
 
 labels = ['StrategicAlliance'] + labels
 
+sdc_rd = sdc[sdc.ResearchandDevelopment & ~sdc.Pending & ~sdc.Terminated].copy()
+sdc_rd.Participants = sdc_rd.Participants.apply(lambda x: sorted(x))
+sdc_rd['Year'] = sdc_rd.Date.dt.year
+sdc_rd['ParticipantsString'] = sdc_rd.Participants.apply(lambda x: ', '.join(x))
+sdc_rd.drop_duplicates(subset=['ParticipantsString', 'Year'])
+sdc_rd[sdc_rd.Year>=2001]
+sdc_rd[sdc_rd.Year>=2001].explode('Participants').groupby('Participants').size().median()
+
 # get string names of labels
 for label_name in labels:
     sdc[label_name] = sdc[label_name].apply(lambda x: [label_name] if x == 1 else [])

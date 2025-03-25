@@ -367,5 +367,5 @@ if __name__ == '__main__':
     common_tokens.head(400).index.values
 
 
-    df = pd.read_pickle('C:/Users/Jakob/Documents/lexisnexis_firm_alliances_combined_new.pkl')
+    df = pd.read_pickle('C:/Users/Jakob/Documents/financial_news_data/lexisnexis_firm_alliances_combined_new.pkl')
 

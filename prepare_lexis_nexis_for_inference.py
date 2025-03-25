@@ -3,7 +3,10 @@ from nltk.tokenize import sent_tokenize
 from firm_name_matching import firm_name_clean
 from prepare_train_test import extract_firm_name_and_spans, clean_unique_entities
 
-df = pd.read_pickle('C:/Users/Jakob/Documents/lexisnexis_firm_alliances_combined_new.pkl')
+df = pd.read_pickle('C:/Users/Jakob/Documents/financial_news_data/lexisnexis_firm_alliances_combined_new.pkl')
+df = pd.read_csv('/Users/Jakob/Documents/financial_news_data/lexisnexis_firm_alliances_combined_new.csv.gzip', compression='gzip')
+
+df.content.str.len().sum()
 
 # # keep only year 2017
 # df = df[df.publication_date.dt.year == 2017]
