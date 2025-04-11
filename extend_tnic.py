@@ -1,74 +1,171 @@
 import pandas as pd
 import os
 import tqdm
-from sklearn.metrics import roc_curve, roc_auc_score, f1_score
+from sklearn.metrics import roc_curve, roc_auc_score, f1_score, precision_score, recall_score
 from matplotlib import pyplot as plt
 import numpy as np
 
-    # run this the first time to consolidate all tnic data
-# all_files = os.listdir('/Users/Jakob/Documents/financial_news_data/tnic_orbis')
-# chunks = [f for f in all_files if f.startswith('Pub')]
-# df = pd.concat([pd.read_excel(os.path.join('/Users/Jakob/Documents/financial_news_data/tnic_orbis', chunk)) for chunk in chunks])
-#
-# rename_dict = {'Company name Latin alphabet' : 'firm_name', 'BvD ID number': 'bvdid',
-#                'NACE Rev. 2, primary code(s)': 'nace_rev_2_core_code_4_digits',
-#                'US SIC, primary code(s)'     : 'sic_primary_code', 'Country ISO code': 'country',
-#                'ISIN number'                 : 'isin', 'Trade description (English)': 'trade_description',
-#                'Products & services'         : 'products_and_services', 'Specialisation': 'specialisation',
-#                'Website address'             : 'website'}
-#
-# df.rename(columns=rename_dict, inplace=True)
-# df = df[rename_dict.values()].copy()
-#
+# read compustat naics and sic to supplement if missing
+path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\compustat-global-naics-sic.csv".replace('\\', '/')
+compustat_global_naics_sic = pd.read_csv(path, usecols=['gvkey', 'naics', 'sic']).drop_duplicates(subset=['gvkey'], keep='last')
+path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\compustat-na-naics-sic.csv".replace('\\', '/')
+compustat_na_naics_sic = pd.read_csv(path, usecols=['gvkey', 'naics', 'sic']).drop_duplicates(subset=['gvkey'], keep='last')
+compustat_naics_sic = pd.concat([compustat_global_naics_sic, compustat_na_naics_sic], ignore_index=True).drop_duplicates(subset=['gvkey'], keep='last')
+del compustat_global_naics_sic, compustat_na_naics_sic
+compustat_naics_sic.dropna(subset=['naics', 'sic'], inplace=True, how='all')
+
+# run this the first time to consolidate all tnic data
+all_files = os.listdir('/Users/Jakob/Documents/financial_news_data/tnic_orbis')
+chunks = [f for f in all_files if f.startswith('Pub')]
+df = pd.concat(
+        [pd.read_excel(os.path.join('/Users/Jakob/Documents/financial_news_data/tnic_orbis', chunk)) for
+         chunk in chunks])
+
+rename_dict = {'Company name Latin alphabet'                 : 'firm_name', 'BvD ID number': 'bvdid',
+               'NACE Rev. 2, primary code(s)'                : 'nace_primary',
+               'NACE Rev. 2, primary code(s) - description'  : 'nace_primary_description',
+               'NACE Rev. 2, secondary code(s)'              : 'nace_secondary',
+               'NACE Rev. 2, secondary code(s) - description': 'nace_secondary_description',
+               'US SIC, primary code(s)'                     : 'sic_primary',
+               'US SIC, secondary code(s)'                   : 'sic_secondary',
+               'NAICS 2022, primary code(s)'                 : 'naics_primary',
+               'NAICS 2022, secondary code(s)'               : 'naics_secondary',
+               'Country ISO code'                            : 'country', 'ISIN number': 'isin',
+               'Trade description (English)'                 : 'trade_description',
+               'Products & services'                         : 'products_and_services',
+               'Specialisation'                              : 'specialisation',
+               'Website address'                             : 'website'}
+
+df.rename(columns=rename_dict, inplace=True)
+df = df[rename_dict.values()].copy()
+
 # df.sic_primary_code = df.sic_primary_code.str.split('\n').str[0].str.strip().str[:2]
 # sic_in_data = df.sic_primary_code.dropna().unique()
-#
-# description_cols = ['trade_description', 'products_and_services', 'specialisation']
-# for col in description_cols:
-#     # nan to empty string
-#     df[col] = df[col].fillna('')
-#     df[col] = df[col].astype(str)
-#     remove_stings = [' [source: Bureau van Dijk]', '\n', '\r', '\t']
-#     for s in remove_stings:
-#         df[col] = df[col].str.replace(s, ' ')
-#
-#     # remove double periods, double spaces, double commas
-#     df[col] = df[col].str.replace('..', '.').str.replace('  ', ' ').str.replace(',,', ',')
-#
-#     df[col] = df[col].str.strip()
-#
-# df['description'] = df[description_cols].apply(lambda x: '. '.join(x), axis=1).str.replace('..', '.')
-#
-# # match to gvkey via isin/cusip
-# compustat_global_sedol_isin = pd.read_excel('C:/Users/Jakob/Documents/compustat-global-sedol-isin.xlsx')
-# compustat_global_sedol_isin.columns = ['gvkey', 'fyear', 'datadate', 'isin', 'sedol']
-# compustat_global_sedol_isin.dropna(subset=['isin', 'sedol'], inplace=True)
-# compustat_global_sedol_isin.drop_duplicates(subset=['gvkey', 'isin', 'sedol'], keep='first', inplace=True)
-# compustat_global_sedol_isin = compustat_global_sedol_isin[['gvkey', 'isin']].dropna().drop_duplicates()
-# compustat_global_sedol_isin = compustat_global_sedol_isin.set_index('isin').squeeze()
-#
-# df['gvkey'] = df['isin'].map(compustat_global_sedol_isin)
-#
-# compustat_na_cusip = pd.read_csv('C:/Users/Jakob/Downloads/compustat-na-cusip.csv', usecols=['gvkey', 'cusip', 'loc']).drop_duplicates().dropna()
-# compustat_na_cusip = compustat_na_cusip[compustat_na_cusip['loc'].isin(['USA', 'CAN'])].copy()
-# compustat_na_cusip['loc'] = compustat_na_cusip['loc'].replace({'USA': 'US', 'CAN': 'CA'})
-# compustat_na_cusip['isin_11_digits'] = compustat_na_cusip['loc'] + compustat_na_cusip['cusip'].astype(str)
-# compustat_na_cusip.to_csv('C:/Users/Jakob/Documents/financial_news_data/tnic_orbis/compustat_na_cusip_isin.csv', index=False)
-#
-# df['gvkey2'] = df['isin'].str[:11].map(compustat_na_cusip.set_index('isin_11_digits')['gvkey'])
-#
-# df['gvkey'] = df['gvkey'].fillna(df['gvkey2'])
-# df.drop(columns=['gvkey2'], inplace=True)
-# df['gvkey'] = df['gvkey'].astype(int)
-#
-# df.to_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/tnic_orbis_input_full.csv', index=False)
 
-df = pd.read_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/tnic_orbis_input_full.csv')
+# match to gvkey via isin/cusip
+compustat_global_sedol_isin = pd.read_excel('C:/Users/Jakob/Documents/compustat-global-sedol-isin.xlsx')
+compustat_global_sedol_isin.columns = ['gvkey', 'fyear', 'datadate', 'isin', 'sedol']
+compustat_global_sedol_isin.dropna(subset=['isin', 'sedol'], inplace=True)
+compustat_global_sedol_isin.drop_duplicates(subset=['gvkey', 'isin', 'sedol'], keep='first', inplace=True)
+compustat_global_sedol_isin = compustat_global_sedol_isin[['gvkey', 'isin']].dropna().drop_duplicates()
+compustat_global_sedol_isin = compustat_global_sedol_isin.set_index('isin').squeeze()
+
+df['gvkey'] = df['isin'].map(compustat_global_sedol_isin)
+
+compustat_na_cusip = pd.read_csv('C:/Users/Jakob/Downloads/compustat-na-cusip.csv',
+                                 usecols=['gvkey', 'cusip', 'loc']).drop_duplicates().dropna()
+compustat_na_cusip = compustat_na_cusip[compustat_na_cusip['loc'].isin(['USA', 'CAN'])].copy()
+compustat_na_cusip['loc'] = compustat_na_cusip['loc'].replace({'USA': 'US', 'CAN': 'CA'})
+compustat_na_cusip['isin_11_digits'] = compustat_na_cusip['loc'] + compustat_na_cusip['cusip'].astype(str)
+compustat_na_cusip.to_csv(
+    'C:/Users/Jakob/Documents/financial_news_data/tnic_orbis/compustat_na_cusip_isin.csv', index=False)
+
+df['gvkey2'] = df['isin'].str[:11].map(compustat_na_cusip.set_index('isin_11_digits')['gvkey'])
+
+df['gvkey'] = df['gvkey'].fillna(df['gvkey2'])
+df.drop(columns=['gvkey2'], inplace=True)
+
+df.dropna(subset=['gvkey'], inplace=True)
+df['gvkey'] = df['gvkey'].astype(int)
+
+# add textual descriptions of primary and secondary NAICS, NACE and SIC
+sic_descriptions = pd.read_csv('https://github.com/saintsjd/sic4-list/raw/refs/heads/master/sic-codes.csv',
+                               usecols=['SIC', 'Description'])
+sic_descriptions.SIC = sic_descriptions.SIC.astype(str).str.strip()
+sic_descriptions = sic_descriptions.set_index('SIC').squeeze().to_dict()
+
+nace_descriptions = pd.read_excel(
+    'C:/Users/Jakob/Documents/financial_news_data/tnic_orbis/NACERev2_ISIC4_Table.xlsx',
+    usecols=['NACE_CODE', 'NACE_NAME'])
+nace_descriptions['NACE_CODE'] = nace_descriptions['NACE_CODE'].astype(str).str.replace('.', '',
+                                                                                        regex=False).str.strip()
+nace_descriptions = nace_descriptions.set_index('NACE_CODE').squeeze().to_dict()
+
+path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\2022_NAICS_Structure.xlsx".replace('\\',
+                                                                                                    '/')
+naics_descriptions = pd.read_excel(path, skiprows=2, usecols=['2022 NAICS Code', '2022 NAICS Title'])
+naics_descriptions.columns = ['naics', 'description']
+naics_descriptions.description = naics_descriptions.description.str.strip().replace('T$', '',
+                                                                                    regex=True).str.replace(
+    '  ', ' ').str.strip()  # remove capital 'T' from right end of string
+naics_descriptions.naics = naics_descriptions.naics.astype(str).str.replace('.', '', regex=False).str.strip()
+naics_descriptions = naics_descriptions.set_index('naics').squeeze().to_dict()
+
+for code_type in ['nace', 'sic', 'naics']:
+    df[f'{code_type}'] = df[f'{code_type}_primary'].str.split('\n') + df[f'{code_type}_secondary'].str.split(
+        '\n')
+    df[f'{code_type}'] = df[f'{code_type}'].apply(lambda x: [] if not isinstance(x, list) else x)
+
+# take union of codes with compustat naics/sic
+df = df.merge(compustat_naics_sic[['gvkey', 'naics', 'sic']], on='gvkey', how='left', suffixes=('', '_compustat'))
+
+df['naics'] = df['naics'] + df['naics_compustat'].apply(lambda x: [str(int(x))] if not pd.isna(x) else [])
+df['sic'] = df['sic'] + df['sic_compustat'].apply(lambda x: [str(int(x))] if not pd.isna(x) else [])
+df.drop(columns=['naics_compustat', 'sic_compustat'], inplace=True)
+
+for code_type in ['nace', 'sic', 'naics']:
+    df[f'{code_type}'] = df[f'{code_type}'].apply(lambda x: list(set(x)))
+
+df = df [df[['nace', 'sic', 'naics']].sum(axis=1).str.len()>0].copy() # drop firms with no industry codes
+
+# this is sometimes not finding the right text!
+df['nace_text'] = df['nace'].apply(lambda x: [nace_descriptions[i] for i in x if i in nace_descriptions])
+df['sic_text'] = df['sic'].apply(lambda x: [sic_descriptions[i] for i in x if i in sic_descriptions])
+df['naics_text'] = df['naics'].apply(lambda x: [naics_descriptions[i] for i in x if i in naics_descriptions])
+
+df['industry_text'] = df[['nace_text', 'sic_text', 'naics_text']].sum(axis=1).apply(lambda x: list(set(x))).apply(
+    lambda x: ', '.join(x))
+
+description_cols = ['trade_description', 'products_and_services', 'specialisation', 'industry_text']
+for col in description_cols:
+    # nan to empty string
+    df[col] = df[col].fillna('')
+    df[col] = df[col].astype(str)
+    remove_stings = [' [source: Bureau van Dijk]', '\n', '\r', '\t']
+    for s in remove_stings:
+        df[col] = df[col].str.replace(s, ' ')
+
+    # remove double periods, double spaces, double commas
+    df[col] = df[col].str.replace('..', '.').str.replace('  ', ' ').str.replace(',,', ',')
+
+    df[col] = df[col].str.strip()
+
+df['description'] = df[description_cols].apply(lambda x: '. '.join(x), axis=1).str.replace('..', '.')
+
+df.drop(columns=['industry_text'], inplace=True)
+
+df.to_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/tnic_orbis_input_full_including_industry_descripions.csv',index=False)
+df = pd.read_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/tnic_orbis_input_full_including_industry_descripions.csv')
+
 gvkey_in_df = df.gvkey.drop_duplicates().sort_values()
 print(f'Unique gvkeys: {len(gvkey_in_df)}')
 
 # unique_gvkeys_etnic = pd.read_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/Etnic2_data/ETNIC2_unique_gvkeys.csv').squeeze()
 # df_in_etnic = df[df.gvkey.isin(unique_gvkeys_etnic)].copy() # DON'T DO THIS because we will only end up with competitors in training data
+
+### construct competition matrix based on shared membership of 3-digit primary or secondary NAICS/NACE
+path = r"C:\Users\Jakob\Downloads\for Jakob\compustat ID.xlsx".replace('\\', '/')
+sample_gvkeys = pd.read_excel(path, header=None, names=['gvkey'])
+sample_gvkeys = sample_gvkeys.gvkey.drop_duplicates()
+
+df_sample = df[df.gvkey.isin(sample_gvkeys)].copy()
+df_sample = df_sample.sort_values('gvkey').reset_index(drop=True)
+n_firms = len(df)
+all_edges = []
+for i, code_type in enumerate(['nace', 'sic', 'naics']):
+    exploded_df = df_sample[['gvkey', code_type]].explode(code_type)
+    exploded_df = exploded_df[exploded_df[code_type].str.len() > 0].copy()
+    edges = exploded_df.merge(exploded_df, on=code_type, suffixes=('1', '2'), how='inner')
+    edges.drop_duplicates(subset=['gvkey1', 'gvkey2'], inplace=True)
+    edges = edges[edges.gvkey1 != edges.gvkey2].copy()
+    edges = edges[['gvkey1', 'gvkey2']]
+    all_edges.append(edges)
+
+edges = pd.concat(all_edges, ignore_index=True).drop_duplicates()
+del all_edges
+edges['score'] = 1
+
+edges.to_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/sample_competition_links_based_on_industry_codes.csv', index=False)
 
 # create sample for fast iteration
 path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/data_sample/tnic_input_files/'
@@ -78,17 +175,26 @@ for i, row in tqdm.tqdm(sample.iterrows(), total=len(sample)):
     with open(os.path.join(path, str(row.gvkey)), 'w') as f:
         f.write(row.description)
 
+# full training data
 path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/data/tnic_input_files/'
 # save each firm as a separate file
 for i, row in tqdm.tqdm(df.iterrows(), total=len(df)):
     with open(os.path.join(path, str(row.gvkey)), 'w') as f:
         f.write(row.description)
 
-
+# TNIC/ETNIC overlap inference data
 df_overlap = df[df.gvkey.isin(unique_gvkeys_etnic)].copy()
 path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/data_overlap/tnic_input_files/'
 # save each firm as a separate file
 for i, row in tqdm.tqdm(df_overlap.iterrows(), total=len(df_overlap)):
+    with open(os.path.join(path, str(row.gvkey)), 'w') as f:
+        f.write(row.description)
+
+# inference data for Estimation sample Compustat global + NA sample (1518 firms)
+df_sample = df[df.gvkey.isin(sample_gvkeys_orbis_tnic)].copy()
+path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/data_estimation_sample/tnic_input_files/'
+# save each firm as a separate file
+for i, row in tqdm.tqdm(df_sample.iterrows(), total=len(df_sample)):
     with open(os.path.join(path, str(row.gvkey)), 'w') as f:
         f.write(row.description)
 
@@ -98,14 +204,18 @@ for i, row in tqdm.tqdm(df_overlap.iterrows(), total=len(df_overlap)):
 # debug
 # python train.py --data_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\data_sample --output_dir output --algorithm pv_dbow --negative 0 --min-count 3 --window 15 --hs 1 --vector-size 300 --epochs 50 --threshold 0.2
 
-# run this command for inference
-# python multi_inference.py --data_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\data_overlap --output_dir output_inference --model_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\replication_code-20220963\PythonCode\output\1742543273684_pv_dbow_dim=300_window=15_epochs=50\models --number_of_processes_run_inference 8
+# run this command for inference on overlap with TNIC/ETNIC
+# python multi_inference.py --data_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\data_overlap --output_dir output_inference --model_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\replication_code-20220963\PythonCode\output\1742501369605_pv_dbow_dim=300_window=15_epochs=50\models --number_of_processes_run_inference 8
+
+# run this command for inference on estimation sample
+# python multi_inference.py --data_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\data_estimation_sample --output_dir output_inference_estimation_sample --model_dir C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\replication_code-20220963\PythonCode\output\1742501369605_pv_dbow_dim=300_window=15_epochs=50\models --number_of_processes_run_inference 8
 
 # read orbis tnic results
 orbis_tnic_path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/replication_code-20220963/PythonCode/output_inference/'
 all_files = [f for f in os.listdir(orbis_tnic_path) if f.endswith('.tsv')]
 orbis_tnic = pd.read_csv(os.path.join(orbis_tnic_path, all_files[0]), sep='\t')
 orbis_tnic.columns = ['gvkey1', 'gvkey2', 'score']
+
 orbis_tnic = orbis_tnic[orbis_tnic.gvkey1 < orbis_tnic.gvkey2].copy()
 
 gvkeys_orbis_tnic = set(orbis_tnic.gvkey1).union(set(orbis_tnic.gvkey2))
@@ -324,8 +434,6 @@ for cutoff in [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99]:
         f'{f1_score(merge.high_etnic_all_score, (merge.score_orbis_tnic >= best_threshold))},'
         f'adjusted F1: {f1_score(merge.high_etnic_all_score, (merge.score_orbis_tnic >= best_threshold))-merge.high_etnic_all_score.mean()}')
 
-
-
 # consolidate tnic all data
 # tnic_all_path = '/Users/Jakob/Documents/financial_news_data/tnic_orbis/tnic_all'
 # all_files = sorted([f for f in os.listdir(tnic_all_path) if f.endswith('.txt')], reverse=True)
@@ -356,13 +464,20 @@ merge = orbis_tnic_shared.merge(tnic_all_shared, on=['gvkey1', 'gvkey2'], suffix
 # merge['high_orbis_tnic_score'] = merge.score_orbis_tnic >= 0.2039
 # merge['high_tnic_all_score'] = merge.score_tnic_all >= tnic_all.score.quantile(0.98)
 
-for cutoff in [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99]:
+
+for cutoff in [0.9]: #[0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99]:
     merge['high_orbis_tnic_score'] = merge.score_orbis_tnic >= merge.score_orbis_tnic.quantile(cutoff)
     merge['high_tnic_all_score'] = merge.score_tnic_all >= merge.score_tnic_all.quantile(cutoff)
 
     best_threshold = plot_roc_and_precision_recall(merge, true_y_col='high_tnic_all_score', plot_title=f'cutoff={cutoff:.2f}')
 
     print(f'F1 score for cutoff={cutoff:.2f}: {f1_score(merge.high_tnic_all_score, merge.high_orbis_tnic_score)}')
+
+    print(f'Precision for cutoff={cutoff:.2f}: {precision_score(merge.high_tnic_all_score, merge.high_orbis_tnic_score)}')
+
+    print(f'Recall for cutoff={cutoff:.2f}: {recall_score(merge.high_tnic_all_score, merge.high_orbis_tnic_score)}')
+
+    print(f'Balanced accuracy for cutoff={cutoff:.2f}: {balanced_accuracy_score(merge.high_tnic_all_score, merge.high_orbis_tnic_score)}')
 
     print(
         f'F1 score for cutoff={cutoff:.2f} and best threshold: '
@@ -375,3 +490,125 @@ for cutoff in [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99]:
 # pair_counts = etnic3['gvkey_pair'].value_counts()
 # pair_counts.describe() # most pairs only occur twice
 # etnic3.drop_duplicates(subset=['gvkey_pair'], keep='first', inplace=True) # keep only one of the duplicates
+
+# read full orbis tnic results
+orbis_tnic_path = r'\Users\Jakob\Documents\financial_news_data\tnic_orbis\replication_code-20220963\PythonCode\output\1742501369605_pv_dbow_dim=300_window=15_epochs=50\similarity'.replace('\\', '/')
+all_files = [f for f in os.listdir(orbis_tnic_path) if f.endswith('.tsv')]
+orbis_tnic = pd.read_csv(os.path.join(orbis_tnic_path, all_files[0]), sep='\t')
+orbis_tnic.columns = ['gvkey1', 'gvkey2', 'score']
+orbis_tnic.score.describe().round(3)
+
+orbis_tnic = orbis_tnic[orbis_tnic.gvkey1 < orbis_tnic.gvkey2].copy()
+
+gvkeys_orbis_tnic = set(orbis_tnic.gvkey1).union(set(orbis_tnic.gvkey2))
+
+gvkeys_orbis_tnic_high_scores = set(orbis_tnic[orbis_tnic.score>=0.2039].gvkey1).union(set(orbis_tnic[orbis_tnic.score>=0.2039].gvkey2))
+
+path = r"C:\Users\Jakob\Downloads\for Jakob\compustat ID.xlsx".replace('\\', '/')
+sample_gvkeys = pd.read_excel(path, header=None, names=['gvkey'])
+sample_gvkeys = sample_gvkeys.gvkey.drop_duplicates()
+sample_gvkeys_orbis_tnic = sample_gvkeys[sample_gvkeys.isin(gvkeys_orbis_tnic)].copy()
+sample_gvkeys_orbis_tnic.to_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/compustat_estimation_sample_gvkeys_covered_by_orbis_trade_descriptions.csv', index=False)
+sample_gvkeys_orbis_tnic = pd.read_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/compustat_estimation_sample_gvkeys_covered_by_orbis_trade_descriptions.csv').squeeze()
+
+path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\replication_code-20220963\PythonCode\output_inference_estimation_sample\tnic_input_files_similarity.tsv".replace('\\', '/')
+estimation_sample_orbis_tnic = pd.read_csv(path, sep='\t')
+estimation_sample_orbis_tnic.columns = ['gvkey1', 'gvkey2', 'score']
+estimation_sample_orbis_tnic.sort_values(['gvkey1', 'gvkey2'], inplace=True)
+estimation_sample_orbis_tnic.score.describe()
+
+# calculate median score for each firm
+medians = {}
+for gvkey in sample_gvkeys_orbis_tnic:
+    median = estimation_sample_orbis_tnic[estimation_sample_orbis_tnic.gvkey1 == gvkey].score.median()
+    medians[gvkey] = median
+medians = pd.Series(medians)
+medians.describe()
+
+cutoff = 0.14 # 0.2039
+comp_links = estimation_sample_orbis_tnic[estimation_sample_orbis_tnic.score>=cutoff].copy()
+comp_links['score'] = comp_links['score'] - cutoff # subtract 0.2039 to get the adjusted score
+comp_links_gvkeys = set(comp_links.gvkey1).union(set(comp_links.gvkey2))
+comp_links.to_csv('/Users/Jakob/Documents/financial_news_data/tnic_orbis/orbis_tnic_compustat_estimation_sample_lower_cutoff.csv', index=False)
+
+pd.concat([comp_links.gvkey1, comp_links.gvkey2]).value_counts().describe()
+
+
+num_edges = comp_links.shape[0]
+num_nodes = len(comp_links_gvkeys)
+(2 * num_edges) / (num_nodes * (num_nodes - 1))
+
+num_edges = etnic3.shape[0]
+num_nodes = len(gvkeys_etnic3)
+(2 * num_edges) / (num_nodes * (num_nodes - 1)) # density is 4 times higher in ETNIC3
+
+num_edges = tnic3.shape[0]
+num_nodes = len(gvkeys_tnic3)
+(2 * num_edges) / (num_nodes * (num_nodes - 1)) # density is 4 times higher in TNIC3
+
+# etnic3_in_estimation_sample = etnic3[etnic3.gvkey1.isin(sample_gvkeys) & etnic3.gvkey2.isin(sample_gvkeys)]
+# gvkeys_etnic3_in_estimation_sample = set(etnic3_in_estimation_sample.gvkey1).union(set(etnic3_in_estimation_sample.gvkey2))
+
+
+
+
+
+# read Chih-Sheng TNIC data
+# path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\TNIC-2020.mat".replace('\\', '/')
+#
+# import scipy.io
+# tnic = scipy.io.loadmat(path)['ans']
+# tnic = pd.DataFrame(tnic)
+# tnic.columns = ['gvkey1', 'gvkey2', 'score']
+# tnic[['gvkey1', 'gvkey2']] = tnic[['gvkey1', 'gvkey2']].astype(int)
+# tnic_sample = tnic[tnic.gvkey1.isin(sample_gvkeys_orbis_tnic) & tnic.gvkey2.isin(sample_gvkeys_orbis_tnic)].copy()
+
+# read TNIC3
+path = r"C:\Users\Jakob\Documents\financial_news_data\tnic_orbis\tnic3_data\tnic3_data.txt".replace('\\', '/')
+tnic3 = pd.read_csv(path, sep='\t')
+tnic3 = tnic3.sort_values(['year', 'gvkey1', 'gvkey2']).drop_duplicates(subset=['gvkey1', 'gvkey2'], keep='last') # keep most recent
+tnic3.dropna(subset=['score'], inplace=True)
+gvkeys_tnic3 = set(tnic3.gvkey1).union(set(tnic3.gvkey2))
+
+tnic3_sample = tnic3[tnic3.gvkey1.isin(sample_gvkeys) & tnic3.gvkey2.isin(sample_gvkeys)].copy()
+tnic3_sample_gvkeys = list(set(tnic3_sample.gvkey1).union(set(tnic3_sample.gvkey2)))
+
+# plot histogram of scores
+for df, label in [(tnic3_sample, 'TNIC3 sample'), (comp_links, 'Orbis TNIC')]:
+    plt.figure(figsize=(10, 6))
+    plt.hist(df.score, bins=100)
+    plt.xlim(0, 1)
+    plt.xlabel('Score')
+    plt.ylabel('Frequency')
+    plt.title(f'{label} Score Distribution')
+    plt.show()
+
+import networkx as nx
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+tnic_sample_g = nx.from_pandas_edgelist(tnic3_sample, 'gvkey1', 'gvkey2', ['score'])
+estimation_sample_orbis_tnic_graph = nx.from_pandas_edgelist(comp_links, 'gvkey1', 'gvkey2', ['score'])
+
+nx.is_directed(tnic_sample_g)
+tnic_sample_g.number_of_edges()
+tnic_sample_g.number_of_nodes()
+nx.density(tnic_sample_g)
+
+nx.is_directed(estimation_sample_orbis_tnic_graph)
+estimation_sample_orbis_tnic_graph.number_of_edges()
+estimation_sample_orbis_tnic_graph.number_of_nodes()
+nx.density(estimation_sample_orbis_tnic_graph)
+
+# plot degree histogram
+for g, label in [(tnic_sample_g, 'TNIC3 sample'), (estimation_sample_orbis_tnic_graph, 'Orbis TNIC')]:
+    degrees = [g.degree(n) for n in g.nodes()]
+    plt.figure(figsize=(10, 6))
+    sns.histplot(degrees, bins=100)
+    plt.xlim(0, 100)
+    plt.xlabel('Degree')
+    plt.ylabel('Frequency')
+    plt.title(f'{label} Degree Distribution')
+    plt.show()
+
+
