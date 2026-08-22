@@ -96,3 +96,60 @@ df.sort_index(inplace=True)
 df = df.squeeze()
 
 df.to_csv(r"C:\Users\Jakob\Documents\financial_news_data\compustat_website_product_descriptions.csv".replace("\\", "/"))
+
+
+# bert similarities all
+path = r"C:\Users\Jakob\Documents\financial_news_data\bert_sims_all.csv".replace("\\", "/")
+df = pd.read_csv(path)
+df.drop(columns=['Unnamed: 0'], inplace=True)
+
+df.describe().round(2)
+
+# check that reverse is contained
+# df_reverse = df.rename(columns={'source': 'target', 'target': 'source'})
+# assert len(df.merge(df_reverse, how='inner', on=['source', 'target'], validate='one_to_one')) == len(df)
+# del df_reverse
+
+# take top 2 percent of scores, since relations are contained both ways that means cutoff is 96th percentile
+cutoff = df.score.quantile(0.96)
+
+df_full_gvkeys = pd.concat([df.source, df.target]).drop_duplicates()
+n_firms_full = len(df_full_gvkeys)
+df_full_comp = compustat.merge(df_full_gvkeys.rename('gvkey'), how='inner')
+df_full_comp['loc'].value_counts()
+
+### construct competition matrix based on shared membership of 3-digit primary or secondary NAICS/NACE
+path = r"C:\Users\Jakob\Documents\financial_news_data\for Jakob\compustat ID.xlsx".replace('\\', '/')
+sample_gvkeys = pd.read_excel(path, header=None, names=['gvkey'])
+sample_gvkeys = sample_gvkeys.gvkey.drop_duplicates()
+
+df_sample = df[df.source.isin(sample_gvkeys) & df.target.isin(sample_gvkeys)].copy()
+df_sample = df_sample.sort_values(['source', 'target']).reset_index(drop=True)
+assert len(df_sample[df_sample.source!=df_sample.target])==len(df_sample) # check that no self-links contained
+
+n_firms = pd.concat([df_sample.source, df_sample.target]).nunique()
+print(f"Number of firms in sample: {len(sample_gvkeys)}, number of firms covered by Bert product description similarities: {n_firms}")
+
+df_sample = df_sample[df_sample.score >= cutoff].copy()
+
+df_sample.to_csv('/Users/Jakob/Documents/financial_news_data/website_product_descriptions_bert_similarities_compustat_sample.csv', index=False)
+
+
+## tobias synthetic 10 k filings
+path = r"C:\Users\Jakob\Documents\financial_news_data\0503-2018-10K_filings-parsed_results.csv"
+df = pd.read_csv(path.replace('\\', '/'))
+
+compustat_global = pd.read_csv('C:/Users/Jakob/Documents/compustat-global.csv.gz')
+compustat_na = pd.read_csv('C:/Users/Jakob/Documents/compustat-north-america.csv.gz')
+compustat_na = compustat_na[
+    ['gvkey', 'fyear', 'datadate', 'emp', 'revt', 'conm', 'conml', 'cusip', 'loc', 'naics', 'weburl']]
+compustat = pd.concat([compustat_na, compustat_global])
+del compustat_na, compustat_global
+compustat = compustat[['weburl', 'gvkey', 'loc']]
+compustat = compustat.drop_duplicates().dropna()
+# compustat.drop_duplicates(subset=['weburl'], inplace=True)
+compustat.weburl = compustat.weburl.str.replace('www.', '').str.replace('http://', '').str.replace('https://', '').str.replace('www2.', '').str.replace('www3.', '')
+
+df = df.merge(compustat.reset_index(), left_on='firm_domain', right_on='weburl', how='inner')
+df['loc'].value_counts()
+

@@ -158,7 +158,7 @@ print(f'Unique gvkeys: {len(gvkey_in_df)}')
 # df_in_etnic = df[df.gvkey.isin(unique_gvkeys_etnic)].copy() # DON'T DO THIS because we will only end up with competitors in training data
 
 ### construct competition matrix based on shared membership of 3-digit primary or secondary NAICS/NACE
-path = r"C:\Users\Jakob\Downloads\for Jakob\compustat ID.xlsx".replace('\\', '/')
+path = r"C:\Users\Jakob\Documents\financial_news_data\for Jakob\compustat ID.xlsx".replace('\\', '/')
 sample_gvkeys = pd.read_excel(path, header=None, names=['gvkey'])
 sample_gvkeys = sample_gvkeys.gvkey.drop_duplicates()
 

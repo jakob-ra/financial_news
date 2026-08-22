@@ -282,7 +282,7 @@ if __name__ == '__main__':
     compustat_global = pd.read_csv('C:/Users/Jakob/Documents/compustat-global.csv.gz')
     compustat_na = pd.read_csv('C:/Users/Jakob/Documents/compustat-north-america.csv.gz')
     compustat_na = compustat_na[['gvkey', 'fyear', 'datadate', 'emp', 'revt', 'conm', 'conml', 'cusip', 'loc', 'naics', 'weburl']]
-    compustat = compustat_na.append(compustat_global)
+    compustat = pd.concat([compustat_na, compustat_global], ignore_index=True)
 
 
     compustat.dropna(subset=['emp'], inplace=True)

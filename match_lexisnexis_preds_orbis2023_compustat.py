@@ -133,7 +133,7 @@ df_dynamic.sort_values('operating_revenue_turnover', inplace=True, ascending=Fal
 
 
 # read rels research and development
-rels = pd.read_csv(os.path.join(output_path, 'rel_database', 'ResearchandDevelopment_LexisNexis.csv'))
+rels2 = pd.read_csv(os.path.join(output_path, 'rel_database', 'ResearchandDevelopment_LexisNexis.csv'))
 rels_industries = rels.merge(df_static[['bvdid', 'nace_rev_2_core_code_4_digits']], left_on='firm_a', right_on='bvdid', how='left', suffixes=('', '_a'))
 rels_industries = rels_industries.merge(df_static[['bvdid', 'nace_rev_2_core_code_4_digits']], left_on='firm_b', right_on='bvdid', how='left', suffixes=('', '_b'))
 
@@ -144,3 +144,11 @@ rels_industries[(rels_industries.nace_rev_2_core_code_2_digits.str.len()>1) & (r
 
 
 df.rels_pred.explode().value_counts()
+
+for rel in important_labels:
+    rels[rel] = rels.rels_pred.apply(lambda rels: rel in rels)
+
+rels.drop(columns=['rels_pred', 'publication', 'firms', 'country', 'industry', 'publication_date', 'document', 'title'], inplace=True)
+rels.to_pickle(os.path.join(output_path, 'lexisnexis_full_rel_db_rel_type_indicators.pkl'))
+
+rels.to_csv(os.path.join(output_path, 'lexisnexis_full_rel_db_rel_type_indicators.csv'), index=False)
