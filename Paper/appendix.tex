@@ -1,0 +1,1628 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Appendix}
+\appendix
+
+\setcounter{section}{0}
+\setcounter{page}{1}
+
+% Appendix section numbering: A, B, C, ...
+\renewcommand{\thesection}{\Alph{section}}
+% Appendix subsection numbering: A.1, A.2, B.1, ...
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+% Equation numbering within appendix sections: A.1, A.2, B.1, ...
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+% Optional: figure and table numbering as Figure A.1, Table A.1, etc.
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+\makeatletter
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\makeatother
+\singlespacing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Notation}
+\label{app:notation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Table~\ref{tab:notation-main} collects the notation of the main text and %Table~\ref{tab:notation-app} 
+the symbols whose meaning is local to individual
+appendices. 
+%Several symbols are deliberately reused across scopes and
+%are flagged in the notes to the table: $\kappa$ (the product-market
+%dampening factor of Equation~\eqref{eq:single-market-elements} vs.\ the
+%M\&A cost parameters $\kappa_0,\kappa_1,\dots$ of
+%Equation~\eqref{eq:mna-cost}), $m$ (the kernel entries $m_{ij}$ vs.\ the
+%merger indicators $m_{ij,t}$), $\mathbf{c}$ (Katz--Bonacich centrality
+%vs.\ the dyadic covariate vector $\mathbf{c}_{ij,t}$), $\delta$ (the
+%depreciation rate of Equation~\eqref{eq:rnd-accumulation}, and $x,y,\alpha,\nu,\gamma$
+%(whose appendix-local meanings in Appendices~\ref{sec:micro-cost}
+%and~\ref{sec:mat-perturb} differ from their main-text meanings).
+
+\begin{table}[htbp]
+\vspace{-2cm}
+\centering
+\scalebox{0.8}{
+\begin{threeparttable}
+\caption{\label{tab:notation-main} Notation in main text.}
+{\footnotesize
+\begin{tabular}{@{} l l l @{}}
+\toprule
+Symbol & Meaning & Defined in \\
+\midrule
+$n$; $i,j,k,\ell$ & number of firms; firm indices & Sec.~\ref{sec:model-profits} \\
+$G_t$; $\mathbf{A}_t=(a_{ij,t})$ & R\&D collaboration network; its adjacency matrix & Sec.~\ref{sec:model-profits} \\
+$\mathbf{B}=(b_{ij,t})$ & product-market competition matrix (TNIC) & Sec.~\ref{sec:industry}, \ref{sec:model-profits} \\
+$\mathcal{M}_k$ & product market $k$ & Sec.~\ref{sec:model-profits} \\
+$y_{it}$, $\mathbf{y}_t$ & equilibrium output & Eq.~\eqref{eq:output-br} \\
+$\eta_{it}$, $\bm{\eta}_t$ & productivity & Eq.~\eqref{eq:prod-dyn} \\
+$x_{it}$; $R_{it}$ & R\&D capital stock; R\&D investment & Eq.~\eqref{eq:rnd-accumulation} \\
+$\delta$ & depreciation rate of R\&D capital ($=0.15$) & Eq.~\eqref{eq:rnd-accumulation} \\
+$\lambda$; $\rho$ & product-market rivalry; technology-spillover parameter & Eq.~\eqref{eq:profit-simplified} \\
+$\theta=(\rho,\lambda)$ & spillover and competition parameters & Sec.~\ref{sec:dyn-rnd} \\
+$\xi$ & profit scale parameter, normalized to one$^{a}$ & Eq.~\eqref{eq:profit-simplified} \\
+$\psi$; $\upsilon$ & demand curvature; market size & Sec.~\ref{sec:model-profits}, App.~\ref{sec:cournot} \\
+$\pi_i$; $\Pi$; $U$; $W$ & firm profit; producer surplus; consumer surplus; welfare & Eqs.~\eqref{eq:profit-simplified}, \eqref{eq:profit-eq} \\
+$H_k$ & Herfindahl--Hirschman index of market $k$ & Sec.~\ref{sec:model-profits}, Eq.~\eqref{eq:herfindahl} \\
+$\mathbf{S}_t=\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}_t$ & interaction matrix & Eq.~\eqref{eq:bonacich} \\
+$\mathbf{M}=(m_{ij})=\mathbf{S}^{-1}$ & equilibrium (interaction) kernel$^{b}$ & Eq.~\eqref{eq:bonacich}, Sec.~\ref{sec:model-implications} \\
+$m_{ij,t}$; $M_t$ & merger indicator ($i$ acquires $j$); set of deals$^{b}$ & Sec.~\ref{sec:dyn-rnd-mna}, Tab.~\ref{tab:outcomes-seq} \\
+$a_{ij,t}$ & R\&D collaboration indicator & Eq.~\eqref{eq:profit-simplified} \\
+$\zeta_{ij,t}$; $\gamma=(\gamma_0,\gamma_1,\dots)$ & R\&D collaboration cost; its parameters$^{c}$ & Eq.~\eqref{eq:link-cost} \\
+$\nu_{ij,t}$; $\kappa=(\kappa_0,\kappa_1,\dots)$ & M\&A transaction cost; its parameters$^{c,d}$ & Eq.~\eqref{eq:mna-cost} \\
+$\mathbf{c}_{ij,t}$ & dyadic covariates (TNIC similarity, etc.)$^{e}$ & Eq.~\eqref{eq:link-cost} \\
+$\varepsilon^{\text{M\&A}}_{ij,t}$, $\varepsilon^{\text{R\&D}}_{ij,t}$, $\varepsilon^{\text{ID}}_{i,t}$ & type~I extreme value payoff shocks & Sec.~\ref{sec:dyn-rnd-mna} \\
+$\Pi^{\text{M\&A}}_{ijt}$, $\Pi^{\text{R\&D}}_{ijt}$, $\Pi^{\text{ID}}_{it}$ & deterministic first-stage payoffs & Eq.~\eqref{eq:profit-mna}, Sec.~\ref{sec:dyn-rnd} \\
+$p^{\mathrm{ac}}_{ij,t}$; $q_{ij,t}$ & acquisition prob.; conditional collaboration prob. & Eqs.~\eqref{eq:i-ac-j}, \eqref{eq:i-co-j} \\
+$\mathbf{H}=(h_{ij})$; $\phi=\rho/(1-\lambda)$ & Katz--Bonacich kernel $(\mathbf{I}_n-\phi\mathbf{A})^{-1}$; decay factor & Sec.~\ref{sec:model-implications}, App.~\ref{sec:katz-bonacich} \\
+$c_i$, $\mathbf{c}=\mathbf{H}\mathbf{u}$ & Katz--Bonacich centrality$^{e}$ & Sec.~\ref{sec:model-implications} \\
+$\kappa$ & product-market dampening factor$^{c}$ & Eq.~\eqref{eq:single-market-elements} \\
+$y^{+ij}_{it}$; $y^{ac,ij}_{it}$ & post-collaboration; post-acquisition output & Eqs.~\eqref{eq:post-link-output-i}, \eqref{eq:mna-form-profit} \\
+$\widehat{\mathbf{A}}^{\,ij}$, $\widehat{\mathbf{M}}^{\,ij}$ & post-reassignment adjacency matrix and kernel & Eq.~\eqref{eq:adjacency-reassignment-mna} \\
+$\widetilde{\mathbf{A}}^{\,ij}$, $\widetilde{\mathbf{M}}^{\,ij}$ & post-removal adjacency matrix and kernel & Eq.~\eqref{eq:post-removal-weight-mna} \\
+$\bm{\eta}^{ac,ij}_t$ & post-acquisition productivity vector & Eq.~\eqref{eq:prod-mna-alt} \\
+$\Theta=(\theta,\beta,\gamma,\kappa,\mu,\tau,\sigma^2_v)$ & full parameter vector & Sec.~\ref{sec:estimation-algorithm} \\
+$\beta$; $\mu_i$; $\tau_t$; $v_{it}$; $\sigma^2_v$ & productivity coefficients; firm and time effects; shock & Eq.~\eqref{eq:prod-dyn} \\
+$I(\cdot)$; $I^{0}_{ij,t}$ & indicator function; idle-pair indicator & Eq.~\eqref{eq:mna-rnd-joint} \\
+$\mathbf{u}$; $\mathbf{e}_i$ & vector of ones; $i$-th unit basis vector & Sec.~\ref{sec:dyn-rnd}, \ref{sec:model-implications} \\
+$x_i$; $y_i$ & output; R\&D effort in the micro-foundation$^{f}$ & App.~\ref{sec:cournot} \\
+$\alpha$; $\beta$ & own and partner R\&D cost-reduction parameters$^{f}$ & Eq.~\eqref{eq:marginal-cost} \\
+$\gamma$; $\nu=\psi-\alpha^2/(4\gamma)$ & R\&D effort cost; own-concavity parameter$^{f}$ & Eq.~\eqref{eq:profit-pi-app-3} \\
+$\bar c_i$; $p_i$; $E_k$, $I_k$ & marginal cost; price; endowment and numeraire & Eqs.~\eqref{eq:marginal-cost}, \eqref{eq:inverse-demand}, \eqref{eq:utility} \\
+$\mathbf{b}_{\mathbf{u}}$, $\mathbf{b}_{\bm{\eta}}$ & unweighted and $\bm{\eta}$-weighted Katz--Bonacich vectors & Eq.~\eqref{eq:bonacich-centrality}, App.~\ref{sec:nash-katz} \\
+$\lambda_{\max}$, $\mathbf{v}_1$ & largest eigenvalue and Perron vector of $\mathbf{A}$ & App.~\ref{sec:katz-bonacich} \\
+$\mathbf{W}=\rho\mathbf{A}-\lambda\mathbf{B}$; $r(\cdot)$ & signed net-interaction matrix; spectral radius & Eq.~\eqref{eq:neumann-kernel}, App.~\ref{sec:br} \\
+$\alpha$; $\Delta$ & rank-two perturbation weight; capacitance determinant$^{f}$ & Lem.~\ref{lem:matrix-perturbation-inv} \\
+$\mathbf{U}$, $\mathbf{V}$, $\mathbf{W}$ & Woodbury factors and capacitance matrix & Eqs.~\eqref{eq:woodbury-sylvester}, \eqref{eq:merger-update} \\
+$\mathbf{u}=\mathbf{e}_i-\mathbf{e}_j$; $\mathbf{c}$ & merger transfer vector; common-collaborator profile$^{e}$ & Lem.~\ref{lem:matrix-perturbation-mult-swap} \\
+$\mathbf{M}$, $\widetilde{\mathbf{y}}$ & interaction matrix and iterate in best-response updating & Eq.~\eqref{eq:output-iteration}, App.~\ref{sec:br-part} \\
+$s_{ij,t}$ & announcement of firm $i$ toward firm $j$ & Eq.~\eqref{eq:app:actions} \\
+$\mathbb{P}^{\mathrm{sim}}$, $\mathbb{P}^{\mathrm{seq}}$, $\mathbb{P}^{\mathrm{comp}}$ & simultaneous, sequential and composite likelihoods & Eqs.~\eqref{eq:app:liksim}, \eqref{eq:mna-rnd-joint}, \eqref{eq:app:comppair} \\
+$\omega_{ij,t}$ & control-contest ratio & Eq.~\eqref{eq:app:omega} \\
+$\Lambda_t$; $\mu_t$; $\bar p_t$, $\bar q_t$ & expected contests; expected announcements; maxima & Eq.~\eqref{eq:app:Lambda} \\
+$d_{\mathrm{TV}}$ & total-variation distance & Prop.~\ref{prop:app:composite} \\
+\midrule
+\bottomrule
+\end{tabular}
+}
+\begin{tablenotes}[flushleft]
+\item \small $^{a}$ The profit-scale parameter in $\xi$ is normalized to one in Section~\ref{sec:dyn-rnd}, which is equivalent to expressing $\zeta_{ij,t}$ and $\nu_{ij,t}$ relative to $\xi$.
+$^{b}$ Kernel entries $m_{ij}$ carry no time subscript; merger
+indicators $m_{ij,t}$ always do.
+$^{c}$ The scalar dampening factor $\kappa$ of
+Eq.~\eqref{eq:single-market-elements} is an equilibrium object
+determined by $\lambda$ and the network; the M\&A cost parameters
+$\kappa_0,\kappa_1,\dots$ of Eq.~\eqref{eq:mna-cost} always carry a
+numeric subscript. The same convention distinguishes the collaboration
+cost parameters $\gamma_0,\gamma_1,\dots$ from the R\&D effort cost
+$\gamma$ of Appendix~\ref{sec:cournot}.
+$^{d}$ The specification estimated in
+Table~\ref{tab:result_output_US_compustat_NAICS_6_mna} augments
+Eqs.~\eqref{eq:link-cost} and~\eqref{eq:mna-cost} by further dyadic
+covariates (patent and vertical-relatedness similarity, the TNIC
+similarity--HHI interaction, and acquirer and target patent stocks); the
+parameter indices in that table follow the notes to the table.
+$^{e}$ The centrality vector $\mathbf{c}$ carries a single firm subscript
+($c_i$); the dyadic covariate vector $\mathbf{c}_{ij,t}$ always carries a
+pair--time subscript; the common-collaborator profile $\mathbf{c}$ of
+Lemma~\ref{lem:matrix-perturbation-mult-swap} is local to
+Appendix~\ref{sec:mat-perturb}.
+$^{f}$ The symbols $x_i$, $y_i$, $\alpha$, $\beta$, $\gamma$ and $\nu$ in
+Appendix~\ref{sec:micro-cost} are local to the micro-foundation and
+unrelated to their main-text meanings; the mapping to the main text sets
+$\nu=\tfrac{1}{2}$ and relabels output $x_i$ as $y_i$ (see
+Eqs.~\eqref{eq:profit-pi-app-3} and~\eqref{eq:output-br-app}). The
+symbol $\alpha$ additionally denotes the generic weight of a symmetric
+rank-two perturbation in Lemma~\ref{lem:matrix-perturbation-inv}.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
+
+%\begin{table}[htbp]
+%\centering
+%\scalebox{1}{
+%\begin{threeparttable}
+%\caption{\label{tab:notation-app} Appendix-local symbols.}
+%{\footnotesize
+%\begin{tabular}{@{} l l l @{}}
+%\toprule
+%Symbol & Meaning & Defined in \\
+%\midrule
+%$x_i$; $y_i$ & output; R\&D effort in the micro-foundation$^{f}$ & App.~\ref{sec:cournot} \\
+%$\alpha$; $\beta$ & own and partner R\&D cost-reduction parameters$^{f}$ & Eq.~\eqref{eq:marginal-cost} \\
+%$\gamma$; $\nu=\psi-\alpha^2/(4\gamma)$ & R\&D effort cost; own-concavity parameter$^{f}$ & Eq.~\eqref{eq:profit-pi-app-3} \\
+%$\bar c_i$; $p_i$; $E_k$, $I_k$ & marginal cost; price; endowment and numeraire & Eqs.~\eqref{eq:marginal-cost}, \eqref{eq:inverse-demand}, \eqref{eq:utility} \\
+%$\mathbf{b}_{\mathbf{u}}$, $\mathbf{b}_{\bm{\eta}}$ & unweighted and $\bm{\eta}$-weighted Katz--Bonacich vectors & Eq.~\eqref{eq:bonacich-centrality}, App.~\ref{sec:nash-katz} \\
+%$\lambda_{\max}$, $\mathbf{v}_1$ & largest eigenvalue and Perron vector of $\mathbf{A}$ & App.~\ref{sec:katz-bonacich} \\
+%$\mathbf{W}=\rho\mathbf{A}-\lambda\mathbf{B}$; $r(\cdot)$ & signed net-interaction matrix; spectral radius & Eq.~\eqref{eq:neumann-kernel}, App.~\ref{sec:br} \\
+%$\alpha$; $\Delta$ & rank-two perturbation weight; capacitance determinant$^{f}$ & Lem.~\ref{lem:matrix-perturbation-inv} \\
+%$\mathbf{U}$, $\mathbf{V}$, $\mathbf{W}$ & Woodbury factors and capacitance matrix & Eqs.~\eqref{eq:woodbury-sylvester}, \eqref{eq:merger-update} \\
+%$\mathbf{u}=\mathbf{e}_i-\mathbf{e}_j$; $\mathbf{c}$ & merger transfer vector; common-collaborator profile$^{e}$ & Lem.~\ref{lem:matrix-perturbation-mult-swap} \\
+%$\mathbf{M}$, $\widetilde{\mathbf{y}}$ & interaction matrix and iterate in best-response updating & Eq.~\eqref{eq:output-iteration}, App.~\ref{sec:br-part} \\
+%$s_{ij,t}$ & announcement of firm $i$ toward firm $j$ & Eq.~\eqref{eq:app:actions} \\
+%$\mathbb{P}^{\mathrm{sim}}$, $\mathbb{P}^{\mathrm{seq}}$, $\mathbb{P}^{\mathrm{comp}}$ & simultaneous, sequential and composite likelihoods & Eqs.~\eqref{eq:app:liksim}, \eqref{eq:mna-rnd-joint}, \eqref{eq:app:comppair} \\
+%$\omega_{ij,t}$ & control-contest ratio & Eq.~\eqref{eq:app:omega} \\
+%$\Lambda_t$; $\mu_t$; $\bar p_t$, $\bar q_t$ & expected contests; expected announcements; maxima & Eq.~\eqref{eq:app:Lambda} \\
+%$d_{\mathrm{TV}}$ & total-variation distance & Prop.~\ref{prop:app:composite} \\
+%\midrule
+%\bottomrule
+%\end{tabular}
+%}
+%\begin{tablenotes}[flushleft]
+%%\item \small $^{a}$ The depreciation rate $\delta$ in
+%%Equation~\eqref{eq:rnd-accumulation} is distinct from the profit-scale
+%%parameter in $\xi=\exp(\delta)$; the latter is normalized to one in
+%%Section~\ref{sec:dyn-rnd}, which is equivalent to expressing
+%%$\zeta_{ij,t}$ and $\nu_{ij,t}$ relative to $\xi$.
+%%$^{b}$ Kernel entries $m_{ij}$ carry no time subscript; merger
+%%indicators $m_{ij,t}$ always do.
+%%$^{c}$ The scalar dampening factor $\kappa$ of
+%%Equation~\eqref{eq:single-market-elements} is an equilibrium object
+%%determined by $\lambda$ and the network; the M\&A cost parameters
+%%$\kappa_0,\kappa_1,\dots$ of Equation~\eqref{eq:mna-cost} always carry a
+%%numeric subscript. The same convention distinguishes the collaboration
+%%cost parameters $\gamma_0,\gamma_1,\dots$ from the R\&D effort cost
+%%$\gamma$ of Appendix~\ref{sec:cournot}.
+%%$^{d}$ The specification estimated in
+%%Table~\ref{tab:result_output_US_compustat_NAICS_6_mna} augments
+%%Equations~\eqref{eq:link-cost} and~\eqref{eq:mna-cost} by further dyadic
+%%covariates (patent and vertical-relatedness similarity, the TNIC
+%%similarity--HHI interaction, and acquirer and target patent stocks); the
+%%parameter indices in that table follow the notes to the table.
+%\item \small $^{e}$ The centrality vector $\mathbf{c}$ carries a single firm subscript
+%($c_i$); the dyadic covariate vector $\mathbf{c}_{ij,t}$ always carries a
+%pair--time subscript; the common-collaborator profile $\mathbf{c}$ of
+%Lemma~\ref{lem:matrix-perturbation-mult-swap} is local to
+%Appendix~\ref{sec:mat-perturb}.
+%$^{f}$ The symbols $x_i$, $y_i$, $\alpha$, $\beta$, $\gamma$ and $\nu$ in
+%Appendix~\ref{sec:micro-cost} are local to the micro-foundation and
+%unrelated to their main-text meanings; the mapping to the main text sets
+%$\nu=\tfrac{1}{2}$ and relabels output $x_i$ as $y_i$ (see
+%Equations~\eqref{eq:profit-pi-app-3} and~\eqref{eq:output-br-app}). The
+%symbol $\alpha$ additionally denotes the generic weight of a symmetric
+%rank-two perturbation in Lemma~\ref{lem:matrix-perturbation-inv}.
+%\end{tablenotes}
+%\end{threeparttable}}
+%\end{table}
+
+\FloatBarrier
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cost Reducing R\&D Collaborations}
+\label{sec:micro-cost}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In the following we derive the firm's profit function in Equations (\ref{eq:profit-simplified}) or (\ref{eq:profit-eq}), respectively, and the corresponding best response function in Equation (\ref{eq:output-br}) %in Section \ref{sec:model} 
+from a Cournot competition model (Appendix  \ref{sec:cournot}) or a Bertrand competition model (Appendix \ref{sec:bertrand}) with cost reducing R\&D collaborations.\footnote{See also \citet[][]{goyal01:_r_d_networ}, \citet[][]{Konig2018} and \citet[][]{Hsieh2021}.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cournot Competition}
+\label{sec:cournot}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We consider a Cournot oligopoly game in which a set $\mathcal{N}=\{1,\dots,n\}$ of firms is competing in a product market with imperfectly substitutable goods. 
+Firms are not only competitors in the product market, but they can also form pairwise collaborative R\&D agreements. 
+These pairwise links
+involve a commitment to share R\&D results and lead to lower marginal
+cost of production of the collaborating firms. 
+%\footnote{R\&D partnerships have become a widespread phenomenon characterizing technological dynamics, especially in industries with rapid technological development such as, for instance, the pharmaceutical and chemical industries
+%\citep[see e.g.][]{hagedoorn02:_inter_r_d,
+%roijakkers06:_inter_r_d, powell05:_networ_dynam_field_evolut}. In these
+%industries firms have become more specialized in specific domains of a
+%technology and they tend to combine their knowledge with that of other firms
+%that are specialized in different domains in order to jointly generate innovations that can help to develop new products or reduce their production
+%costs \citep{ahuja00:_collab, powell96:_inter_collab_and_locus_of_innov}.
+%For example, \citet{Bernstein1988} finds that R\&D spillovers decrease the
+%unit costs of production for a sample of Canadian firms. Similarly \citet{Belderbos2004} find evidence for production cost reductions due to R\&D collaborations using data on a large sample of Dutch innovating firms.}
+The amount of this cost reduction depends on the effort the firms invest into R\&D. Given the collaboration network $G \in \mathcal{G}^n$, where $\mathcal{G}^n$ denotes the set of all graphs with $n$ nodes, and the firms' R\&D effort levels, $\mathbf{y} = (y_i)_{i=1}^n$, the marginal cost of production for firm $i$ is given by \citep[cf.][]{goyal01:_r_d_networ}%\footnote{This generalizes earlier studies such as the one by \citet{aspremont88:_cooper_and_noncoop_r_d} where spillovers were assumed to take place between all firms in the industry and no distinction between collaborating and non-collaborating firms was made.}
+\begin{equation}
+c_i = \bar{c}_i - \alpha y_i - \beta \sum_{j=1}^n a_{ij} y_j.
+\label{eq:marginal-cost}
+\end{equation}
+The indicator variables $a_{ij} \in \{0,1\}$ in Equation (\ref{eq:marginal-cost}) indicate wether firms $i$ and $j$ are collaborating (or not), and can be represented by the symmetric adjacency matrix $\mathbf{A}=(a_{ij})_{1\le i,j \le n}$ (with zero diagonal, $a_{ii}=0$). The parameter $\alpha \ge 0$ \label{sym:alpha} measures the
+relative cost reduction due to a firms' own R\&D effort while the parameter $\beta \ge 0$ \label{sym:beta} measures the relative cost reduction due to
+the R\&D effort of its collaboration partners. %\footnote{%
+%Note that in this model, firms are exposed to business stealing effects if
+%their rivals increase their output via cost reducing R\&D collaborations.}
+%\footnote{In order to guarantee non-negative marginal costs we assume that $e_i \in [0, \bar{y}]$ and $\bar{c} \ge (n-1) \bar{e}$. This shows that $\bar{c}$ must be of the order of $O(n)$. Throughout the paper we shall assume parameter are constrained such that the second-order conditions hold and equilibria can be characterized in terms of first-order conditions and are interior.}
+We further allow for ex ante heterogeneity (observed and unobserved) among firms in the cost parameter $\bar c_i \ge 0$
+expressing their different technological and organizational capabilities related to heterogeneous firm productivities \citep[][]{Banerjee2005, Blundell1995}.
+
+We further assume that firms incur a direct cost $\gamma y_{i}^{2}$, with $\gamma \ge 0$, for their R\&D effort and a fixed cost $\zeta_{ij} \ge 0$ for the R\&D collaboration between firms $i$ and $j$. The profit of firm $i$ is then given by
+\begin{equation}
+\pi_i = (p_i - c_i)x_i - \gamma y_i^2 - \sum_{j=1}^n a_{ij} \zeta_{ij},
+\label{eq:profit-cost}
+\end{equation}
+where $x_i \ge 0$ is the output level and $\zeta_{ij}$ is the cost of collaboration between firms $i$ and $j$. Inserting marginal costs from Equation (\ref{eq:marginal-cost}) gives
+\begin{equation*}
+\pi_i = p_i x_i - \bar{c}_i x_i + \alpha x_i y_i +
+\beta x_i \sum_{j=1}^n a_{ij} y_j - \gamma y_i^2 - \sum_{j=1}^n a_{ij}\zeta_{ij}.
+\end{equation*}
+Next we consider the demand for goods produced by firm $i$. A representative
+consumer in market $\mathcal{M}_k \subseteq \mathcal{N}$, $k=1,\ldots,K$ maximizes \citep{Singh1984}
+\begin{equation}
+%U = I + \upsilon \sum_{i=1}^n x_i - \frac{\psi}{2} \sum_{i=1}^n x_i^2 - \frac{\lambda}{2} \sum_{i=1}^n \sum_{j \ne i}^n x_i x_j,
+U_k = I_k + \upsilon \sum_{i \in \mathcal{M}_k} x_i - \frac{\psi}{2} \sum_{i \in \mathcal{M}_k} x_i^2 - \frac{\lambda}{2} \sum_{\substack{i,j \in \mathcal{M}_k, \\ j \neq i}} x_i x_j,
+\label{eq:utility}
+\end{equation}
+with the budget constraint $I_k + \sum_{i \in \mathcal{M}_k} p_i x_i \le E_k$, endowment $E_k$ and a numeraire good $I_k$. The parameter $\upsilon>0$ captures the total
+size of the market, whereas $\lambda \in (0,1]$, measures the degree of
+substitutability between products. In particular, $\lambda = 1$ depicts a market
+of perfect substitutable goods, while $\lambda \to 0$ represents the
+case of almost independent markets. %\footnote{Observe that we do not ex ante impose any restrictions on the parameter $\lambda$, in particular, we do not require that $\lambda=1$ nor $\lambda=0$.}
+The parameter $\lambda$ is therefore a measure of the degree of competition between firms. We assume that $\psi>\lambda>0$ to ensure that the utility function is concave. The budget constraint is binding and the utility maximization of the representative
+consumer gives the inverse demand function for firm $i \in \mathcal{M}_k$:\footnote{With the budget constraint $I_k = E_k - \sum_{i \in \mathcal{M}_k} p_i x_i$ in the consumer's utility in Equation (\ref{eq:utility}), the FOC for $i \in \mathcal{M}_k$ is given by $\frac{\partial U_k}{\partial x_i} = - p_i + \upsilon - \psi x_i - \lambda \sum_{\substack{j \in \mathcal{M}_k, j \neq i}} ^n x_j = 0$, from which we obtain Equation (\ref{eq:inverse-demand}).}
+\begin{equation}
+p_i = \upsilon - \psi x_i - \lambda \sum_{j \in \mathcal{M}_k, j \neq i} x_j.
+\label{eq:inverse-demand}
+\end{equation} 
+%Moreover, inserting Equation (\ref{eq:inverse-demand}) into the utility (\ref{eq:utility}) of the consumer gives: 
+%\begin{align}
+%U & = E - \sum_{i=1}^n p_i x_i + \upsilon \sum_{i=1}^n x_i - \frac{\psi}{2} \sum_{i=1}^n x_i^2 - \frac{\lambda}{2} \sum_{i=1}^n \sum_{j \ne i}^n x_i x_j \notag \\
+%& = E - \sum_{i=1}^n \left( \upsilon - \psi x_i - \lambda \sum_{j \ne i}^n x_j \right) x_i + \upsilon \sum_{i=1}^n x_i - \frac{\psi}{2} \sum_{i=1}^n x_i^2 -\frac{\lambda}{2} \sum_{i=1}^n \sum_{j \ne i}^n x_i x_j \notag \\
+%& = E + \frac{\psi}{2} \sum_{i=1}^n x_i^2 + \frac{\lambda}{2} \sum_{i=1}^n \sum_{j \ne i}^n x_i x_j. 
+%\label{eq:consumer-utility}
+%\end{align}
+%This defines consumer surplus. Note that in the special case of non-substitutable goods, when $\lambda \to 0$, we obtain $U = E +\frac{\psi}{2} \sum_{i=1}^n x_i^2$, while in the case of perfectly substitutable goods, when $\lambda \to 1$, we get $U = E +\frac{1+\psi}{2} \left(\sum_{i=1}^n x_i \right)^2$. 
+Inserting the marginal cost from Equation (\ref{eq:marginal-cost}) and inverse demand from Equation (\ref{eq:inverse-demand}) into profits yields
+\begin{equation}
+\pi_i = \upsilon  x_i - \psi x_i^2 - \lambda \sum_{j \ne i}^n b_{ij} x_j x_i - \bar{c}_i x_i + \alpha x_i y_i +
+\beta x_i \sum_{j=1}^n a_{ij} y_j - \gamma y_i^2 - \sum_{j=1}^n a_{ij}\zeta_{ij},
+\label{eq:profit-app}
+\end{equation}
+where $b_{ij} \in \{0,1\}$ is an indicator variable for whether firms $i$ and $j$ are competitors (or not), i.e. $i,j \in \mathcal{M}_k$ for some $k$. This can be represented by the symmetric block diagonal competition matrix $\mathbf{B}=(b_{ij})_{1\le i,j \le n}$. The optimal R\&D effort level follows from the first-order condition 
+\begin{equation*}
+\frac{\partial \pi_i}{\partial y_i} = \alpha x_i -2 \gamma y_i = 0.
+\end{equation*}
+Solving for $y_i$ delivers\footnote{%
+We assume that firms always implement the optimal R\&D effort level. Since
+the optimal R\&D effort decision only depends on a firm's own output, we
+assume that a firm does not face any uncertainty when implementing this
+strategy. %In contrast, in Section \ref{sec:stability} we will, however, introduce noise in the optimal output and collaboration decisions, since these depend on the decisions of all other firms in the industry and their characteristics, which might be harder to observe. 
+See also \citet{kamien92:_resear_joint_ventur_and_r_d_cartel} for a similar
+model of competitive research joint ventures in which firms unilaterally (and optimally) choose their R\&D
+effort levels.}  
+\begin{equation}
+y_i = \frac{\alpha}{2 \gamma} x_i.
+\label{eq:opt-rnd-effort}
+\end{equation}
+This equation can be viewed as reflecting learning-by-doing effects of production on R\&D. It is consistent with various empirical studies which have found
+that the R\&D effort is correlated with firm size \citep{cohen96:_firm_size_and_natur_of, cohen96:_repris_of_size_and_r_d}. 
+
+Similarly, the first-order condition w.r.t. to output, $x_i$, is given by
+\begin{equation*}
+\frac{\partial \pi_i}{\partial x_i} = \upsilon - 2 \psi x_i - \lambda \sum_{j \ne i}^n b_{ij} x_j - \bar{c}_i  + \alpha y_i +
+\beta \sum_{j=1}^n a_{ij} y_j = 0.
+\end{equation*}
+This gives
+\begin{equation*}
+x_i = \frac{\upsilon - \bar{c}_i}{2 \psi}  - \frac{\lambda}{2 \psi} \sum_{j \ne i}^n b_{ij} x_j +  \frac{\alpha}{2 \psi} y_i +
+\frac{\beta}{2 \psi} \sum_{j=1}^n a_{ij} y_j.
+\end{equation*}
+Further, inserting Equation (\ref{eq:opt-rnd-effort}) yields
+\begin{equation*}
+x_i = \frac{\upsilon - \bar{c}_i}{2 \psi}  - \frac{\lambda}{2 \psi} \sum_{j \ne i}^n b_{ij} x_j +  \frac{\alpha^2}{4 \psi \gamma} x_i +
+\frac{\alpha \beta}{4 \psi \gamma} \sum_{j=1}^n a_{ij} x_j .
+\end{equation*}
+Solving for $x_i$ then gives
+%\begin{equation*}
+%(1- \frac{\alpha^2}{4 \psi \gamma} )x_i = \frac{\upsilon - \bar{c}_i}{2 \psi}  - \frac{\lambda}{2 \psi} \sum_{j \ne i}^n b_{ij} x_j +
+%\frac{\alpha \beta}{4 \psi \gamma} \sum_{j=1}^n a_{ij} x_j.
+%\end{equation*}
+%and
+%\begin{equation*}
+%\frac{4 \psi \gamma-\alpha^2}{4 \psi \gamma} x_i = \frac{\upsilon - \bar{c}_i}{2 \psi}  - \frac{\lambda}{2 \psi} \sum_{j \ne i}^n b_{ij} x_j +
+%\frac{\alpha \beta}{4 \psi \gamma} \sum_{j=1}^n a_{ij} x_j.
+%\end{equation*}
+%and
+%\begin{equation*}
+%x_i = \frac{4 \psi \gamma} {4 \psi \gamma-\alpha^2} \frac{\upsilon - \bar{c}_i}{2 \psi}  - \frac{4 \psi \gamma} {4 \psi \gamma-\alpha^2} \frac{\lambda}{2 \psi} \sum_{j \ne i}^n b_{ij} x_j +
+%\frac{4 \psi \gamma} {4 \psi \gamma-\alpha^2} \frac{\alpha \beta}{4 \psi \gamma} \sum_{j=1}^n a_{ij} x_j.
+%\end{equation*}
+%and
+\begin{equation}
+x_i = \frac{2 \gamma (\upsilon - \bar{c}_i)} {4 \psi \gamma-\alpha^2} - \frac{2 \lambda \gamma} {4 \psi \gamma-\alpha^2} \sum_{j \ne i}^n b_{ij} x_j +
+\frac{\alpha \beta} {4 \psi \gamma-\alpha^2} \sum_{j=1}^n a_{ij} x_j.
+\label{eq:output-x-br-app}
+\end{equation}
+%If we denote by
+%\begin{align*}
+%\eta_i & \equiv \frac{2 \gamma (\upsilon - \bar{c}_i)} {4 \psi \gamma-\alpha^2} , \\
+%\tilde{\lambda} &  \equiv \frac{2 \lambda \gamma} {4 \psi \gamma-\alpha^2} ,  \\
+%\rho & \equiv\frac{\alpha \beta} {4 \psi \gamma-\alpha^2},
+%\end{align*}
+%then we get
+%\begin{equation*}
+%x_i = \eta_i - \tilde{\lambda} \sum_{j \ne i}^n b_{ij} x_j + \rho \sum_{j=1}^n a_{ij} x_j,
+%\end{equation*}
+%Multiplication with $\frac{\alpha}{2\gamma}$ and using Equation (\ref{eq:opt-rnd-effort}) this can be written equivalently in terms of R\&D effort as follows
+%\begin{equation*}
+%y_i = \frac{\alpha (\upsilon - \bar{c}_i)} {4 \psi \gamma-\alpha^2} - \frac{2 \lambda \gamma} {4 \psi \gamma-\alpha^2} \sum_{j \ne i}^n b_{ij} y_j +
+%\frac{\alpha \beta} {4 \psi \gamma-\alpha^2} \sum_{j=1}^n a_{ij} y_j.
+%\end{equation*}
+%If we denote by
+%\begin{align*}
+%\eta_i & \equiv \frac{\alpha (\upsilon - \bar{c}_i)} {4 \psi \gamma-\alpha^2}, \\
+%\tilde{\lambda} &  \equiv \frac{2 \lambda \gamma} {4 \psi \gamma-\alpha^2},  \\
+%\rho &  \equiv \frac{\alpha \beta} {4 \psi \gamma-\alpha^2} ,
+%\end{align*}
+%then we get
+%\begin{equation*}
+%y_i = \eta_i - \tilde{\lambda} \sum_{j \ne i}^n b_{ij} y_j + \rho \sum_{j=1}^n a_{ij} y_j,
+%\end{equation*}
+%which is Equation (\ref{eq:output-br}) in the main text. 
+Further, with Equation (\ref{eq:opt-rnd-effort}) the profit function in Equation (\ref{eq:profit-app}) of firm $i$ can be written as
+\begin{equation*}
+\pi_i = (\upsilon- \bar{c}_i)  x_i - \psi x_i^2 - \lambda \sum_{j \ne i}^n b_{ij} x_i x_j + \frac{\alpha^2}{2 \gamma} x_i^2 +
+ \frac{\alpha \beta}{2 \gamma}   \sum_{j=1}^n a_{ij} x_i x_j - \frac{\alpha^2}{4 \gamma} x_i^2 - \sum_{j=1}^n a_{ij}\zeta_{ij}.
+\end{equation*}
+This is
+\begin{equation}
+\pi_i = (\upsilon- \bar{c}_i)  x_i - (\psi - \frac{\alpha^2}{4 \gamma}) x_i^2 - \lambda \sum_{j \ne i}^n b_{ij} x_i x_j   +
+ \frac{\alpha \beta}{2 \gamma}   \sum_{j=1}^n a_{ij} x_i x_j  - \sum_{j=1}^n a_{ij}\zeta_{ij}.
+\label{eq:profit-app-2}
+\end{equation}
+If we denote by $\eta_i \equiv \upsilon - \bar{c}_i$, $\nu \equiv \psi-\frac{\alpha^2}{4\gamma}$ and $\rho \equiv \frac{\alpha \beta}{2 \gamma}$ then we can write Equation (\ref{eq:profit-app-2}) more compactly as follows
+\begin{equation}
+\pi_i = \eta_i x_i - \nu x_i^2 - \lambda x_i \sum_{j \ne i}^n x_j + \rho
+\sum_{j=1}^n a_{ij} x_i x_j - \sum_{j=1}^n a_{ij}\zeta_{ij}.
+\label{eq:profit-pi-app-3}
+\end{equation}
+%Further, if we normalize $\nu=1/2$ then profits from Equation (\ref{eq:profit-app-3}) can be written as Equation (\ref{eq:profit-simplified}). 
+This gives Equation (\ref{eq:profit-simplified}). Similarly, Equation (\ref{eq:output-x-br-app}) can then be written as
+% \begin{equation*}
+% (4 \psi \gamma-\alpha^2) x_i = 2 \gamma (\upsilon - \bar{c}_i) - 2 \lambda \gamma \sum_{j \ne i}^n b_{ij} x_j +
+% \alpha \beta \sum_{j=1}^n a_{ij} x_j.
+% \end{equation*}
+% which is
+% \begin{equation*}
+% \frac{4 \psi \gamma-\alpha^2}{2 \gamma} x_i =  (\upsilon - \bar{c}_i) - \lambda \sum_{j \ne i}^n b_{ij} x_j +
+% \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j.
+% \end{equation*}
+% or
+% \begin{equation*}
+% 2 \frac{4 \psi \gamma-\alpha^2}{4 \gamma} x_i =  \upsilon - \bar{c}_i - \lambda \sum_{j \ne i}^n b_{ij} x_j +
+% \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j.
+% \end{equation*}
+% or
+% \begin{equation*}
+% 2 (\psi-\frac{\alpha^2}{4 \gamma}) x_i =  \upsilon - \bar{c}_i - \lambda \sum_{j \ne i}^n b_{ij} x_j +
+% \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j.
+% \end{equation*}
+% or
+% \begin{equation*}
+% 2 \nu x_i =  \upsilon - \bar{c}_i - \lambda \sum_{j \ne i}^n b_{ij} x_j +
+% \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j.
+% \end{equation*}
+% or equivalently,
+\begin{equation}
+x_i = \frac{\eta_i}{2 \nu} - \frac{\lambda}{2 \nu} \sum_{j \ne i}^n b_{ij} x_j +
+\frac{\rho}{2 \nu} \sum_{j=1}^n a_{ij} x_j,
+\label{eq:output-br-app}
+\end{equation}
+which is Equation (\ref{eq:output-br}) in Section \ref{sec:model} if we normalize  $\nu=1/2$. From Equations (\ref{eq:output-br-app}) and (\ref{eq:profit-pi-app-3}) it then immediately follows that
+\begin{align*}
+\pi_i 
+% & =  \eta_i x_i - \nu x_i^2 - \lambda x_i \sum_{j \ne i}^n x_j + \rho
+% \sum_{j=1}^n a_{ij} x_i x_j - \sum_{j=1}^n a_{ij}\zeta_{ij} \\
+% & =  x_i \left( \eta_i
+% - \lambda \sum_{j \ne i}^n x_j + \rho
+% \sum_{j=1}^n a_{ij} x_j 
+% \right)
+% - \nu x_i^2 - \sum_{j=1}^n a_{ij}\zeta_{ij} \\
+% & =  2 \nu x_i^2 - \nu x_i^2 - \sum_{j=1}^n a_{ij}\zeta_{ij} \\
+& = \nu x_i^2  - \sum_{j=1}^n a_{ij}\zeta_{ij},
+\end{align*}
+which gives Equation (\ref{eq:profit-eq}) in Section \ref{sec:model} if we normalize  $\nu=1/2$. Producer surplus is given by firms' aggregate profits $\Pi = \sum_{i=1}^n \pi_i$.
+
+Using the budget constraint $I_k + \sum_{i \in \mathcal{M}_k} p_i x_i = E_k$ and inserting Equation (\ref{eq:inverse-demand}) into the utility (\ref{eq:utility}) of the consumer gives: 
+\begin{align*}
+U_k & = E_k - \sum_{i \in \mathcal{M}_k} p_i x_i + \upsilon \sum_{i \in \mathcal{M}_k} x_i - \frac{\psi}{2} \sum_{i \in \mathcal{M}_k} x_i^2 - \frac{\lambda}{2} \sum_{\substack{i,j \in \mathcal{M}_k, j \neq i}} x_i x_j \notag \\
+& = E_k - \sum_{i \in \mathcal{M}_k} \left( \upsilon - \psi x_i - \lambda \sum_{j \ne i}^n b_{ij} x_j \right) x_i + \upsilon \sum_{i \in \mathcal{M}_k} x_i - \frac{\psi}{2} \sum_{i \in \mathcal{M}_k} x_i^2 -\frac{\lambda}{2} \sum_{\substack{i,j \in \mathcal{M}_k, j \neq i}} x_i x_j \notag \\
+& = E_k + \frac{\psi}{2} \sum_{i \in \mathcal{M}_k} x_i^2 + \frac{\lambda}{2} \sum_{i \in \mathcal{M}_k} \sum_{j \ne i}^n b_{ij} x_i x_j. 
+\end{align*}
+Summation over all markets gives
+\begin{align}
+U = \sum_{k=1}^K U_k & = \sum_{k=1}^K E_k + \frac{\psi}{2} \sum_{k=1}^K \sum_{i \in \mathcal{M}_k} x_i^2 + \frac{\lambda}{2} \sum_{k=1}^K \sum_{i \in \mathcal{M}_k} \sum_{j \ne i}^n b_{ij} x_i x_j 
+ = E + \frac{\psi}{2} \sum_{i=1}^n x_i^2 + \frac{\lambda}{2} \sum_{i=1}^n \sum_{j \ne i}^n b_{ij} x_i x_j,
+\label{eq:consumer-utility}
+\end{align}
+where we have denoted by $E = \sum_{k=1}^K E_k$, and $U$ in Eq. (\ref{eq:consumer-utility}) defines consumer surplus. Note that in the special case of non-substitutable goods, when $\lambda \to 0$, we obtain $U = E +\frac{\psi}{2} \sum_{i=1}^n x_i^2$.  %while in the case of perfectly substitutable goods, when $\lambda \to 1$, we get $U = E +\frac{1+\psi}{2} \sum_{i,j=1}^n b_{ij} x_i x_j$. 
+In the single-product-market case ($b_{ij} = 1$ for all $i \neq j$) and
+in the limit $\lambda \to 1$, using
+$\sum_{i}\sum_{j \neq i} x_i x_j = \bigl(\sum_i x_i\bigr)^2 - \sum_i
+x_i^2$, consumer surplus simplifies to
+\begin{equation}
+  U
+  \;=\;
+  E
+  \;+\;
+  \frac{\psi - 1}{2} \sum_{i=1}^n x_i^2
+  \;+\;
+  \frac{1}{2} \Bigl( \sum_{i=1}^n x_i \Bigr)^{\!2},
+  \label{eq:cs-single-market-limit}
+\end{equation}
+so that with perfectly substitutable products consumer surplus depends
+on individual outputs only through aggregate output when $\psi = 1$,
+and rewards (penalizes) the dispersion of output across firms when
+$\psi > 1$ ($\psi < 1$).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bertrand Competition}
+\label{sec:bertrand}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In the case of price setting firms we obtain from the profit function% inEquation (\ref{eq:profit}) 
+\begin{equation}
+\pi_i = (p_i - c_i)x_i - \gamma y_i^2 - \sum_{j=1}^n a_{ij} \zeta_{ij},
+\label{eq:profit-app}
+\end{equation}
+the following first order condition for firm $i$:
+\begin{equation}
+\frac{\partial \pi _{i}}{\partial p_{i}} = (p_i-c_i) \dfrac{\partial x_i}{\partial p_i} + x_i = 0.
+\label{eq:foc-app}
+\end{equation}
+The inverse demand function is given by %Equation (\ref{eq:inverse-demand}) 
+\begin{equation*}
+p_i = \upsilon - \psi x_i - \lambda \sum_{j \ne i}^n b_{ij} x_j,
+\end{equation*}
+from which it can be shown that
+\begin{align*}
+x_i = \frac{\upsilon}{\lambda (m_i-1)+\psi} 
+- 
+ \frac{\lambda (m_i-2)+\psi}{(\lambda (m_i-1)+\psi)(\psi-\lambda)} 
+p_i
+-
+ \frac{\lambda}{(\lambda (m_i-1)+\psi)(\psi-\lambda)} 
+\sum_{j=1, j \neq i}^n b_{ij} p_j,
+\end{align*}
+where $m_i = 1+\sum_{j=1, j \neq i}^n b_{ij}$ counts one plus the number of firms competing with firm $i$ (i.e. the total number of firms in the market in which firm $i$ is operating). It then follows that
+\begin{align}
+\frac{\partial x_i}{\partial p_i} =
+- 
+ \frac{\lambda (m_i-2)+\psi}{(\lambda (m_i-1)+\psi)(\psi-\lambda)}.
+\label{eq:partial_x_p}
+\end{align}
+Inserting Equation (\ref{eq:partial_x_p}) into Equation (\ref{eq:foc-app}) gives
+\begin{align}
+x_i & = -(p_i-c_i) \frac{\partial x_i}{\partial p_i}
+= 
+\frac{\lambda (m_i-2)+\psi}{(\lambda (m_i-1)+\psi)(\psi-\lambda)} 
+(p_i-c_i).
+\label{eq:x_i_app}
+\end{align}
+Further, using the fact that
+\begin{align*}
+c_i = \bar{c}_i - \alpha y_i - \beta \sum_{j=1}^n a_{ij} y_j,
+\end{align*}
+and
+\begin{align*}
+p_i = \upsilon - \psi x_i - \lambda \sum_{j=1}^n b_{ij} x_j,
+\end{align*}
+we get that
+\begin{align}
+p_i-c_i =  \upsilon - \bar{c}_i  - \psi x_i - \lambda \sum_{j=1}^n b_{ij} x_j + \alpha y_i + \beta \sum_{j=1}^n a_{ij} y_j. 
+\label{eq:p_c_app}
+\end{align}
+Inserting Equation (\ref{eq:p_c_app}) into (\ref{eq:x_i_app}) gives
+\begin{align*}
+x_i & 
+= 
+\frac{\lambda (m_i-2)+\psi}{(\lambda (m_i-1)+\psi)(\psi-\lambda)} 
+\left(\upsilon - \bar{c}_i  - \psi x_i - \lambda \sum_{j=1}^n b_{ij} x_j + \alpha y_i + \beta \sum_{j=1}^n a_{ij} y_j\right).
+\end{align*}
+Solving for $x_i$ yields 
+\begin{align}
+x_i & 
+= 
+\frac{
+(\lambda (m_i-2)+\psi)(\upsilon-\bar{c}_i)
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+- 
+\frac{
+(\lambda (m_i-2)+\psi) \lambda
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+\sum_{j=1}^n b_{ij} x_j 
+\notag \\
+& 
++ 
+\frac{
+(\lambda (m_i-2)+\psi) \alpha
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+y_i
++ 
+\frac{
+(\lambda (m_i-2)+\psi) \beta
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+\sum_{j=1}^n a_{ij} y_j.
+\label{eq:xi_app_2}
+\end{align}
+Further, inserting Equation (\ref{eq:p_c_app}) into the profit function of Equation (\ref{eq:profit-app}) gives
+\begin{align*}
+\pi_i & = \upsilon x_i - \psi x_i^2 - \lambda \sum_{j=1}^n b_{ij} x_i x_j - \bar{c}_i x_i + \alpha x_i y_i + \beta \sum_{j=1}^n a_{ij} x_i y_j - \gamma y_i^2 - \sum_{j=1}^n \zeta_{ij}.
+\end{align*}
+The first order condition with respect to R\&D effort is given by
+\begin{align*}
+\frac{\partial \pi_i}{\partial y_i} & = \alpha x_i - 2 \gamma y_i = 0,
+\end{align*}
+from which we get that
+\begin{align}
+y_i & = \frac{\alpha}{2 \gamma} x_i.
+\label{eq:opt-effort-app}
+\end{align}
+Inserting Equation (\ref{eq:opt-effort-app}) into Equation (\ref{eq:xi_app_2}) gives
+\begin{align}
+x_i & 
+= 
+\frac{
+(\lambda (m_i-2)+\psi)(\upsilon-\bar{c}_i)
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+- 
+\frac{
+(\lambda (m_i-2)+\psi) \lambda
+}{
+\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i
+} 
+\sum_{j=1}^n b_{ij} x_j 
+\notag \\
+& 
++ 
+\frac{
+(\lambda (m_i-2)+\psi) \alpha^2
+}{
+2 \gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i)
+} 
+x_i
++ 
+\frac{
+(\lambda (m_i-2)+\psi) \alpha \beta
+}{
+2 \gamma(\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i)
+} 
+\sum_{j=1}^n a_{ij} x_j.
+\label{eq:xi_app_3}
+\end{align}
+This can be written as
+\begin{align}
+x_i & 
+= 
+\frac{
+2 \gamma (\lambda (m_i-2)+\psi)(\upsilon-\bar{c}_i)
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i) - \alpha^2 (\psi + \lambda (m_i - 2))
+} 
+\notag \\
+& - 
+\frac{
+2 \gamma (\lambda (m_i-2)+\psi) \lambda
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i) - \alpha^2 (\psi + \lambda (m_i - 2))
+} 
+\sum_{j=1}^n b_{ij} x_j 
+\notag \\
+& 
++ 
+\frac{
+(\lambda (m_i-2)+\psi) \alpha \beta
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)m_i) - \alpha^2 (\psi + \lambda (m_i - 2))
+} 
+\sum_{j=1}^n a_{ij} x_j.
+\label{eq:xi_app_4}
+\end{align}
+In the case of a single market, $m_i=n$, Equation (\ref{eq:xi_app_4}) can be written as
+\begin{align}
+x_i & 
+= 
+\frac{
+2 \gamma (\lambda (n-2)+\psi)(\upsilon-\bar{c}_i)
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)n) - \alpha^2 (\psi + \lambda (n - 2))
+} 
+\notag \\
+& - 
+\frac{
+2 \gamma (\lambda (n-2)+\psi) \lambda
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)n) - \alpha^2 (\psi + \lambda (n- 2))
+} 
+\sum_{j=1}^n b_{ij} x_j 
+\notag \\
+& 
++ 
+\frac{
+(\lambda (n-2)+\psi) \alpha \beta
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)n) - \alpha^2 (\psi + \lambda (n - 2))
+} 
+\sum_{j=1}^n a_{ij} x_j.
+\label{eq:xi_app_5}
+\end{align}
+If we further denote by $\tilde{\eta}_i \equiv (\upsilon - \bar{c}_i) C $, $\tilde{\lambda} \equiv \lambda C$ and $\tilde{\rho} \equiv \frac{\alpha \beta}{2 \gamma} C$, where
+\begin{align}
+C & = \frac{
+2 \gamma (\lambda (n-2)+\psi)
+}{
+2\gamma (\lambda^2 - 4\lambda\psi + 2\psi^2 - \lambda(\lambda - 2\psi)n) - \alpha^2 (\psi + \lambda (n - 2))
+},
+\label{eq:C_app}
+\end{align}
+we can write Equation (\ref{eq:xi_app_5}) compactly as follows
+\begin{align*}
+x_i & = \tilde{\eta}_i - \tilde{\lambda} \sum_{j=1}^n b_{ij} x_j + \tilde{\rho}  \sum_{j=1}^n a_{ij} x_j,
+%\label{eq:xi_app_5}
+\end{align*}
+which has the same functional form as Equation (\ref{eq:output-br}) in Section \ref{sec:model}. Next, note that after inserting the optimal R\&D effort from Equation (\ref{eq:opt-effort-app}), the profit function of the firm becomes 
+\begin{align}
+\pi_i & = (p_i-\bar{c}_i) x_i - \frac{\alpha^2}{4 \gamma} x_i^2 - \sum_{j=1}^n \zeta_{ij}. 
+\label{eq:pi_opt_rnd}
+\end{align}
+Similarly, inserting Equation (\ref{eq:opt-effort-app}) into Equation (\ref{eq:p_c_app}), we get that
+\begin{align}
+p_i-c_i =  \upsilon - \psi x_i - \lambda \sum_{j=1}^n b_{ij} x_j - \bar{c}_i + \frac{\alpha^2}{2 \gamma} x_i + \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j. 
+\label{eq:p_c_app_2}
+\end{align}
+Inserting Equation (\ref{eq:p_c_app_2}) into Equation (\ref{eq:pi_opt_rnd}) gives
+\begin{align*}
+\pi_i & = \left(
+\upsilon - \bar{c}_i
+ - \lambda \sum_{j=1}^n b_{ij} x_j + \frac{\alpha \beta}{2 \gamma} \sum_{j=1}^n a_{ij} x_j
+ \right) x_i - \left(\psi - \frac{\alpha^2}{2 \gamma}\right) x_i^2 - \sum_{j=1}^n \zeta_{ij}. 
+\end{align*}
+Using the definition in Equation (\ref{eq:C_app}) this can be written as
+\begin{align*}
+\pi_i & =  \left(\frac{1}{C}-\left(\psi - \frac{\alpha^2}{2 \gamma}\right)\right) x_i^2
+- \sum_{j=1}^n \zeta_{ij}. 
+\end{align*}
+which gives the same functional form as in Equation (\ref{eq:profit-eq}) in Section \ref{sec:model}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Additional Notes for Section \ref{sec:model-implications}}
+%\label{app:model-implications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%In the following we analyze the choice between the two alternative governance modes for internalizing technological complementarities in our model. An R\&D collaboration adds a bilateral spillover link while preserving the two firms as separate nodes. An acquisition, by contrast, integrates the target into the acquirer: the acquirer inherits the target's knowledge stock and R\&D collaborations, while the target ceases to exist as an independent node in the network. Throughout this subsection, all payoffs are evaluated at the inherited network $G_{t-1}$, and we drop time subscripts whenever this causes no confusion.
+%
+%\paragraph{Katz-Bonacich centrality.} To better understand the drivers of R\&D collaboration and M\&A profits, we first derive a simple representation of the equilibrium kernel $\mathbf{M} = (\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$ in terms of the Katz-Bonacich centrality \citep[cf.][]{Katz1953,ballester06:_who_networ} in the special case of a uniform productivity vector $\bm{\eta}=\eta \mathbf{u}$ and a single-product market.
+%In the single-product-market case, every firm competes symmetrically with all others, such that the market substitution matrix $\mathbf{B} = \mathbf{u}\mathbf{u}^\top - \mathbf{I}_n$. Let $\phi = \rho / (1-\lambda)$ and assume the spectral condition $\phi\lambda_{\max}(\mathbf{A})<1$. The Katz-Bonacich kernel is given by the inverse $\mathbf{H} = (h_{ij}) = (\mathbf{I}_n-\phi\mathbf{A})^{-1}$, which depends only on the adjacency matrix of the R\&D collaboration network $\mathbf{A}$. The elements $h_{ij}$ are the discounted sum of all walks in the R\&D network emanating from $i$ and ending at $j$, where walks of length $\ell$ receive weight $\phi^\ell$.\footnote{See Online Appendix \ref{sec:katz-bonacich} for the definition of the Katz-Bonacich kernel, centrality and their properties. Note that $h_{ij}\ge 0$ and $h_{ii}\ge 1$ for all $i,j$, so that the centralities defined below satisfy $c_i \ge h_{ii} \ge 1$.} The Katz-Bonacich centrality vector is $\mathbf{c}=(c_1,\ldots,c_n)^\top = \mathbf{H}\mathbf{u}$ with elements $c_i = \sum_{j=1}^n h_{ij}$. Under the uniform productivity assumption, the market share of firm $i$ simplifies to $y_i/\sum_j y_j = c_i/\sum_j c_j$.\footnote{See Equation (\ref{eq:nash-bonacich-single-market}) in Online Appendix \ref{sec:nash-katz}. Explicitly, $\mathbf{y} = \eta\mathbf{M}\mathbf{u} = \eta\,\mathbf{c}/\!\left(1+\lambda\left(\sum_k c_k - 1\right)\right)$, so output is strictly positive and proportional to centrality.} Consequently, firm $i$'s Katz-Bonacich centrality, $c_i$, is proportional to its market share. 
+%
+%One can then show that the elements of the equilibrium kernel $\mathbf{M}$ are given by:\footnote{See Remark \ref{rem:one} in Online Appendix \ref{sec:model-implications-notes}.}
+%\begin{equation}
+%m_{ij} = \frac{1}{1-\lambda} \left( h_{ij} - \kappa c_i c_j \right),
+%\label{eq:single-market-elements}
+%\end{equation}
+%with the dampening factor
+%$\kappa = \lambda /(1+\lambda\left(\sum_k c_k-1\right))$. %\footnote{The dampening factor $\kappa$ should not be confused with the M\&A cost parameters $\kappa_0,\ldots,\kappa_5$ in Equation \eqref{eq:mna-cost}; the former is an equilibrium object determined by $\lambda$ and the network, the latter are structural cost coefficients. Note also that $\kappa \le \lambda < 1$, and that $\kappa \sum_k c_k < 1$, which guarantees positive equilibrium outputs.} 
+%This decomposition in Equation (\ref{eq:single-market-elements}) provides an economic interpretation of $m_{ij}$ as a \textit{net compounded R\&D spillover}. It is the difference between two competing forces:
+%\begin{itemize}
+%    \item \textbf{Gross compounded R\&D spillover:}
+%The network's capacity to transmit knowledge from firm $j$ to firm $i$, measured by the Katz--Bonacich kernel ($h_{ij}$).
+%    \item \textbf{Strategic cannibalization penalty:}
+%The reduction in the value of that knowledge transmission due to product-market competition, proportional to the product of the firms' market shares ($c_i c_j$), scaled by the factor $\kappa$.
+%\end{itemize}
+%Therefore, two firms may have a high gross technological proximity ($h_{ij}$), but if they are both highly central (holding large market shares), their net compounded R\&D spillover ($m_{ij}$) can be severely dampened.
+%
+%\paragraph{Marginal profits from R\&D collaborations.}
+%
+%\begin{figure}[tp]
+%    \centering
+%    \psset{unit=0.9cm}
+%    \begin{pspicture}(0,-6.0)(11,2.5)
+%
+%    \newrgbcolor{firmicolor}{0.8 0.9 1.0}
+%    \newrgbcolor{firmjcolor}{1.0 0.8 0.8}
+%    \newrgbcolor{nodecolor}{0.9 0.9 0.9}
+%    \newrgbcolor{newlink}{0.0 0.4 0.8}
+%
+%    % ==========================================
+%    % PANEL 1: Pre-Collaboration
+%    % ==========================================
+%    % The \phantom{j} forces node i to have the exact same radius as node j
+%    \cnodeput[fillstyle=solid,fillcolor=firmicolor](2,1){A1}{$i\hspace{-0.2cm}\phantom{j}$}
+%    \cnodeput[fillstyle=solid,fillcolor=firmjcolor](2,-1){T1}{\scalebox{0.85}{$j$}}
+%
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](0.5, 1.5){N11}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](3.5, 0){N12}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](0.5, -1.5){N13}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](3.5, -2){N14}{}
+%
+%    \ncline{A1}{N11}
+%    \ncline{A1}{N12}
+%    % Note: No direct link between i and j in the pre-collaboration stage
+%    \ncline{T1}{N12}
+%    \ncline{T1}{N13}
+%    \ncline{T1}{N14}
+%
+%    % The candidate R&D alliance link (dashed to show intent/formation)
+%    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.5pt]{A1}{T1}
+%
+%    \rput(2,-4.2){\footnotesize \begin{tabular}{c}
+%        \textbf{(a) Pre-Collaboration} \\[0.15cm]
+%        Adjacency Matrix: $\mathbf{A}$ \\[0.1cm]
+%        Kernel: $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$
+%    \end{tabular}}
+%
+%    % ==========================================
+%    % PANEL 2: Post-Collaboration
+%    % ==========================================
+%    \cnodeput[fillstyle=solid,fillcolor=firmicolor](9,1){A2}{$i\hspace{-0.2cm}\phantom{j}$}
+%    \cnodeput[fillstyle=solid,fillcolor=firmjcolor](9,-1){T2}{\scalebox{0.85}{$j$}}
+%
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.5, 1.5){N21}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10.5, 0){N22}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.5, -1.5){N23}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10.5, -2){N24}{}
+%
+%    \ncline{A2}{N21}
+%    \ncline{A2}{N22}
+%    \ncline{T2}{N22}
+%    \ncline{T2}{N23}
+%    \ncline{T2}{N24}
+%
+%    % The new R&D alliance link (solid to show established)
+%    \ncline[linestyle=solid, linecolor=newlink, linewidth=1.5pt]{A2}{T2}
+%
+%    \rput(9,-4.2){\footnotesize \begin{tabular}{c}
+%        \textbf{(b) Post-Collaboration} \\[0.15cm]
+%        Adjacency Matrix: $\mathbf{A}^{+ij} = \mathbf{A} + \mathbf{e}_i\mathbf{e}_j^\top + \mathbf{e}_j\mathbf{e}_i^\top$ \\[0.1cm]
+%        Kernel: $\mathbf{M}^{+ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}^{+ij})^{-1}$
+%    \end{tabular}}
+%
+%    \end{pspicture}
+%    \vspace{-0.5cm}
+%    \caption{The left panel (a) shows the pre-collaboration network (with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$). Firm $i$ and firm $j$ are connected indirectly through their local network structure but share no direct link; the dashed line indicates the candidate collaboration under consideration. The right panel (b) illustrates the formation of the new bilateral R\&D collaboration between firm $i$ and firm $j$ (solid blue line), resulting in the post-collaboration network (with adjacency matrix $\mathbf{A}^{+ij} = \mathbf{A} + \mathbf{e}_i\mathbf{e}_j^\top + \mathbf{e}_j\mathbf{e}_i^\top$ and equilibrium kernel $\mathbf{M}^{+ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}^{+ij})^{-1}$).}
+%    \label{fig:rnd_collaboration}
+%\end{figure}
+%When the bilateral collaboration link $(i,j)$ is added to the inherited network $G_{t-1}$, as illustrated in Figure \ref{fig:rnd_collaboration}, the collaboration profit for firm $i$ is given by:\footnote{See Appendix \ref{sec:profit-rnd} for further details.}
+%\begin{equation}
+%\Pi_{ij}^{\text{R\&D}}
+%=
+%\frac{\xi}{2}
+%\left(y_{i}^{+ij}\right)^2
+%-
+%\zeta_{ij},
+%\label{eq:rnd-coll-profit-main}
+%\end{equation}
+%where the post-collaboration output $y_{i}^{+ij}$ of firm $i$ from the new R\&D collaboration $(i,j)$ is given by:\footnote{See Remark \ref{rem:two} in Online Appendix \ref{sec:model-implications-notes}.}
+%\begin{equation}
+%y_{i}^{+ij} = \frac{(1-\rho m_{ij})y_{i} + \rho m_{ii}y_{j}}{(1-\rho m_{ij})^2-\rho^2 m_{ii}m_{jj}}.
+%\label{eq:post-link-output-i}
+%\end{equation}
+%The pre-collaboration equilibrium outputs of firms $i$ and $j$ are
+%$y_i = \mathbf{e}_i^\top \mathbf{M}\bm{\eta}$ and $y_j = \mathbf{e}_j^\top \mathbf{M}\bm{\eta}$, i.e., their productivity-weighted centralities. The kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$ aggregates direct R\&D effects, indirect spillovers, product-market substitution effects, and all higher-order feedback loops generated by the joint R\&D collaboration ($\mathbf{A}$) and product-market competition network ($\mathbf{B}$).
+%
+%To build intuition for the drivers of R\&D collaboration profits, we evaluate the expression in Equation (\ref{eq:post-link-output-i}) under two simplifying restrictions: a single product market and a uniform baseline productivity vector, $\bm{\eta} = \eta\mathbf{u}$. The following proposition states the resulting output multiplier.
+%\begin{proposition}%[Post-collaboration output multiplier]
+%\label{prop:multiplier}
+%Consider a single product market ($\mathbf{B} = \mathbf{u}\mathbf{u}^\top - \mathbf{I}_n$) with uniform productivity $\bm{\eta} = \eta\mathbf{u}$, and let $\phi = \rho/(1-\lambda)$ satisfy the spectral condition $\phi\lambda_{\max}(\mathbf{A}) < 1$. Then the relative output gain of firm $i$ from forming the R\&D collaboration $(i,j)$ is
+%\begin{equation}
+%\frac{y_i^{+ij}}{y_i} = \frac{1 - \phi \left( h_{ij} - h_{ii}\frac{c_j}{c_i} \right)}{\left[ 1 - \phi \left( h_{ij} - \kappa c_i c_j \right) \right]^2 - \phi^2 \left( h_{ii} - \kappa c_i^2 \right) \left( h_{jj} - \kappa c_j^2 \right)},
+%\label{eq:post-link-output-i-rel}
+%\end{equation}
+%where $h_{k\ell}$ and $c_k$ are the entries and row sums of the Katz--Bonacich kernel $\mathbf{H} = (\mathbf{I}_n - \phi \mathbf{A})^{-1}$ and $\kappa$ is the dampening factor of Equation \eqref{eq:single-market-elements}. 
+%%The cannibalization terms cancel exactly in the numerator, so that product-market overlap affects the multiplier only through the denominator, which is strictly positive and equals the determinant ratio $|\mathbf{S}^{+ij}|/|\mathbf{S}|$.
+%\end{proposition}
+%\begin{proof}
+%See Appendix \ref{app:proof-multiplier}.
+%\end{proof}
+%\noindent Equation \eqref{eq:post-link-output-i-rel} shows that collaboration profits are governed by two opposing forces: the terms $h_{ij}$, $h_{ii}$, and $h_{jj}$ capture pure technological propagation through the R\&D network, while the terms involving $\kappa c_i c_j$, $\kappa c_i^2$, and $\kappa c_j^2$ capture the product-market cannibalization generated by operating in a single common product market. %The exact cancellation in the numerator implies that a firm's own market footprint never dampens the \emph{gross} absorption of a partner's centrality; it operates only through the equilibrium feedback loops collected in the denominator.
+%
+%We next characterize three polar network configurations based on Proposition \ref{prop:multiplier}. Since $c_k \ge h_{kk} \ge 1$ for every firm, centralities are bounded below by one; a \emph{peripheral} firm is therefore one whose centrality is of order one, while a \emph{dominant hub} is a firm whose centrality is large relative to its partner's. The asymmetric cases are stated as limits along sequences of configurations in which the centrality ratio diverges while the market-overlap term $\kappa c_i c_j$ vanishes, which holds whenever no single firm commands a nonvanishing share of aggregate centrality.
+%\begin{proposition}%[Boundary cases]
+%\label{prop:boundary}
+%Under the assumptions of Proposition \ref{prop:multiplier}:
+%\begin{enumerate}
+%\item[(i)] \textbf{Symmetric alliance:} If $c_i = c_j$ and $h_{ii} = h_{jj}$, then
+%\begin{equation*}
+%\frac{y_i^{+ij}}{y_i} = \frac{1}{1 - \phi\left( h_{ij} + h_{ii} \right) + 2\phi\kappa c_i^2}.
+%\end{equation*}
+%\item[(ii)] \textbf{Peripheral firm joining a dominant hub:} Along any sequence of configurations with $h_{ij}, h_{ii}, h_{jj}$ bounded, $c_j/c_i \to \infty$, $\kappa c_i c_j \to 0$, and $D_1 \equiv (1-\phi h_{ij})^2 - \phi^2 h_{ii}(h_{jj} - \kappa c_j^2)$ bounded away from zero,
+%\begin{equation*}
+%\frac{y_i^{+ij}}{y_i} = \frac{\phi h_{ii}}{D_1}\,\frac{c_j}{c_i}\,\bigl( 1 + o(1) \bigr).
+%\end{equation*}
+%\item[(iii)] \textbf{Dominant hub joining a peripheral firm:} Symmetrically, along any sequence with $h_{ij}, h_{ii}, h_{jj}$ bounded, $c_j/c_i \to 0$, $\kappa c_i c_j \to 0$, and $D_2 \equiv (1-\phi h_{ij})^2 - \phi^2 (h_{ii} - \kappa c_i^2) h_{jj}$ bounded away from zero,
+%\begin{equation*}
+%\frac{y_i^{+ij}}{y_i} = \frac{1 - \phi h_{ij}}{D_2}\,\bigl( 1 + o(1) \bigr).
+%\end{equation*}
+%\end{enumerate}
+%\end{proposition}
+%\begin{proof}
+%See Appendix \ref{app:proof-boundary}.
+%\end{proof}
+%\noindent The three cases admit the following economic interpretation.
+%\begin{enumerate}
+%    \item \textbf{Symmetric collaboration ($c_i \approx c_j$).} In a symmetric alliance, neither firm benefits from an asymmetric centrality advantage. The collaboration is therefore governed by the balance between technological reinforcement, captured by $h_{ij} + h_{ii}$, and product-market cannibalization, captured by $2 \phi \kappa c_i^2$. When the two firms are central and operate in a common product market, the market-overlap penalty can substantially reduce the collaboration surplus. By contrast, when the firms are similarly positioned but peripheral (so that $c_i$ is of order one and the cannibalization term is weak), the collaboration mainly reflects technological complementarity.
+%    \item \textbf{Peripheral firm collaborating with a dominant hub ($c_j \gg c_i$).} This is the most favorable asymmetric case for the smaller firm. Its own baseline market footprint is limited, so its direct product-market cannibalization is weak. At the same time, the link gives it access to the more central partner's collaboration network environment, and this access is amplified by the firm's own local feedback term $h_{ii}$. The proportional gain can therefore be large when $c_j/c_i$ is large. However, the hub's market footprint still matters through the term $\kappa c_j^2$ in the denominator: product-market overlap does not disappear entirely, but it is primarily associated with the dominant partner rather than the peripheral firm.
+%    \item \textbf{Dominant hub collaborating with a peripheral firm ($c_i \gg c_j$).} This case is less attractive for the central incumbent. Collaborating with a peripheral partner generates little additional technology spillover because $c_j/c_i$ is small. At the same time, the incumbent's own market footprint remains important through the term $\kappa c_i^2$, which enters the denominator with a positive sign and thereby reduces the multiplier. Thus, even if the link creates some technological complementarity, the proportional gain for the already central firm is limited by its exposure to product-market cannibalization and by the fact that the collaboration also transmits technology spillovers to a rival firm.
+%\end{enumerate}
+%Overall, these cases show that R\&D collaboration incentives depend not only on whether a link creates technological spillovers, but also on the rivalry effects of product-market competition. Links from peripheral firms to central firms can generate large proportional gains for the peripheral partner, whereas links involving already dominant firms are more strongly disciplined by product-market cannibalization. A detailed example with three firms can be found in Online Appendix \ref{sec:rnd-example}.
+%
+%\paragraph{Marginal profits from M\&As.} Given the inherited network $G_{t-1}$, define
+%$
+%\mathbf{S}_{t-1}
+%=
+%\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}(G_{t-1})$, and
+%$
+%\mathbf{M}_{t-1}
+%=
+%\mathbf{S}_{t-1}^{-1}$. The matrix $\mathbf{M}_{t-1}$ is the equilibrium kernel associated with the
+%pre-transaction network.\footnote{See also Appendices \ref{sec:katz-bonacich} and \ref{sec:nash-katz}, respectively.} It maps the productivity vector $\bm{\eta}_t$ into
+%equilibrium output,
+%$
+%\mathbf{y}_t
+%=
+%\mathbf{M}_{t-1}\bm{\eta}_t$. For notational convenience, write
+%$
+%\mathbf{A}
+%\equiv
+%\mathbf{A}(G_{t-1})$,
+%$
+%\mathbf{S}
+%\equiv
+%\mathbf{S}_{t-1}$,
+% $\mathbf{M}
+%\equiv
+%\mathbf{M}_{t-1}$ and drop time indices for brevity. Let $\mathbf{e}_i$ and $\mathbf{e}_j$ denote the $i$-th and $j$-th unit basis
+%vectors, respectively.
+%
+%We consider an acquisition in which firm $i$ acquires target
+%firm $j$. The acquisition involves two distinct network operations. (i) First, the target's collaboration
+%links are reassigned to the acquirer. (ii) Second, the target is removed as an independent
+%node. The first operation creates new propagation paths through the merged entity,
+%whereas the second operation removes paths that relied on the target as a distinct
+%intermediary. This is schematically illustrated in Figure \ref{fig:mna_operations}.
+%\begin{figure}[tp]
+%    \centering
+%    \psset{unit=0.9cm}
+%    \begin{pspicture}(-2.5,-5.8)(13.5,2.5)
+%
+%    \newrgbcolor{acqcolor}{0.8 0.9 1.0}
+%    \newrgbcolor{tgtcolor}{1.0 0.8 0.8}
+%    \newrgbcolor{nodecolor}{0.9 0.9 0.9}
+%    \newrgbcolor{newlink}{0.0 0.4 0.8}
+%    \newrgbcolor{ghostgray}{0.6 0.6 0.6}
+%
+%    % ==========================================
+%    % PANEL 1: Pre-Transaction
+%    % ==========================================
+%    \cnodeput[fillstyle=solid,fillcolor=acqcolor](-0.5,1){A1}{$i\hspace{-0.2cm}\phantom{j}$}
+%    \cnodeput[fillstyle=solid,fillcolor=tgtcolor](-0.5,-1){T1}{\scalebox{0.85}{$j$}}
+%
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](-2, 1.5){N11}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](1, 0){N12}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](-2, -1.5){N13}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](1, -2){N14}{}
+%
+%    \ncline{A1}{N11}
+%    \ncline{A1}{N12}
+%    \ncline{A1}{T1}
+%    \ncline{T1}{N12}
+%    \ncline{T1}{N13}
+%    \ncline{T1}{N14}
+%
+%    \rput(-0.5,-4.2){\footnotesize \begin{tabular}{c}
+%        \textbf{(a) Pre-Transaction} \\[0.15cm]
+%        Adjacency Matrix: $\mathbf{A}$ \\[0.1cm]
+%        Kernel: $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$
+%    \end{tabular}}
+%
+%    % ==========================================
+%    % PANEL 2: Link Reassignment
+%    % ==========================================
+%    \cnodeput[fillstyle=solid,fillcolor=acqcolor](5.5,1){A2}{$i\hspace{-0.2cm}\phantom{j}$}
+%    \cnodeput[fillstyle=solid,fillcolor=tgtcolor](5.5,-1){T2}{\scalebox{0.85}{$j$}}
+%
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](4.0, 1.5){N21}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.0, 0){N22}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](4.0, -1.5){N23}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7, -2){N24}{}
+%
+%    \ncline{A2}{N21}
+%    \ncline{A2}{N22}
+%    \ncline{A2}{T2}
+%    \ncline{T2}{N22}
+%    \ncline{T2}{N23}
+%    \ncline{T2}{N24}
+%
+%    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.2pt]{A2}{N23}
+%    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.2pt]{A2}{N24}
+%
+%    \rput(5.5,-4.2){\footnotesize \begin{tabular}{c}
+%        \textbf{(b) Link Reassignment} \\[0.15cm]
+%        Adjacency Matrix: $\widehat{\mathbf{A}}^{\,ij}$ \\[0.1cm]
+%        $\widehat{\mathbf{M}}^{\,ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\widehat{\mathbf{A}}^{\,ij})^{-1}$
+%    \end{tabular}}
+%
+%    % ==========================================
+%    % PANEL 3: Node Removal
+%    % ==========================================
+%    \cnodeput[fillstyle=solid,fillcolor=acqcolor](11.5,1){A3}{$i\hspace{-0.2cm}\phantom{j}$}
+%    \cnodeput[fillstyle=none,linestyle=dashed,linecolor=ghostgray](11.5,-1){T3}{\color{ghostgray}\scalebox{0.85}{$j$}}
+%
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10, 1.5){N31}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](13, 0){N32}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10, -1.5){N33}{}
+%    \cnodeput[fillstyle=solid,fillcolor=nodecolor](13, -2){N34}{}
+%
+%    \ncline{A3}{N31}
+%    \ncline{A3}{N32}
+%
+%    \ncline[linecolor=newlink, linewidth=1.2pt]{A3}{N33}
+%    \ncline[linecolor=newlink, linewidth=1.2pt]{A3}{N34}
+%
+%    \ncline[linestyle=dotted,linecolor=ghostgray]{A3}{T3}
+%    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N32}
+%    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N33}
+%    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N34}
+%
+%    \rput(11.5,-4.2){\footnotesize \begin{tabular}{c}
+%        \textbf{(c) Post-Removal} \\[0.15cm]
+%        Adjacency Matrix: $\widetilde{\mathbf{A}}^{\,ij}$ \\[0.1cm]
+%        $\widetilde{\mathbf{M}}^{\,ij} = (\mathbf{I}_{n-1}+\lambda\widetilde{\mathbf{B}}^{\,ij}-\rho\widetilde{\mathbf{A}}^{\,ij})^{-1}$
+%    \end{tabular}}
+%
+%    \end{pspicture}
+%    \vspace{-0.25cm}
+%    \caption{The left panel (a) shows the pre-transaction network (with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$). The middle panel (b) shows the reassignment of the target $j$'s non-redundant links (dashed blue lines) to the acquirer $i$ (with intermediate adjacency matrix $\widehat{\mathbf{A}}^{\,ij}$ and equilibrium kernel $\widehat{\mathbf{M}}^{\,ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\widehat{\mathbf{A}}^{\,ij})^{-1}$). The right panel (c) shows the removal (dotted gray lines) of the target node from the network, including from the competition matrix (with adjacency matrix $\widetilde{\mathbf{A}}^{\,ij}$, competition matrix $\widetilde{\mathbf{B}}^{\,ij}$, and equilibrium kernel $\widetilde{\mathbf{M}}^{\,ij} = (\mathbf{I}_{n-1}+\lambda\widetilde{\mathbf{B}}^{\,ij}-\rho\widetilde{\mathbf{A}}^{\,ij})^{-1}$).}
+%    \label{fig:mna_operations}
+%\end{figure}
+%To describe the reassignment step, let the intermediate post-reassignment adjacency matrix be denoted by $\widehat{\mathbf{A}}^{\,ij}$. The reassignment operation acts as a link-copying step: it adds the target $j$'s non-redundant collaboration links to the acquirer $i$, while temporarily leaving the target $j$'s original links intact.\footnote{See Remark \ref{rem:three} in Online Appendix \ref{sec:model-implications-notes}.} The corresponding interaction matrix after reassignment is
+%$
+%\widehat{\mathbf{S}}^{\,ij}
+%=
+%\mathbf{I}_n+\lambda\mathbf{B}
+%-
+%\rho\widehat{\mathbf{A}}^{\,ij},
+%$
+%with intermediate kernel
+%$
+%\widehat{\mathbf{M}}^{\,ij}
+%=
+%\big(\widehat{\mathbf{S}}^{\,ij}\big)^{-1}$.\footnote{See Remark \ref{rem:four} in Online Appendix \ref{sec:model-implications-notes}.} After link reassignment, the target is removed from the intermediate system: its row and column are deleted from both the collaboration and the competition matrix.
+%The $(n-1) \times (n-1)$-post-removal kernel $\widetilde{\mathbf{M}}^{\,ij}$
+%over the surviving nodes has elements:\footnote{See Remark \ref{rem:five} in Online Appendix \ref{sec:model-implications-notes}.} 
+%\begin{equation}
+%\widetilde m_{r\ell}^{\,ij}
+%=
+%\widehat m_{r\ell}^{\,ij}
+%-
+%\frac{
+%\widehat m_{rj}^{\,ij}\widehat m_{j\ell}^{\,ij}
+%}{
+%\widehat m_{jj}^{\,ij}
+%},
+%\qquad r,\ell \neq j,
+%\label{eq:post-removal-weight-mna}
+%\end{equation}
+%while $\widetilde m_{r j}^{\,ij} = \widetilde m_{j \ell}^{\,ij} = 0$, so that sums over all $n$ indices below are well defined. The distinction between $\widehat{\mathbf{M}}^{\,ij}$ and
+%$\widetilde{\mathbf{M}}^{\,ij}$ is important: the correction term in Equation \eqref{eq:post-removal-weight-mna} is applied to the
+%intermediate kernel $\widehat{\mathbf{M}}^{\,ij}$, not to the post-removal kernel. If firm $i$ acquires firm $j$, the post-acquisition output
+%of the merged firm applies these post-removal propagation weights to the
+%post-acquisition productivity vector $\bm{\eta}^{ac,ij}$, which assigns the combined knowledge stocks to the acquirer's node (cf. Equation \eqref{eq:prod-mna-alt}) and, in the intermediate step, retains the target's pre-merger productivity in the target's slot. Under the take-it-or-leave-it bargaining protocol, the acquisition price equals the target's outside option in the pre-transaction network,
+%$
+%\frac{\xi}{2}y_{j}^2
+%=
+%\frac{\xi}{2}
+%\left(
+%\mathbf{e}_j^{\top}\mathbf{M} \bm{\eta}
+%\right)^2.
+%$
+%Hence the net profit of firm $i$ from acquiring firm $j$ is
+%\begin{align}
+%\Pi_{ij}^{\text{M\&A}}
+%& =
+%\frac{\xi}{2}
+%\left(
+%\sum_{\ell=1}^n
+%\widetilde m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}
+%\right)^2
+%-
+%\frac{\xi}{2}
+%y_j^2
+%-
+%\nu_{ij} \notag \\
+%& = \frac{\xi}{2}
+%\left(
+%\widehat y_i^{\,ij}
+%-
+%\frac{
+%\widehat m_{ij}^{\,ij}
+%}{
+%\widehat m_{jj}^{\,ij}
+%}
+%\widehat y_j^{\,ij}
+%\right)^2
+%-
+%\frac{\xi}{2}
+%\left(
+%\mathbf{e}_j^{\top}\mathbf{M}\bm{\eta}
+%\right)^2
+%-
+%\nu_{ij},
+%\label{eq:mna-form-profit}
+%\end{align}
+%where $\widehat y_{i}^{\,ij} = \sum_{\ell=1}^n \widehat m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}$ and $y_j=\mathbf{e}_j^{\top}\mathbf{M}\bm{\eta}$.%\footnote{\label{foot:etaj-cancel}Note that the coefficient of the target-slot productivity $\eta_j^{ac,ij}$ in the merged firm's output is $\widetilde m_{ij}^{\,ij} = \widehat m_{ij}^{\,ij} - \widehat m_{ij}^{\,ij}\widehat m_{jj}^{\,ij}/\widehat m_{jj}^{\,ij} = 0$: the value assigned to the target's slot in the intermediate step is immaterial for the final payoff, as it must be, since the target does not exist in the post-removal network and its knowledge has already been transferred to the acquirer through $\bm{\eta}^{ac,ij}$. The decomposition below nevertheless assigns economic content to $\eta_j^{ac,ij}$-terms, because it separates two exactly offsetting channels: the competitive pressure that the (technologically isolated but still competing) target exerts inside the intermediate output $\widehat y_i^{\,ij}$, and the market-vacating dividend of its subsequent removal.}
+%
+%To simplify the M\&A transaction payoff in Equation \eqref{eq:mna-form-profit}, we impose an additional restriction: a single product market. For the decomposition it is convenient to work with the \emph{transfer} representation of the reassignment step, in which the target's links are moved -- rather than copied -- to the acquirer, so that the target is technologically isolated in the intermediate adjacency matrix, while it remains a competitor in the product market. Formally, the transfer representation deletes the target's original links from $\widehat{\mathbf{A}}^{\,ij}$ in Equation \eqref{eq:adjacency-reassignment-mna} by setting its row and column to zero. This change of representation is without loss of generality: the copy and transfer representations induce the same post-removal network, and hence, by Equation \eqref{eq:post-removal-weight-mna}, the same post-removal kernel $\widetilde{\mathbf{M}}^{\,ij}$ and the same M\&A profit in Equation \eqref{eq:mna-form-profit}; only the decomposition into intermediate objects differs.%\footnote{Both representations yield, upon deletion of node $j$, the identical $(n-1)$-dimensional network in which the acquirer's neighborhood is the union of the two pre-merger neighborhoods; the post-removal kernel is the inverse of the interaction matrix of that network and therefore does not depend on the representation of the intermediate step.} 
+%Abusing notation slightly, we continue to write $\widehat{\mathbf{A}}^{\,ij}$, $\widehat{\mathbf{M}}^{\,ij}$ for the transfer representation in the remainder of this paragraph; in particular, row and column $j$ of $\widehat{\mathbf{A}}^{\,ij}$ are now zero. As shown in Equation (\ref{eq:single-market-elements}), under a single product market, the elements of the intermediate kernel can be written as
+%\begin{equation}
+%\widehat m_{k \ell}^{\,ij} = \frac{1}{1-\lambda} \left( \widehat h_{k \ell}^{\,ij} - \widehat\kappa \widehat c_k^{\,ij} \widehat c_\ell^{\,ij} \right),
+%\label{eq:single-market-elements-hat}
+%\end{equation}
+%where
+%$
+%\widehat{\mathbf{H}}^{\,ij} = (\mathbf{I}_n-\phi\widehat{\mathbf{A}}^{\,ij})^{-1}$, $\widehat c_k^{\,ij} = \mathbf{e}_k^\top\widehat{\mathbf{H}}^{\,ij}\mathbf{u}$, and $\widehat\kappa = \lambda/(1+\lambda(\sum_k \widehat c_k^{\,ij}-1))$ is the corresponding product-market dampening factor. It can then be shown that the post-merger payoff for firm $i$ can be written as:\footnote{See Remark \ref{rem:six} in Online Appendix \ref{sec:model-implications-notes}.}
+%\begin{equation}
+%\Pi_{ij}^{\mathrm{M\&A}} = \frac{\xi}{2} \left[ \widehat y_i^{\,ij} + \frac{\widehat\kappa}{(1-\widehat\kappa)(1-\lambda)} \widehat c_i^{\,ij} \left( (1-\widehat\kappa)\eta_j^{ac,ij} - \widehat\kappa \sum_{\ell \neq j} \widehat c_\ell^{\,ij} \eta_\ell^{ac,ij} \right)
+%\right]^2 - \frac{\xi}{2}y_j^2 - \nu_{ij}.
+%\label{eq:mna-profit-simplified-inserted}
+%\end{equation}
+%Based on Equation \eqref{eq:mna-profit-simplified-inserted} we can decompose the drivers of a profitable acquisition into three distinct economic forces:
+%\begin{enumerate}
+%\item \textbf{Technological synergy.}
+%The first driver of value is the acquirer's intermediate output after link reassignment, $\widehat y_i^{\,ij}$, which enters the post-acquisition payoff in Equation \eqref{eq:mna-form-profit}. Using the single-market decomposition of the intermediate kernel, this term can be written as
+%$$
+%\widehat y_i^{\,ij}
+%=
+%\sum_{\ell=1}^n
+%\widehat m_{i\ell}^{\,ij}
+%\eta_\ell^{ac,ij}
+%=
+%\frac{1}{1-\lambda}
+%\sum_{\ell=1}^n
+%\left(
+%\widehat h_{i\ell}^{\,ij}
+%-
+%\widehat\kappa
+%\widehat c_i^{\,ij}
+%\widehat c_\ell^{\,ij}
+%\right)
+%\eta_\ell^{ac,ij}.
+%$$
+%This expression shows that the acquirer's intermediate output is shaped by three forces. The term $\widehat h_{i\ell}^{\,ij}$ captures pure technological propagation from firm $\ell$ to the acquirer in the post-reassignment R\&D network. The productivity term $\eta_\ell^{ac,ij}$ weights each inherited propagation path by the post-acquisition productivity of the corresponding firm. The term $\widehat\kappa \widehat c_i^{\,ij}\widehat c_\ell^{\,ij}$ captures the product-market dampening generated by the overlap between the acquirer's market centrality and the market centrality of firm $\ell$. Hence, a target creates high technological synergy when its non-redundant links connect the acquirer to firms that are both technologically close and highly productive, while exposing it to limited product-market cannibalization.
+%    \item \textbf{The isolated target's net market footprint.} The fractional term inside the squared bracket captures the product-market effect of deleting the target as a competitor, relative to the intermediate benchmark in which the technologically isolated target still competes. %(cf. Footnote \ref{foot:etaj-cancel}). 
+%    This strategic dividend is determined by two opposing forces:
+%    \begin{itemize}
+%        \item \textit{Intrinsic capacity:} The term $(1-\widehat\kappa)\eta_j^{ac,ij}$ represents the target's standalone productive capacity. Removing a highly productive competitor vacates substantial market demand.
+%        \item \textit{Third-party cannibalization:} The penalty term, $\widehat\kappa \sum_{\ell \neq j} \widehat c_\ell^{\,ij} \eta_\ell^{ac,ij}$, reflects the capacity of the remaining rivals to absorb the vacated space. If competition is fierce and rivals are structurally central or highly productive, they capture the abandoned market share before the acquirer can secure it.
+%    \end{itemize}
+%    The acquirer captures this net vacated space only in proportion to its own topological dominance, $\widehat c_i^{\,ij}$. Thus, the merger is most lucrative when the target is highly productive, but operates in an environment where the remaining rivals are structurally weak.
+%    \item \textbf{Acquisition price and transaction cost.} The subtraction terms, $\frac{\xi}{2}y_j^2$ and $\nu_{ij}$, reflect the acquisition price -- which under the take-it-or-leave-it protocol equals the target's pre-transaction standalone profit -- and the transaction cost, respectively. An efficient transaction requires that the target's pre-merger outside option is sufficiently low to avoid a prohibitive purchase price.
+%\end{enumerate}
+%A detailed example with four firms can be found in Online Appendix \ref{sec:rnd-example}.
+%
+%\paragraph{From R\&D collaborations to M\&As.} The choice between alliances and mergers is governed by a threshold comparison of their benefits and relative costs: M\&A dominates R\&D collaboration when the integrated output gain is large enough to compensate for the acquisition price and the additional transaction cost.
+%\begin{proposition}%[Governance threshold]
+%\label{prop:threshold}
+%Given the inherited network $G_{t-1}$, firm $i$ prefers acquiring firm $j$ to collaborating with it, $\Pi_{ijt}^{\text{M\&A}}(G_{t-1}) \ge \Pi_{ijt}^{\text{R\&D}}(G_{t-1})$, if and only if
+%\begin{equation}
+%\left( y_{it}^{ac,ij} \right)^2 - \left( y_{it}^{+ij} \right)^2 \;\ge\; y_{jt}^2 + \frac{2}{\xi} \left( \nu_{ij,t} - \zeta_{ij,t} \right).
+%\label{eq:rnd-mna-comp}
+%\end{equation}
+%\end{proposition}
+%\begin{proof}
+%See Appendix \ref{app:proof-threshold}.
+%\end{proof}
+%\noindent In Equation \eqref{eq:rnd-mna-comp}, the output $y_{it}^{+ij}$ for firm $i$ after forming an R\&D link with firm $j$ is given by Equation (\ref{eq:post-link-output-i}), and the acquirer's post-acquisition output is $y_{it}^{ac,ij} = \sum_{\ell} \widetilde m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}$ from Equation (\ref{eq:mna-form-profit}), which in the single-market case equals the expression inside the square brackets in Equation (\ref{eq:mna-profit-simplified-inserted}). The condition in Equation (\ref{eq:rnd-mna-comp}) shows that acquisition is more attractive when the target has high transferable network value ($\left( y_{it}^{ac,ij} \right)^2 - \left( y_{it}^{+ij} \right)^2$) but a relatively low standalone outside option ($y_{jt}^2$). Conversely, R\&D collaboration is more attractive when a bilateral link already captures most of the technological complementarity, when the target is expensive to buy because $y_{jt}$ is large, or when preserving the target as an independent network node is itself valuable. Thus, the model predicts M\&A when control, link reassignment, and target removal create incremental value beyond what can be achieved through a collaboration link; it predicts R\&D collaboration when access to the target's knowledge is valuable but full consolidation adds little net benefit.
+%
+%Generalizing the analysis to multiple product markets weakens the tight link between technological centrality and product-market cannibalization that arises in the single-market case. With multiple markets, technological proximity and product-market overlap become distinct dimensions of firm-pair heterogeneity. R\&D collaboration is therefore most attractive when firms are technologically close but product-market distant: the new link creates strong knowledge spillovers while limiting direct cannibalization in overlapping product markets. By contrast, M\&A is most attractive when the target's technological links and knowledge stock are highly transferable to the acquirer, and when product-market overlap makes target removal valuable. In this case, consolidation allows the acquirer to internalize both the target's network position and the product-market effects of eliminating an independent competitor, provided that the acquisition price does not fully absorb these gains.
+%
+%Finally, a comparison of the respective cost functions gives
+%\begin{align}
+%\nu_{ij,t}-\zeta_{ij,t} = & (\kappa_0-\gamma_0)
+%+
+%\mathbf{c}_{ij,t}(\kappa_1-\gamma_1)
+%+
+%\kappa_2(y_{i,t-1}-y_{j,t-1})
+%+
+%(\kappa_3-\gamma_3)(y_{i,t-1}-y_{j,t-1})^2
+%\notag\\
+%\qquad
+%& -
+%\gamma_2 |y_{i,t-1}-y_{j,t-1}|
+%+
+%\underbrace{(\kappa_4-\gamma_4)a_{ij,t-1}}_{
+%\text{prior collaboration}
+%}
+%+
+%\underbrace{(\kappa_5-\gamma_5)\sum_{r=1}^n a_{ir,t-1}a_{jr,t-1}.}_{
+%\text{prior common collaborators}
+%}
+%\label{eq:mna_rnd_cost-diff}
+%\end{align}
+%The coefficient $(\kappa_4-\gamma_4)$ in Eq. (\ref{eq:mna_rnd_cost-diff}) captures how a prior alliance changes the relative cost of acquisition, while $(\kappa_5-\gamma_5)$ captures how prior common
+%collaborators change the same margin. When these differences are negative, prior
+%collaboration and shared network experience make acquisition relatively cheaper than
+%continued arm's-length collaboration. In that case, alliances may serve as a stepping
+%stone to integration: firms first collaborate to learn about technological fit,
+%organizational compatibility, and the value of the partner's knowledge, and later
+%consolidate when the expected surplus from integration exceeds the value of maintaining
+%a separate collaboration link. Note also that the difference in Equation \eqref{eq:mna_rnd_cost-diff} is not symmetric in the size variables: the signed term $\kappa_2(y_{i,t-1}-y_{j,t-1})$ enters only through the acquisition cost, so that -- other things equal -- the acquisition margin, but not the collaboration margin, distinguishes the direction of the transaction within a pair.
+%
+%Taken together, these implications highlight that organizational form is a key determinant of both the level and the distribution of output in the economy. Because firms can substitute between alliances and mergers, policy or technological changes affecting one margin necessarily propagate to the other, making this substitution mechanism central for understanding the aggregate effects of innovation policy and market structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proofs}
+\label{app:proofs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof of Proposition \ref{prop:multiplier}}
+\label{app:proof-multiplier}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+One can then show that the elements of the equilibrium kernel $\mathbf{M}$ are given by:\footnote{To derive $m_{ij}$, we express the kernel as $\mathbf{M} = ((1-\lambda)\mathbf{I}_n - \rho \mathbf{A} + \lambda \mathbf{u}\mathbf{u}^\top)^{-1}$. Factoring out $(1-\lambda)$ gives $\mathbf{M} = \frac{1}{1-\lambda} (\mathbf{H}^{-1} + c_0\mathbf{u}\mathbf{u}^\top)^{-1}$ with $\mathbf{H}^{-1} = \mathbf{I}_n - \phi \mathbf{A}$, $\phi = \rho/(1-\lambda)$ and $c_0 = \frac{\lambda}{1-\lambda}$. Applying the Sherman-Morrison identity $(\mathbf{H}^{-1} + c_0\mathbf{u}\mathbf{u}^\top)^{-1} = \mathbf{H} - \frac{c_0 \mathbf{H} \mathbf{u} \mathbf{u}^\top \mathbf{H}}{1 + c_0 \mathbf{u}^\top \mathbf{H} \mathbf{u}}$ with $\mathbf{c} = \mathbf{H}\mathbf{u}$ and $\mathbf{u}^\top \mathbf{H} \mathbf{u} = \sum_k c_k$, and defining $\kappa \equiv \frac{\lambda}{1+\lambda(\sum_k c_k-1)}$, we obtain $\mathbf{M} = \frac{1}{1-\lambda} (\mathbf{H} - \kappa \mathbf{c}\mathbf{c}^\top)$. The element-wise form in Equation (\ref{eq:single-market-elements}) then follows.}%\footnote{See Remark \ref{rem:one} in Online Appendix \ref{sec:model-implications-notes}.}
+\begin{equation}
+m_{ij} = \frac{1}{1-\lambda} \left( h_{ij} - \kappa c_i c_j \right),
+\label{eq:single-market-elements}
+\end{equation}
+with the dampening factor
+$\kappa = \lambda /(1+\lambda\left(\sum_k c_k-1\right))$. 
+Under the stated assumptions, Equation (\ref{eq:single-market-elements}) gives $m_{k\ell} = (h_{k\ell} - \kappa c_k c_\ell)/(1-\lambda)$ for the entries of the equilibrium kernel, and uniform productivity implies $y_j/y_i = c_j/c_i$ (cf. Appendix \ref{sec:nash-katz}). The post-collaboration output $y_{i}^{+ij}$ of firm $i$ from the new R\&D collaboration $(i,j)$ is given by:\footnote{\label{foot:rem-two}Adding the undirected link $(i,j)$ changes the
+interaction matrix from
+$
+\mathbf S
+=
+\mathbf I_n+\lambda\mathbf B-\rho\mathbf A
+$
+to
+$
+\mathbf S^{+ij}
+=
+\mathbf S
+-
+\rho
+\left(
+\mathbf e_i\mathbf e_j^\top
++
+\mathbf e_j\mathbf e_i^\top
+\right)$.
+Let
+$
+\mathbf M^{+ij}
+=
+\left(\mathbf S^{+ij}\right)^{-1}$. The post-collaboration output vector satisfies
+$
+\mathbf y^{+ij}
+=
+\mathbf M^{+ij}\bm{\eta}
+=
+\mathbf y
++
+\rho\mathbf M
+\left(
+\mathbf e_i y_{j}^{+ij}
++
+\mathbf e_j y_{i}^{+ij}
+\right)$. Left-multiplying by $\mathbf{e}_i^\top$ extracts the $i$-th scalar component. Using $\mathbf{e}_i^\top \mathbf{M} \mathbf{e}_i = m_{ii}$ and $\mathbf{e}_i^\top \mathbf{M} \mathbf{e}_j = m_{ij}$, this gives:
+$ y_i^{+ij} = y_i + \rho \left( m_{ii} y_j^{+ij} + m_{ij} y_i^{+ij} \right)$. Rearranging to isolate the post-collaboration terms on the left yields the first equation:
+$ (1 - \rho m_{ij}) y_i^{+ij} - \rho m_{ii} y_j^{+ij} = y_i $. Symmetrically, left-multiplying by $\mathbf{e}_j^\top$ and applying the symmetry of $\mathbf{M}$ ($m_{ji} = m_{ij}$) extracts the $j$-th component:
+$ y_j^{+ij} = y_j + \rho \left( m_{ij} y_j^{+ij} + m_{jj} y_i^{+ij} \right)$. Rearranging yields the second equation:
+$ -\rho m_{jj} y_i^{+ij} + (1 - \rho m_{ij}) y_j^{+ij} = y_j $. Stacking these two linear equations forms the matrix system:
+\begin{equation}
+\begin{bmatrix}
+1 - \rho m_{ij} & -\rho m_{ii} \\
+-\rho m_{jj} & 1 - \rho m_{ij}
+\end{bmatrix}
+\begin{bmatrix}
+y_i^{+ij} \\
+y_j^{+ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+y_i \\
+y_j
+\end{bmatrix}.
+\label{eq:two-by-two}
+\end{equation}
+Inverting this $(2 \times 2)$-matrix gives Equation \eqref{eq:post-link-output-i}. The denominator, $\Delta \equiv (1-\rho m_{ij})^2 - \rho^2 m_{ii}m_{jj}$, is the determinant of this matrix; it equals the determinant ratio $|\mathbf{S}^{+ij}|/|\mathbf{S}|$ (see Appendix \ref{sec:mat-perturb}) and is therefore strictly positive whenever both the pre- and post-collaboration interaction matrices are positive definite, which is the maintained stability condition.} %\footnote{See Remark \ref{rem:two} in Online Appendix \ref{sec:model-implications-notes}.}
+\begin{equation}
+y_{i}^{+ij} = \frac{(1-\rho m_{ij})y_{i} + \rho m_{ii}y_{j}}{(1-\rho m_{ij})^2-\rho^2 m_{ii}m_{jj}}.
+\label{eq:post-link-output-i}
+\end{equation}
+The pre-collaboration equilibrium outputs of firms $i$ and $j$ are
+$y_i = \mathbf{e}_i^\top \mathbf{M}\bm{\eta}$ and $y_j = \mathbf{e}_j^\top \mathbf{M}\bm{\eta}$, i.e., their productivity-weighted centralities. The kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$ aggregates direct R\&D effects, indirect spillovers, product-market substitution effects, and all higher-order feedback loops generated by the joint R\&D collaboration ($\mathbf{A}$) and product-market competition network ($\mathbf{B}$). 
+
+Substituting Equation (\ref{eq:single-market-elements}) into the post-collaboration output formula of Equation (\ref{eq:post-link-output-i}) and using $\rho/(1-\lambda) = \phi$, the numerator of $y_i^{+ij}/y_i$ becomes
+\begin{align*}
+(1 - \rho m_{ij}) + \rho m_{ii}\,\frac{c_j}{c_i}
+&= 1 - \phi\bigl( h_{ij} - \kappa c_i c_j \bigr) + \phi\bigl( h_{ii} - \kappa c_i^2 \bigr)\frac{c_j}{c_i} \\
+&= 1 - \phi h_{ij} + \phi\kappa c_i c_j + \phi h_{ii}\frac{c_j}{c_i} - \phi\kappa c_i c_j
+\;=\; 1 - \phi\Bigl( h_{ij} - h_{ii}\frac{c_j}{c_i} \Bigr),
+\end{align*}
+where the two cannibalization terms cancel exactly. The denominator is $(1-\rho m_{ij})^2 - \rho^2 m_{ii} m_{jj}$, which upon the same substitution equals the expression in Equation \eqref{eq:post-link-output-i-rel}. By Sylvester's determinant theorem (cf. Appendix \ref{sec:mat-perturb}) it equals $|\mathbf{S}^{+ij}|/|\mathbf{S}|$ and is therefore strictly positive whenever both interaction matrices are positive definite, which holds under the maintained spectral condition. \hfill$\blacksquare$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof of Proposition \ref{prop:boundary}}
+\label{app:proof-boundary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Write $N$ and $D(\kappa)$ for the numerator and denominator of Equation \eqref{eq:post-link-output-i-rel}. Expanding the square and collecting terms, the $\kappa^2 c_i^2 c_j^2$ contributions of the two products cancel identically, yielding the \emph{exact} decompositions
+\begin{align}
+D(\kappa)
+&= D_1 + \underbrace{2(1-\phi h_{ij})\,\phi\kappa c_i c_j + \phi^2 h_{jj}\,\kappa c_i^2}_{\displaystyle \equiv\, r_1}
+\label{eq:app:D-decomp-1} \\
+&= D_2 + \underbrace{2(1-\phi h_{ij})\,\phi\kappa c_i c_j + \phi^2 h_{ii}\,\kappa c_j^2}_{\displaystyle \equiv\, r_2},
+\label{eq:app:D-decomp-2}
+\end{align}
+with $D_1 \equiv (1-\phi h_{ij})^2 - \phi^2 h_{ii}(h_{jj} - \kappa c_j^2)$ and $D_2 \equiv (1-\phi h_{ij})^2 - \phi^2 (h_{ii} - \kappa c_i^2) h_{jj}$ as defined in the proposition.
+
+(i) Set $c_i = c_j = c$ and $h_{ii} = h_{jj}$. The numerator is $N = 1 - \phi(h_{ij} - h_{ii})$, and the denominator factors as a difference of squares,
+\begin{align*}
+D(\kappa)
+&= \bigl( 1 - \phi h_{ij} + \phi\kappa c^2 \bigr)^2 - \bigl( \phi h_{ii} - \phi\kappa c^2 \bigr)^2 \\
+&= \bigl[ 1 - \phi(h_{ij} - h_{ii}) \bigr] \bigl[ 1 - \phi(h_{ij} + h_{ii}) + 2\phi\kappa c^2 \bigr].
+\end{align*}
+Since $\mathbf{H}$ is symmetric positive definite under the spectral condition, $h_{ii} h_{jj} \ge h_{ij}^2$; with $h_{ii} = h_{jj}$ this gives $h_{ii} \ge |h_{ij}|$, so the common factor satisfies $1 - \phi(h_{ij} - h_{ii}) \ge 1 > 0$ and cancels, which is the stated identity.
+
+(ii) Factor the numerator exactly as
+\begin{equation*}
+N = \phi h_{ii}\,\frac{c_j}{c_i} \left( 1 + \frac{(1-\phi h_{ij})\,c_i}{\phi h_{ii}\, c_j} \right) = \phi h_{ii}\,\frac{c_j}{c_i}\,\bigl( 1 + o(1) \bigr),
+\end{equation*}
+since $c_i/c_j \to 0$ and $h_{ij}, h_{ii}$ are bounded with $h_{ii} \ge 1$. In Equation \eqref{eq:app:D-decomp-1}, $\kappa c_i^2 \le \kappa c_i c_j \to 0$ (as $c_i \le c_j$ along the sequence) and $h_{jj}$ is bounded, so $r_1 = o(1)$; with $D_1$ bounded away from zero, $D(\kappa) = D_1(1 + o(1))$. Dividing the two expansions gives the claim.
+
+(iii) Symmetrically, $N = (1-\phi h_{ij})\bigl( 1 + \phi h_{ii} c_j/((1-\phi h_{ij}) c_i) \bigr)$; here $c_j/c_i \to 0$ and, since $D_2$ is bounded away from zero, $1 - \phi h_{ij} \neq 0$ along the sequence, so $N = (1-\phi h_{ij})(1 + o(1))$. In Equation \eqref{eq:app:D-decomp-2}, $\kappa c_j^2 \le \kappa c_i c_j \to 0$ and $h_{ii}$ is bounded, so $r_2 = o(1)$ and $D(\kappa) = D_2(1+o(1))$. \hfill$\blacksquare$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof of Proposition \ref{prop:mna-single-market}}
+\label{app:proof-mna-single-market}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The proof proceeds in four steps: we first verify that the Schur complement is
+well defined, then exploit the technological isolation of the target in the
+transfer representation to obtain closed forms for the entries
+$\widehat m_{ij}^{\,ij}$ and $\widehat m_{jj}^{\,ij}$ of the intermediate
+kernel, next compute the target's intermediate output
+$\widehat y_j^{\,ij}$, and finally substitute these expressions into Equation
+\eqref{eq:mna-form-profit}.
+%\emph{Step 1 (Well-definedness).}
+To describe the reassignment step, let the intermediate post-reassignment adjacency matrix be denoted by $\widehat{\mathbf{A}}^{\,ij}$. The reassignment operation acts as a link-copying step: it adds the target $j$'s non-redundant collaboration links to the acquirer $i$, while temporarily leaving the target $j$'s original links intact.\footnote{For a formal definition, let
+$
+\mathbf{a}_i
+=
+\mathbf{A}_{i\bullet}^{\top}$
+ and
+$\mathbf{a}_j
+=
+\mathbf{A}_{j\bullet}^{\top}
+$
+be the pre-merger collaboration-link vectors of the acquirer and the target, respectively. The acquirer inherits only those target links that are not already its own links. Define the vector of strictly novel links brought by the target as
+$
+\mathbf{a}_{j}^{\text{nov}}
+=
+\mathbf{a}_j
+-
+\mathbf{a}_i\circ\mathbf{a}_j
+-
+a_{ij}\mathbf{e}_i,
+$
+where $\circ$ denotes the Hadamard product. The overlap term
+$\mathbf{a}_i\circ\mathbf{a}_j$ prevents common collaborators from generating an
+edge weight of two, and the term $a_{ij}\mathbf{e}_i$ prevents an artificial self-loop
+at the acquirer if firms $i$ and $j$ were directly linked before the acquisition. The intermediate post-reassignment adjacency matrix is
+\begin{equation}
+\widehat{\mathbf{A}}^{\,ij}
+=
+\mathbf{A}
++
+\mathbf{e}_i\left(\mathbf{a}_{j}^{\text{nov}}\right)^{\top}
++
+\mathbf{a}_{j}^{\text{nov}}\mathbf{e}_i^{\top}.
+\label{eq:adjacency-reassignment-mna}
+\end{equation}
+Since the perturbation in Equation \eqref{eq:adjacency-reassignment-mna} is symmetric, the intermediate
+adjacency matrix $\widehat{\mathbf{A}}^{\,ij}$ remains symmetric. An example with four firms is shown in Equation (\ref{eq:corrected-intermediate-A}).} %\footnote{See Remark \ref{rem:three} in Online Appendix \ref{sec:model-implications-notes}.} 
+The corresponding interaction matrix after reassignment is
+$
+\widehat{\mathbf{S}}^{\,ij}
+=
+\mathbf{I}_n+\lambda\mathbf{B}
+-
+\rho\widehat{\mathbf{A}}^{\,ij},
+$
+with intermediate kernel
+$
+\widehat{\mathbf{M}}^{\,ij}
+=
+\big(\widehat{\mathbf{S}}^{\,ij}\big)^{-1}$.\footnote{Using Equation \eqref{eq:adjacency-reassignment-mna}, the matrix
+$\widehat{\mathbf{S}}^{\,ij}$ can be written as a low-rank perturbation of the
+pre-transaction interaction matrix:
+$
+\widehat{\mathbf{S}}^{\,ij}
+=
+\mathbf{S}
+-
+\rho
+\left(
+\mathbf{e}_i\left(\mathbf{a}_{j}^{\text{nov}}\right)^{\top}
++
+\mathbf{a}_{j}^{\text{nov}}\mathbf{e}_i^{\top}
+\right).
+$
+Equivalently, define the $(n\times 2)$ and $(2\times n)$-perturbation matrices
+$
+\mathbf{U}_{ij}
+=
+\begin{bmatrix}
+\mathbf{e}_i
+&
+\mathbf{a}_{j}^{\text{nov}}
+\end{bmatrix}$ and
+$
+\mathbf{V}_{ij}^{\top}
+=
+\begin{bmatrix}
+\left(\mathbf{a}_{j}^{\text{nov}}\right)^{\top}
+\\
+\mathbf{e}_i^{\top}
+\end{bmatrix}.
+$
+Then
+$
+\widehat{\mathbf{S}}^{\,ij}
+=
+\mathbf{S}
+-
+\rho\mathbf{U}_{ij}\mathbf{V}_{ij}^{\top}.
+$
+By the Woodbury formula, provided the relevant inverses exist,
+$
+\widehat{\mathbf{M}}^{\,ij}
+=
+\big(\widehat{\mathbf{S}}^{\,ij}\big)^{-1}
+=
+\mathbf{M}
++
+\rho
+\mathbf{M}\mathbf{U}_{ij}
+\left(
+\mathbf{I}_2
+-
+\rho\mathbf{V}_{ij}^{\top}\mathbf{M}\mathbf{U}_{ij}
+\right)^{-1}
+\mathbf{V}_{ij}^{\top}\mathbf{M}
+$
+(see also Appendix \ref{sec:mat-perturb}).
+Note that the inner inverse is only a $(2\times 2)$-matrix (and reduces to a scalar if the target brings exactly one novel link). This low-dimensional inverse captures the infinite-order feedback loops created by transferring the target's non-redundant links to the acquirer, without recomputing the inverse of an $(n\times n)$-matrix. Since $\widehat{\mathbf{A}}^{\,ij}$ and $\mathbf{B}$ are symmetric, $\widehat{\mathbf{S}}^{\,ij}$ is symmetric. Hence, whenever $\widehat{\mathbf{S}}^{\,ij}$ is nonsingular, $\widehat{\mathbf{M}}^{\,ij}$ is also symmetric.} %\footnote{See Remark \ref{rem:four} in Online Appendix \ref{sec:model-implications-notes}.} 
+After link reassignment, the target is removed from the intermediate system: its row and column are deleted from both the collaboration and the competition matrix.
+The $(n-1) \times (n-1)$-post-removal kernel $\widetilde{\mathbf{M}}^{\,ij}$
+over the surviving nodes has elements:\footnote{Note that the last term on the right hand side in Equation \eqref{eq:post-removal-weight-mna} is the firm-pair component of the intercentrality measure introduced by \citet{ballester06:_who_networ}. More specifically, the intercentrality of node $j$ in the intermediate network with adjacency matrix $\widehat{\mathbf{A}}^{\,ij}$ is given by $\sum_{\ell=1}^n \frac{\widehat m_{\ell j}^{\,ij}\widehat m_{j \ell}^{\,ij}}{\widehat m_{jj}^{\,ij}}$.
+The intercentrality measures the total reduction in aggregate equilibrium output when node $j$ is removed, assuming a unit productivity vector $\bm{\eta} = \mathbf{u}$. To see this, note that in the intermediate network with adjacency matrix $\widehat{\mathbf{A}}^{\,ij}$, the equilibrium output vector is $\widehat{\mathbf{y}}^{\,ij} = \widehat{\mathbf{M}}^{\,ij}\mathbf{u}$, with aggregate output
+$
+Y_{\text{total}}^{\text{inter}} = \mathbf{u}^\top \widehat{\mathbf{M}}^{\,ij}\mathbf{u} = \sum_{\ell=1}^n \sum_{k=1}^n \widehat{m}_{\ell k}^{\,ij}
+$.
+When node $j$ is removed, the aggregate output in the post-removal network is
+$
+Y_{\text{total}}^{\text{post}} = \sum_{\ell \neq j} \sum_{k \neq j} \widetilde{m}_{\ell k}^{\,ij}
+$.
+Using Equation (\ref{eq:post-removal-weight-mna}) together with $\widetilde m_{\ell j}^{\,ij} = \widetilde m_{j k}^{\,ij} = 0$, the change in aggregate output is
+$
+\Delta Y = \sum_{\ell=1}^n \sum_{k=1}^n \frac{\widehat{m}_{\ell j}^{\,ij} \widehat{m}_{j k}^{\,ij}}{\widehat{m}_{jj}^{\,ij}} = \frac{1}{\widehat{m}_{jj}^{\,ij}} \left( \sum_{\ell=1}^n \widehat{m}_{\ell j}^{\,ij} \right) \left( \sum_{k=1}^n \widehat{m}_{j k}^{\,ij} \right)
+$.
+Because the kernel is symmetric, $\widehat{m}_{\ell j}^{\,ij} = \widehat{m}_{j \ell}^{\,ij}$, and
+$
+\Delta Y = \frac{1}{\widehat{m}_{jj}^{\,ij}} \left( \sum_{\ell=1}^n \widehat{m}_{j \ell}^{\,ij} \right)^2
+$,
+which is equivalent to the intercentrality of node $j$ defined above.} %\footnote{See Remark \ref{rem:five} in Online Appendix \ref{sec:model-implications-notes}.} 
+\begin{equation}
+\widetilde m_{r\ell}^{\,ij}
+=
+\widehat m_{r\ell}^{\,ij}
+-
+\frac{
+\widehat m_{rj}^{\,ij}\widehat m_{j\ell}^{\,ij}
+}{
+\widehat m_{jj}^{\,ij}
+},
+\qquad r,\ell \neq j,
+\label{eq:post-removal-weight-mna}
+\end{equation}
+while $\widetilde m_{r j}^{\,ij} = \widetilde m_{j \ell}^{\,ij} = 0$, so that sums over all $n$ indices below are well defined. The distinction between $\widehat{\mathbf{M}}^{\,ij}$ and
+$\widetilde{\mathbf{M}}^{\,ij}$ is important: the correction term in Equation \eqref{eq:post-removal-weight-mna} is applied to the
+intermediate kernel $\widehat{\mathbf{M}}^{\,ij}$, not to the post-removal kernel. If firm $i$ acquires firm $j$, the post-acquisition output
+of the merged firm applies these post-removal propagation weights to the
+post-acquisition productivity vector $\bm{\eta}^{ac,ij}$, which assigns the combined knowledge stocks to the acquirer's node (cf. Equation \eqref{eq:prod-mna-alt}) and, in the intermediate step, retains the target's pre-merger productivity in the target's slot. Under the take-it-or-leave-it bargaining protocol, the acquisition price equals the target's outside option in the pre-transaction network,
+$
+\frac{\xi}{2}y_{j}^2
+=
+\frac{\xi}{2}
+\left(
+\mathbf{e}_j^{\top}\mathbf{M} \bm{\eta}
+\right)^2.
+$
+Hence the net profit of firm $i$ from acquiring firm $j$ is
+\begin{align}
+\Pi_{ij}^{\text{M\&A}}
+& =
+\frac{\xi}{2}
+\left(
+\sum_{\ell=1}^n
+\widetilde m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}
+\right)^2
+-
+\frac{\xi}{2}
+y_j^2
+-
+\nu_{ij} \notag \\
+& = \frac{\xi}{2}
+\left(
+\widehat y_i^{\,ij}
+-
+\frac{
+\widehat m_{ij}^{\,ij}
+}{
+\widehat m_{jj}^{\,ij}
+}
+\widehat y_j^{\,ij}
+\right)^2
+-
+\frac{\xi}{2}
+\left(
+\mathbf{e}_j^{\top}\mathbf{M}\bm{\eta}
+\right)^2
+-
+\nu_{ij},
+\label{eq:mna-form-profit}
+\end{align}
+where $\widehat y_{i}^{\,ij} = \sum_{\ell=1}^n \widehat m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}$ and $y_j=\mathbf{e}_j^{\top}\mathbf{M}\bm{\eta}$.%\footnote{\label{foot:etaj-cancel}Note that the coefficient of the target-slot productivity $\eta_j^{ac,ij}$ in the merged firm's output is $\widetilde m_{ij}^{\,ij} = \widehat m_{ij}^{\,ij} - \widehat m_{ij}^{\,ij}\widehat m_{jj}^{\,ij}/\widehat m_{jj}^{\,ij} = 0$: the value assigned to the target's slot in the intermediate step is immaterial for the final payoff, as it must be, since the target does not exist in the post-removal network and its knowledge has already been transferred to the acquirer through $\bm{\eta}^{ac,ij}$. 
+
+Since $\widehat{\mathbf{A}}^{\,ij}$ is entrywise non-negative and
+$\phi\,\widehat{\mathbf{A}}^{\,ij}$ has spectral radius below one, the Neumann
+series
+$\widehat{\mathbf{H}}^{\,ij}=\sum_{s\ge 0}\phi^s(\widehat{\mathbf{A}}^{\,ij})^s$
+converges and is entrywise non-negative with unit diagonal dominated from
+below, so that
+$\widehat c_k^{\,ij}=\sum_{\ell}\widehat h_{k\ell}^{\,ij}\ge \widehat
+h_{kk}^{\,ij}\ge 1$ for every $k$. Hence
+$\sum_k \widehat c_k^{\,ij}\ge n$ and
+$\widehat\kappa
+=\lambda/\big(1+\lambda\big(\sum_k \widehat c_k^{\,ij}-1\big)\big)
+\le \lambda/\big(1+\lambda(n-1)\big)<1$.
+
+As shown in Equation (\ref{eq:single-market-elements}), under a single product market, the elements of the intermediate kernel can be written as
+\begin{equation}
+\widehat m_{k \ell}^{\,ij} = \frac{1}{1-\lambda} \left( \widehat h_{k \ell}^{\,ij} - \widehat\kappa \widehat c_k^{\,ij} \widehat c_\ell^{\,ij} \right),
+\label{eq:single-market-elements-hat}
+\end{equation}
+where
+$
+\widehat{\mathbf{H}}^{\,ij} = (\mathbf{I}_n-\phi\widehat{\mathbf{A}}^{\,ij})^{-1}$, $\widehat c_k^{\,ij} = \mathbf{e}_k^\top\widehat{\mathbf{H}}^{\,ij}\mathbf{u}$, and $\widehat\kappa = \lambda/(1+\lambda(\sum_k \widehat c_k^{\,ij}-1))$ is the corresponding product-market dampening factor.
+
+By Equation \eqref{eq:single-market-elements-hat} this implies %(using Step 2
+below) 
+$\widehat m_{jj}^{\,ij}=(1-\widehat\kappa)/(1-\lambda)>0$, so the Schur
+correction in Equation \eqref{eq:post-removal-weight-mna} is well defined.
+%\emph{Step 2 (Isolation of the target).}
+In the transfer representation, row and column $j$ of
+$\widehat{\mathbf{A}}^{\,ij}$ are zero, so every power
+$(\widehat{\mathbf{A}}^{\,ij})^s$, $s\ge 1$, has zero $j$-th row and column.
+The Neumann series then yields
+\begin{equation*}
+\widehat h_{j\ell}^{\,ij}=\widehat h_{\ell j}^{\,ij}=0
+\quad\text{for all } \ell \neq j,
+\qquad
+\widehat h_{jj}^{\,ij}=1,
+\qquad\text{and hence}\qquad
+\widehat c_j^{\,ij}=\sum_{\ell=1}^n \widehat h_{j\ell}^{\,ij}=1.
+\end{equation*}
+Substituting these values into Equation
+\eqref{eq:single-market-elements-hat} gives
+\begin{equation*}
+\widehat m_{ij}^{\,ij}
+=
+\frac{1}{1-\lambda}
+\left(
+\widehat h_{ij}^{\,ij}-\widehat\kappa\,\widehat c_i^{\,ij}\widehat c_j^{\,ij}
+\right)
+=
+-\frac{\widehat\kappa}{1-\lambda}\,\widehat c_i^{\,ij},
+\qquad
+\widehat m_{jj}^{\,ij}
+=
+\frac{1}{1-\lambda}
+\left(
+1-\widehat\kappa
+\right),
+\end{equation*}
+so that the Schur ratio in Equation \eqref{eq:mna-form-profit} simplifies to
+\begin{equation}
+\frac{\widehat m_{ij}^{\,ij}}{\widehat m_{jj}^{\,ij}}
+=
+-\frac{\widehat\kappa}{1-\widehat\kappa}\,\widehat c_i^{\,ij}.
+\label{eq:schur-ratio-single-market}
+\end{equation}
+%\emph{Step 3 (Intermediate output of the target).}
+Using Equation \eqref{eq:single-market-elements-hat} together with
+$\widehat h_{j\ell}^{\,ij}=0$ for $\ell\neq j$,
+$\widehat h_{jj}^{\,ij}=1$, and $\widehat c_j^{\,ij}=1$, the target's
+intermediate output is
+\begin{equation}
+\widehat y_j^{\,ij}
+=
+\sum_{\ell=1}^n \widehat m_{j\ell}^{\,ij}\,\eta_\ell^{ac,ij}
+=
+\frac{1}{1-\lambda}
+\left(
+(1-\widehat\kappa)\,\eta_j^{ac,ij}
+-
+\widehat\kappa
+\sum_{\ell \neq j}
+\widehat c_\ell^{\,ij}\,\eta_\ell^{ac,ij}
+\right).
+\label{eq:yhat-j-single-market}
+\end{equation}
+The analogous computation for the acquirer,
+$\widehat y_i^{\,ij}=\sum_{\ell=1}^n \widehat m_{i\ell}^{\,ij}\,
+\eta_\ell^{ac,ij}$, yields Equation \eqref{eq:yhat-i-single-market}.
+%\emph{Step 4 (Substitution).}
+Inserting the Schur ratio \eqref{eq:schur-ratio-single-market} into the squared
+term of Equation \eqref{eq:mna-form-profit} gives
+\begin{equation*}
+\widehat y_i^{\,ij}
+-
+\frac{\widehat m_{ij}^{\,ij}}{\widehat m_{jj}^{\,ij}}\,
+\widehat y_j^{\,ij}
+=
+\widehat y_i^{\,ij}
++
+\frac{\widehat\kappa}{1-\widehat\kappa}\,
+\widehat c_i^{\,ij}\,
+\widehat y_j^{\,ij},
+\end{equation*}
+and substituting Equation \eqref{eq:yhat-j-single-market} for
+$\widehat y_j^{\,ij}$ delivers the bracketed term in Equation
+\eqref{eq:mna-profit-simplified-inserted}. Since the acquisition price
+$\frac{\xi}{2}y_j^2$ and the transaction cost $\nu_{ij}$ are unaffected by
+the change of representation, Equation
+\eqref{eq:mna-profit-simplified-inserted} follows. 
+\hfill$\blacksquare$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Proof of Proposition \ref{prop:threshold}}
+%\label{app:proof-threshold}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%When the bilateral collaboration link $(i,j)$ is added to the inherited network $G_{t-1}$, as illustrated in Figure \ref{fig:rnd_collaboration}, the collaboration profit for firm $i$ is given by:\footnote{See Appendix \ref{sec:profit-rnd} for further details.}
+%\begin{equation}
+%\Pi_{ij}^{\text{R\&D}}
+%=
+%\frac{\xi}{2}
+%\left(y_{i}^{+ij}\right)^2
+%-
+%\zeta_{ij},
+%\label{eq:rnd-coll-profit-main}
+%\end{equation}
+%where the post-collaboration output $y_{i}^{+ij}$ of firm $i$ from the new R\&D collaboration $(i,j)$ is given by:${}^{\ref{foot:rem-two}}$ %\footnote{See Remark \ref{rem:two} in Online Appendix \ref{sec:model-implications-notes}.}
+%\begin{equation}
+%y_{i}^{+ij} = \frac{(1-\rho m_{ij})y_{i} + \rho m_{ii}y_{j}}{(1-\rho m_{ij})^2-\rho^2 m_{ii}m_{jj}}.
+%\label{eq:post-link-output-i}
+%\end{equation}
+%By Equations (\ref{eq:mna-form-profit}) and (\ref{eq:rnd-coll-profit-main}),
+%\begin{equation*}
+%\Pi_{ijt}^{\text{M\&A}} - \Pi_{ijt}^{\text{R\&D}}
+%= \frac{\xi}{2}\bigl( y_{it}^{ac,ij} \bigr)^2 - \frac{\xi}{2}\, y_{jt}^2 - \nu_{ij,t} - \frac{\xi}{2}\bigl( y_{it}^{+ij} \bigr)^2 + \zeta_{ij,t}.
+%\end{equation*}
+%Nonnegativity of the left-hand side, multiplied by $2/\xi > 0$ and rearranged, is Equation \eqref{eq:rnd-mna-comp}. \hfill$\blacksquare$

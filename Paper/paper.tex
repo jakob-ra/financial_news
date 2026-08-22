@@ -1,0 +1,2132 @@
+\documentclass[12pt]{article}
+\usepackage{amssymb,amsfonts,amsmath,amsthm,amscd,dsfont,mathrsfs}
+\usepackage{bm,amsmath,bbm,amsfonts,nicefrac,latexsym,amsmath,amsfonts,amsbsy,amscd,amsxtra,amsgen,amsopn,bbm,amsthm,amssymb,physics,algorithm,paralist, algcompatible,tikz,tikz-cd,adjustbox}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+%\newcounter{bibcount}
+\usepackage{cancel}
+%\usepackage{mathptmx}
+\usepackage{adjustbox}	
+\usepackage{subcaption}
+\usepackage{color}
+\usepackage{url}
+\usepackage{thmtools}
+\usepackage{thm-restate}
+\usepackage{appendix}
+\usepackage{csquotes}
+\usepackage{blindtext}
+%\usepackage{har2nat}
+\usepackage{booktabs}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{caption} 
+\captionsetup{labelsep=period}	
+%\usepackage{float,lscape}
+\usepackage{float,pdflscape}
+\usepackage{framed}
+\usepackage{mdframed}
+\usepackage{adjustbox}
+\usepackage{graphicx,float,epsfig,color}
+\usepackage[colorlinks]{hyperref}
+\usepackage{rotating}
+\hypersetup{
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,         % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black           % color of external links
+}
+\usepackage{pstricks,pstricks-add}
+%\usepackage{pst-node,pst-plot,pst-coil,pst-tree}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{multicol}
+\usepackage{multirow}
+%\usepackage{framed}
+\usepackage{sectsty}
+\usepackage{bm}
+\usepackage{etex}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{float}
+\setcounter{MaxMatrixCols}{10}
+%\reserveinserts{28}
+\usepackage{caption}
+\usepackage{chngcntr}
+\usepackage{mathtools}
+\usepackage{placeins}
+\usepackage{setspace}
+%\usepackage{egameps}
+%\usepackage[symbol]{footmisc}
+\usepackage{tcolorbox}
+
+\usepackage{longtable}   % for tables that can break across pages
+\usepackage{booktabs}    % \toprule … \bottomrule
+\usepackage{pdflscape}   % landscape pages
+\usepackage{adjustbox}
+\usepackage{arydshln}    % dashed lines (\hdashline)
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+\footnotesep 14pt
+\floatsep 27pt plus 2pt minus 4pt      % Nominal is double what is in art12.sty
+\textfloatsep 40pt plus 2pt minus 4pt
+\intextsep 27pt plus 4pt minus 4pt
+
+% Somewhat wider and taller page than in art12.sty
+\topmargin -0.2in
+\headsep 0.15in
+\textheight 8.5in
+\oddsidemargin -0.07in
+\evensidemargin -0.07in
+\textwidth 6.6in
+
+\newtheorem{claim}{Claim}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[claim]{Proposition}
+\newtheorem{corollary}[claim]{Corollary}
+\newtheorem{definition}[claim]{Definition}
+\newtheorem{note}{Note}
+\newtheorem{remark}{Remark}
+\newtheorem{conjecture}{Conjecture}
+
+%%%%%%%%%%%% BEGIN COLOR DEFINITIONS
+%\definecolor{Red}{rgb}{1,0,0}
+\definecolor{Blue}{rgb}{0,0,1}
+%\definecolor{Olive}{rgb}{0.41,0.55,0.13}
+\definecolor{Green}{rgb}{0,1,0}
+%\definecolor{MGreen}{rgb}{0,0.8,0}
+%\definecolor{DGreen}{rgb}{0,0.55,0}
+%\definecolor{Yellow}{rgb}{1,1,0}
+%\definecolor{Cyan}{rgb}{0,1,1}
+%\definecolor{Magenta}{rgb}{1,0,1}
+%\definecolor{Orange}{rgb}{1,.5,0}
+%\definecolor{Violet}{rgb}{.5,0,.5}
+%\definecolor{Purple}{rgb}{.75,0,.25}
+%\definecolor{Brown}{rgb}{.75,.5,.25}
+%\definecolor{Grey}{rgb}{.5,.5,.5}
+%\definecolor{Pink}{rgb}{1,0,1}
+%\definecolor{DBrown}{rgb}{.5,.34,.16}
+\definecolor{Black}{rgb}{0,0,0}
+%\def\red{\color{Red}}
+\def\blue{\color{Blue}}
+%\def\olive{\color{Olive}}
+\def\green{\color{Green}}
+%\def\mgreen{\color{MGreen}}
+%\def\dgreen{\color{DGreen}}
+%\def\yellow{\color{Yellow}}
+%\def\cyan{\color{Cyan}}
+%\def\magenta{\color{Magenta}}
+%\def\orange{\color{Orange}}
+%\def\violet{\color{Violet}}
+%\def\purple{\color{Purple}}
+%\def\brown{\color{Brown}}
+%\def\grey{\color{Grey}}
+%\def\doubt{\color{Pink}}
+%\def\dbrown{\color{DBrown}}
+\def\black{\color{Black}}
+
+\long\def\mquestion#1{{\red #1}}
+\long\def\tocheck#1{{\blue #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Bibliography 
+\usepackage{setspace}
+\usepackage[authoryear,round]{natbib}%\usepackage[authoryear,sort&compress,sectionbib]{natbib}
+\let\oldthebibliography=\thebibliography
+  \let\endoldthebibliography=\endthebibliography
+  \renewenvironment{thebibliography}[1]{%
+    \begin{oldthebibliography}{#1}%
+      \setlength{\parskip}{0ex}%
+      \setlength{\itemsep}{0ex}%
+}%
+{%
+\end{oldthebibliography}%
+}
+
+%% Table of contents for supplementary appendix
+\usepackage{scrwfile}
+%\TOCclone[\contentsname~(\appendixname)]{toc}{atoc}
+\TOCclone[\contentsname]{toc}{atoc}
+\newcommand\StartAppendixEntries{}
+\AfterTOCHead[toc]{%
+  \renewcommand\StartAppendixEntries{\value{tocdepth}=-10000\relax}%
+}
+\AfterTOCHead[atoc]{%
+  \edef\maintocdepth{\the\value{tocdepth}}%
+  \value{tocdepth}=-10000\relax%
+  \renewcommand\StartAppendixEntries{\value{tocdepth}=\maintocdepth\relax}%
+}
+\newcommand*\appendixwithtoc{%
+  %\cleardoublepage
+  %\appendix
+  \addtocontents{toc}{\protect\StartAppendixEntries}
+  \listofatoc
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{titlepage}
+\title{\textbf{Collaborate and$/$or Consolidate? A Network Analysis of R\&D Alliances and M\&A}}
+\author{Chih-Sheng Hsieh, Michael D. K{\"o}nig, Gordon M. Phillips, and Jakob Rauch\thanks{Hsieh: National Taiwan University. Email: cshsieh@ntu.edu.tw, K{\"o}nig:  CEPR, ETH-KOF, Tinbergen Institute and Department of Spatial Economics, Vrije Universiteit. Email: m.d.konig@vu.nl. Phillips: Tuck School of Business, Dartmouth College and NBER. Email: Gordon.M.Phillips@tuck.dartmouth.edu, Rauch: Vrije Universiteit. Email: j.m.rauch@vu.nl. We thank seminar participants at Cambridge University, CEPR, ESSEC Paris, FOM Seminar Series, the 13th Oligo Workshop, University of Miami, and the University of Washington Seattle for their helpful comments.  
+Copyright \copyright 2026.  All rights reserved.}}
+\thispagestyle{empty}
+\renewcommand{\baselinestretch}{1}
+\maketitle
+\begin{abstract} 
+We analyze firm decisions to enter into R\&D collaborations as an alternative to purchasing firms through M\&A.   We analyze these endogenous decisions using a novel dataset of R\&D collaborations between firms constructed using text mining over 1.5 million candidate news articles and using a RoBERTa-based transformer model to classify collaborations.  The comprehensiveness of our data allows us to document differences in R\&D collaboration activities across firm characteristics, industries, countries, or regions and how these differences change over time. We estimate a structural model capturing the joint endogeneity of both R\&D collaborations and M\&A activities to identify technology spillovers and market competition effects in firm performance. Our results indicate that the changing pattern in technology spillovers is due to firms substituting R\&D collaborations with M\&As on the governance-choice margin, a shift reinforced by the complementarity between accumulated alliance capital and merger surplus, emphasizing the close connection between R\&D collaborations and M\&A activities.
+\end{abstract}
+\vspace{0.1cm}
+\noindent \textbf{Keywords}: Joint ventures, mergers, acquisitions, R\&D  networks, concentration \\
+\noindent \textbf{JEL Codes:} L11, G34, G32, L25, L26
+
+\bigskip
+\setcounter{page}{0}
+\setcounter{section}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\pagebreak \newpage
+
+\doublespacing
+
+\thispagestyle{empty}
+
+%\clearpage
+\newpage
+\setcounter{page}{1}
+
+%\tableofcontents
+%\clearpage
+
+\renewcommand{\baselinestretch}{2} 
+\begin{spacing}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Inter-firm collaborations take a large variety of forms, such as co-marketing, co-production, or joint product development. They have been shown to have a key role in the diffusion of knowledge and technology and have attracted attention from economists, policy researchers, and strategic analysts. Understanding the role of collaboration on firm performance is a critical challenge that has been complicated by the lack of comprehensive data on existing collaborations.
+
+To solve this problem, we propose an NLP text-mining algorithm for R\&D alliance extraction. We apply this algorithm to over 1.5 million candidate news articles (e.g., those mentioning specific firms or industries of interest) and combine with text data from firm 10-Ks and websites. It automatically detects mentions of collaborative agreements and extracts the names of the participants. It also classifies the agreement as either a Joint Venture or Strategic Alliance, detects whether the agreement is completed/signed or just planned, and flags the agreement according to purpose, e.g. manufacturing, marketing, licensing, and/or R\&D. 
+
+To capitalize on the comprehensiveness of our extracted data, we develop a structural R\&D network formation model in which firms experience positive externalities from technology spillovers in R\&D collaborations and negative externalities from market competition. Our approach uniquely incorporates M\&As into the model, capturing the joint endogeneity of both R\&D collaborations and M\&A activities - a novel feature that has not been explored in the existing literature.
+
+We estimate the structural model with the above-mentioned R\&D collaboration data from news articles, combined with the text-based network industry classification (TNIC) developed by \citet{hoberg2016}, and information on M\&A activities from the Thomson SDC database. Our estimates show that the technology spillover effect is positive and significant across all sample periods from 2000 to 2020 and all specifications but exhibits a cyclical pattern over time. We further observe an upward bias correction for the technology spillover effect after controlling for R\&D network formation and the endogeneity of M\&As, likely due to unobserved firm-specific effects influencing jointly output, R\&D collaborations and M\&As. Furthermore, product similarity, past collaborations, or shared partners decrease R\&D collaboration costs. 
+
+We find that market concentration increases M\&A costs, likely due to antitrust regulations, while technological similarity and a higher patent stock of the acquirer reduce M\&A costs. Similarly, past R\&D collaborations and shared R\&D collaboration partners further decrease M\&A costs. The significance of the cost-reducing effects of prior R\&D collaborations on M\&As,\footnote{Two notions are involved and kept distinct throughout: the governance modes are substitutes on the ex-ante choice margin, one is always chosen instead of the other, while alliance capital is a complement to merger surplus in the payoff structure, since prior collaborations reduce acquisition costs and add to the target's transferable network value (Section~\ref{sec:model-implications}).} and the bias in the estimated spillover effects, emphasize the importance of jointly controlling for R\&D collaborations and M\&As when estimating technology spillover effects. Moreover, our results suggest that firms substitute R\&D collaborations with M\&As, emphasizing the close and previously underexplored connection between R\&D collaborations and M\&A activities and their impact on technology spillover dynamics. %We are extending the model to allow for mergers to also benefit firms by reducing duplicative R\&D costs and by allowing firms to reduce ex post holdup costs as in \cite{williamson1998institutions} through integrating.  
+
+\paragraph{Related literature.} An extensive literature has documented that knowledge spillovers are important for firm performance and productivity \citep[][]{audretsch2020role, ugur2020we}. This is particularly relevant for  spillovers created through R\&D collaborations \citep[][]{ahuja00:_collab, powell1999network, allenphillips2000, Baum2010, rosenkopf08:_inves_micros_of_networ_evolut}. 
+For example, \citet[][]{belderbos2004cooperative} provide evidence for a positive effect on firm performance (measured by sales growth or productivity improvements) through R\&D collaborations with various types of partners (such as competitors, suppliers, customers, and universities and research institutes). 
+\citet{kumar2022much} find that 11\% of the variance in firm profitability is explained by the network of a firm's alliances. 
+%\citet{goerzen2007alliance} shows that firms often enter into repeated R\&D collaborations with prior partners, and that there exists a negative effect of repeated partnerships on firm performance particularly in environments of greater technological uncertainty. 
+%\citet{watson2007modeling} documents a significant positive relationship between ``networking'' of SMEs (defined as the ability of getting access to external knowledge) and both firm survival and firm growth. 
+\citet{Gulati2010} study the macro dynamics of R\&D networks and document an evolutionary pattern where an increase in the small-worldliness (high clustering and small average path length between nodes) of the network is followed by its later decline. This indicates the importance of accounting for time-varying coefficients for measuring the positive and negative externalities in R\&D networks as we do here. Complementarily, there exists a large literature studying the formation of networks such as \citet[][]{powell05:_networ_dynam_field_evolut}, \citet[][]{liben2003link}, \citet{goyal03:_networ_collab_oligop, goyal01:_r_d_networ}, \citet[][]{Fafchamps2010} and \citet{petrakis2018effect}. In this paper we combine the above mentioned separate strands of the literature by analyzing the two-way influence of the formation of R\&D collaborations on firm performance and the effect of firm performance on the formation of R\&D collaborations \citep[cf.][]{koza1998co}, and how these have changed over time with the evolution of technologies and markets \citep[cf.][]{Lucking2019}. 
+
+Innovation dynamics have significantly changed in recent years \citep{bloom2020ideas}, raising the question of whether technology spillovers have experienced similar shifts. \citet{Lucking2019} study US firms over three decades and find no evidence of changes in spillovers, but their analysis is based on a restricted sample of publicly listed companies using patent data, and does not focus on spillovers within R\&D collaborations as we do. Previous studies, such as \citet{Bloom2013} and \citet{Lucking2019}, measure spillovers through patent portfolio similarities, which may be less precise than R\&D collaborations that are typically formed to facilitate technology spillovers. While \citet{Konig2018} and \citet{Hsieh2019,Hsieh2021} analyze R\&D spillovers, they do not estimate temporal variation or coevolution between R\&D investment and alliance formation. In contrast, we analyze a novel and comprehensive R\&D collaboration dataset, allowing for more accurate measurement of spillover variations and the intensity of competition between R\&D firms, as well as changes in competition over time \citep{hoberg2016,hoberg2022scope}.
+
+Moreover, an extensive body of literature examined the welfare effects of M\&As when accounting for technology spillovers. \citet{grossman1986costs} argue that when a firm acquires its supplier, removing the supplier's manager's residual rights of control, the manager's incentives may be distorted to the point where common ownership becomes detrimental to firm performance. In contrast, \citet{lopez2019overlapping} suggest that overlapping ownership can enhance welfare and consumer surplus, provided the technology spillovers are sufficiently large. \citet{cunningham2021killer} highlights the risk that incumbent firms may acquire innovative targets with the sole intention of discontinuing the target’s innovation projects, thus preempting future competition. Meanwhile, \citet{anton2024innovation} propose that the impact of common ownership on innovation is nuanced: it weakens when product market overlap is high but strengthens when technological proximity increases. We contribute to this literature by jointly modeling technology spillovers in R\&D collaborations and M\&A formation, and find that M\&A deals lead to lower firm output. In comparison, the formation of R\&D alliances results in higher firm output.
+
+The paper is organized as follows. The structural model is introduced in Section \ref{sec:model}. The R\&D and M\&A data are described in Section \ref{sec:data}. The estimation algorithm is explained in Section \ref{sec:estimation-algorithm}. Section \ref{sec:results} presents the results from estimating the model and Section \ref{sec:counterfactual} discusses various counterfactuals and discusses policy implications. Finally, Section \ref{sec:conclusion} concludes. The microfoundation for the profit function considered in the paper and the proofs of the propositions can be found in the Appendix. Additional relevant results including a more detailed description on how the data set has been created (and how the text mining algorithms have been implemented) can be found in the Online Appendix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model}
+\label{sec:model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In Section \ref{sec:model-profits} we introduce the static environment of the firm. In Section \ref{sec:dyn-rnd} we generalize this to a dynamic panel context modeling the formation of R\&D collaborations. In Section \ref{sec:dyn-rnd-mna} we extend this framework to  account for the formation of M\&As. Appendix \ref{app:notation}  (Table~\ref{tab:notation-main}) provides a summary of the notation used in the following sections and the corresponding appendices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Profits from R\&D Collaborations}
+\label{sec:model-profits}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Consider a set $\mathcal{N}=\{1,\dots,n\}$ of firms and a collaboration network $G \in \mathcal{G}^n$, where $\mathcal{G}^n$ denotes the set of all graphs/networks with $n$ nodes. Let the firms' output levels be given by $\mathbf{y} = (y_1,\ldots,y_n)^{\top} \in \mathcal{Y}^n$. Firm $i \in \mathcal{N}$ sets its output $y_i \in \mathcal{Y}$ and earns a profit $\pi_i \colon \mathcal{Y}^n \times \mathcal{G}^n \to \mathbb{R}$ given by the following linear-quadratic function:\footnote{A more detailed micro-foundation for the profit function in Equation (\ref{eq:profit-simplified}) derived from a Cournot or, alternatively, a Bertrand competition model with cost-reducing R\&D collaborations building on the seminal model by \citet{goyal01:_r_d_networ} can be found in Appendix \ref{sec:cournot}. Moreover, note that the Cournot competition model can also be interpreted as a model of quantity pre-commitment followed by price competition \citep[cf.][]{kreps1983quantity}.}
+\begin{equation}
+\pi_i =
+\xi \left( \eta_i y_i - \frac{1}{2} y_i^2
+- \lambda y_i \sum_{j \ne i}^n b_{ij} y_j
++ \rho y_i \sum_{j=1}^n a_{ij} y_j \right)
+- \sum_{j=1}^n a_{ij}\zeta_{ij}.
+\label{eq:profit-simplified}
+\end{equation}
+The indicator variables $a_{ij} \in \{0,1\}$ in Equation (\ref{eq:profit-simplified}) indicate whether firms $i$ and $j$ are collaborating (or not), and can be represented by the symmetric adjacency matrix $\mathbf{A}=(a_{ij})_{1\le i,j \le n}$ (with a zero diagonal, $a_{ii}=0$). Equation (\ref{eq:profit-simplified}) is similar to the linear-quadratic profit/payoff function analyzed in \citet{Konig2018}, \citet{Hsieh2021} and \citet{ballester06:_who_networ}. This function is characterized by an own concavity term ($\eta_i y_i - \frac{1}{2} y_i^2$) reflecting decreasing returns in expanding a firm's output level, with $\eta_i$ capturing firm heterogeneity in productivity, a global substitutability term ($\lambda y_i \sum_{j \ne i}^n b_{ij} y_j$) reflecting market stealing effects from competition, where $b_{ij} \in \{0,1\}$ is an indicator variable for whether firms $i$ and $j$ are competitors (or not) which can be represented by the symmetric competition matrix $\mathbf{B}=(b_{ij})_{1\le i,j \le n}$, and a local complementarity term ($\rho y_i \sum_{j=1}^n a_{ij} y_j$) reflecting technology spillover effects from R\&D collaborations,\footnote{Such R\&D collaborations often involve competing firms. An illustrative example is the strategic alliance between \emph{Pfizer} and \emph{Bayer}, both operating in the pharmaceutical sector (with primary standard industry classification
+code 2834) developing treatments for obesity, type 2 diabetes and other
+related disorders.} capturing the fact that R\&D is correlated with firm size \citep{cohen96:_firm_size_and_natur_of, cohen96:_repris_of_size_and_r_d}. $\xi$ is a non-negative scaling parameter to balance the measurement (scale) of output ($y$) and linking cost ($\zeta$). %To ensure $\xi>0$, we reparameterize it by $\xi=\exp(\delta)$.
+
+The first order condition of Equation (\ref{eq:profit-simplified}) with respect to output $y_i$ is given by
+\begin{equation}
+\frac{\partial \pi_i}{\partial y_i} =
+\xi\left( \eta_i - y_i
+- \lambda \sum_{j \ne i}^n b_{ij} y_j
++ \rho \sum_{j=1}^n a_{ij} y_j \right) =0,
+\label{eq:profit-foc}
+\end{equation}
+from which we obtain the best response function
+\begin{equation}
+y_i =
+\hspace{-0.2cm}
+\underbrace{\phantom{qq} \eta_i \phantom{qq}}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{productivity} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}
+}  
+\hspace{-0.2cm}
+- 
+\underbrace{ \lambda \sum_{j \ne i}^n b_{ij} y_j}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{competition} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}
+}
+\hspace{-0.2cm}
++ 
+\hspace{0.25cm}
+\underbrace{ \rho \sum_{j=1}^n a_{ij} y_j.}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{spillover} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}}
+\label{eq:output-br}
+\end{equation}
+A firm's output (measured by $y_i$) is thus increasing with a firm's productivity ($\eta_i$), decreasing due to a market competition effect ($\lambda \sum_{j \ne i}^n b_{ij} y_j$), and increasing due to an R\&D spillover effect ($\rho \sum_{j=1}^n a_{ij} y_j$). %This highlights the positive externalities from technology spillovers in R\&D collaborations and negative externalities from market competition \citep[cf.][]{Bloom2013,Konig2018}. 
+Inserting the best response function from Equation (\ref{eq:output-br}) into the profit function in Equation (\ref{eq:profit-simplified}) gives
+\begin{align}
+\pi_i & = 
+%x_i \left(
+%\eta_i - \frac{1}{2} y_i
+%- \lambda \sum_{j \ne i}^n y_j
+%+ \rho \sum_{j=1}^n a_{ij} y_j
+%\right) - \sum_{j=1}^n a_{ij}\zeta_{ij} \notag \\
+%& = y_i \left(\frac{1}{2} y_i + 
+%\eta_i - y_i
+%- \lambda \sum_{j \ne i}^n y_j
+%+ \rho \sum_{j=1}^n a_{ij} y_j
+%\right) - \sum_{j=1}^n a_{ij}\zeta_{ij}  \notag \\
+%& = 
+\frac{\xi}{2} y_i^2 - \sum_{j=1}^n a_{ij} \zeta_{ij}.
+\label{eq:profit-eq}
+\end{align}
+Hence, firms' profits ($\pi_i$) net of linking costs are an increasing (quadratic) function of output ($y_i$). Moreover, from Equation (\ref{eq:output-br}) we find that%\footnote{When the matrix $(\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})$ is invertible then $\mathbf{x}  = (\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})^{-1} \bm{\eta}$.} 
+\begin{align}
+\mathbf{y}  
+ & = \bm{\eta} - \lambda \mathbf{B} \mathbf{y} + \rho \mathbf{A} \mathbf{y} \notag \\
+ & = (\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})^{-1} \bm{\eta} \label{eq:bonacich} \\
+ & = \bm{\eta}  - \lambda \mathbf{B} \bm{\eta}  + \rho \mathbf{A}\bm{\eta} + O(\lambda^2) + O(\rho^2) + O(\lambda \rho), \notag
+\end{align}
+where we assume that the matrix $\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A}$ is invertible \citep[cf.][]{horn90:_matrix_analy}. For the output of firm $i$ this implies that
+\begin{equation}
+y_i =
+\hspace{-0.2cm}
+\underbrace{\phantom{qq} \eta_i \phantom{qq}}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{own} \\
+\vspace{-0.35cm} \small \text{productivity} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}
+}  
+\hspace{-0.2cm}
+- 
+\underbrace{\lambda \sum_{j \ne i}^n b_{ij} \eta_j}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{direct} \\
+\vspace{-0.35cm} \small \text{competition} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}
+}
+\hspace{-0.2cm}
++ 
+\hspace{0.25cm}
+\underbrace{\rho \sum_{j=1}^n a_{ij} \eta_j}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{direct} \\
+\vspace{-0.35cm} \small \text{spillover} \\
+\vspace{-0.35cm} \small \text{effect}
+\end{array}
+}
+\hspace{0.25cm}
++ 
+\hspace{0.1cm}
+\text{higher order effects.}
+\label{eq:output-prod-first-order}
+\end{equation}
+This shows that firm output ($y_i$) is, up to first order effects, increasing with firm productivity ($\eta_i$), decreasing with competitor's productivities ($\sum_{j=1}^n b_{ij} \eta_j$), and increasing with collaborators' productivities ($\sum_{j=1}^n a_{ij} \eta_j$). This illustrates the positive and negative externalities affecting firm performance (measured by firm size) in R\&D networks \citep[cf. e.g.][]{Bloom2013, Konig2018}.\footnote{A more detailed discussion of how to compute the Nash equilibrium for any given network structure can be found in Online Appendix \ref{sec:equilib-comp}.}
+
+Social welfare, $W(\mathbf{y})$, is given by the sum of consumer surplus, $U(\mathbf{y})$, and producer surplus, $\Pi(\mathbf{y})$. Consumer surplus is given by $U(\mathbf{y}) = \frac{\psi}{2} \sum_{i=1}^n y_i^2 + \frac{\lambda}{2} \sum_{i=1}^n \sum_{j \neq i}^n b_{ij} y_i y_j$ with $\psi>\lambda>0$ %to ensure concavity 
+\citep{Singh1984,vives1999oligopoly}.\footnote{The assumption of $\psi>\lambda>0$ ensures concavity of the consumer's utility function. Moreover, the assumption of $\lambda>0$ ensures that products are (imperfect) substitutes. The higher $\lambda$, the more alike products are and the more intense is competition. 
+See Appendix \ref{sec:cournot} for further details and explanation.} %; net of the constant endowment $E$.} 
+Producer surplus is given by firms' aggregate profits $\Pi(\mathbf{y}) = \sum_{i=1}^n \pi_i(\mathbf{y})$, with profits given by Eq. (\ref{eq:profit-eq}). The Herfindahl-Hirschman industry (HHI) concentration index is defined as $H_k(\mathbf{y}) = \sum_{i \in \mathcal{M}_k} s_i^2(\mathbf{y})$, where the market share of firm $i$ in market $\mathcal{M}_k$ is given by $s_i(\mathbf{y}) = \frac{y_i}{\sum_{j \in \mathcal{M}_k}^n y_j}$ \citep[cf. e.g.][]{tirole88:_theor_indus_orgniz, Hirschman1964}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{R\&D Network Formation}
+\label{sec:dyn-rnd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We assume that, in each time period $t=1,\ldots,T$, firms undergo a two-stage process \citep{hsieh2020specification}:
+\begin{itemize}
+\item In the first stage, each pair of firms independently determines whether to 
+\begin{itemize}
+\item[(i)] establish an R\&D collaboration,  
+\item[(ii)] or to remain idle, 
+\end{itemize}
+depending on which yields higher expected profits in the second stage, irrespective of the choices made by other pairs. 
+\item In the second stage, each firm takes the R\&D collaboration network formed in the first stage as given and chooses output to maximize  profits by interacting with other firms non-cooperatively. 
+\end{itemize}
+Between the two stages, firms have complete information, i.e., they know the productivities (characteristics) of all other firms and which R\&D collaboration links are formed in the first  stage. We also assume that firms are not myopic in the sense that they will take the potential benefit of interactions in the second stage into account when forming links in the first stage.
+
+\paragraph{First stage.} In the following we consider the first stage of the process where the network $G_t$ is formed. We take into account various network externalities that affect the formation of R\&D collaborations in the pairwise linking costs, $\zeta_{ij}$ in Equation (\ref{eq:profit-simplified}), between firms \citep[cf.][]{powell05:_networ_dynam_field_evolut, gulati07:_manag_networ_resour, Gulati2010}. For example, \citet[][]{liben2003link} show that  two nodes  and are more likely to form a link if they have a large overlap in their characteristics. %; this follows the natural intuition that such node pairs represent authors with many colleagues in common, and hence are more likely to come into contact themselves. 
+We incorporate this in terms of observable characteristics (geographical, spatial and technological) and unobservable characteristics (``latent variables''). Moreover, \citet[][]{Fafchamps2010} show that a new collaboration emerges faster among two nodes if they are ``closer'' (in terms of network distance) in the existing network. We incorporate this feature by network dependent variables affecting the formation of collaborations or mergers via a reduction of the linking cost if nodes have a common neighbor in the past. More specifically, we assume that\footnote{Note that it is straightforward to introduce higher order network dependencies in Equation (\ref{eq:link-cost}) as in \citet[][]{Fafchamps2010}.}${}^{,}$\footnote{For the remainder of the paper we normalize the scaling factor $\xi$ in the profit function (\ref{eq:profit-eq}) to one, which is equivalent to expressing the R\&D collaboration cost $\zeta_{ij,t}$ (and similarly the M\&A cost in (\ref{eq:mna-cost}) in Section \ref{sec:dyn-rnd-mna} below) relative to $\xi$.}
+\begin{equation}
+\zeta_{ij,t}
+= 
+\underbrace{
+\phantom{\sum_k} \hspace{-0.5cm}
+\gamma_0
++ \mathbf{c}_{ij,t} \gamma_1
++
+\gamma_2 |y_{i,t-1}-y_{j,t-1}|
++
+\gamma_3 |y_{i,t-1}-y_{j,t-1}|^2
+}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{R\&D network} \\
+\vspace{-0.35cm} \small \text{independent}
+\end{array}
+}
+\underbrace{
++
+\gamma_4 a_{ij,t-1}
++
+\gamma_5 \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}
+}_{
+\begin{array}{c}
+\vspace{-0.35cm} \small \text{R\&D network} \\
+\vspace{-0.35cm} \small \text{dependent}
+\end{array}
+}.
+\label{eq:link-cost}
+\end{equation}
+We further distinguish between network-dependent and network-independent explanatory variables to examine the explanatory power of network variables over and above knowledge of firm characteristics only \citep{Ductor2011}. More specifically, the $r$-dimensional (row) vector of dyad-specific variables, $\mathbf{c}_{ij,t}$, in Equation (\ref{eq:link-cost}) captures the similarity between firms $i$ and $j$ regarding observable characteristics such as sector, location, productivity, etc., that might affect the collaboration costs \citep[see, e.g.,][]{Lychagin2010}. We include $|y_{i,t-1}-y_{j,t-1}|$ and its square to capture the potential nonlinear homophily (heterophily) effect from past R\&D efforts. %We also include the distance of individual latent (unobservable) variables $|z_{i,t}-z_{j,t}|$ in Equation (\ref{eq:link-cost}) to capture unobserved homophily/heterophily \citep{han2021spatial}. 
+%More specifically, as the latent variable $z_i$ is positively associated with a firm's productivity 
+%when $\kappa > 0$ in Equation (\ref{eq:productivity-func-empirics}),
+%subtracting $z_i$ and $z_j$ from $\mathbf{y}_{ij} \bm{\gamma}$ 
+%in Equation (\ref{eq:marginal-cost-func-empirics}) implies that 
+%more productive firms have lower costs to form R\&D collaborations 
+%and are more likely to collaborate with each other.
+The term $a_{ij,t-1}$ in Equation (\ref{eq:link-cost}) captures the effect of repeated collaborations of firms $i$ and $j$ \citep[][]{Fafchamps2010,goerzen2007alliance}. Further, the term $ \sum_{k=1}^n a_{jk,t-1} a_{ik,t-1}$ captures the effect of common collaborators of firms $i$ and $j$ in the past (clustering or cyclic triangle effect),\footnote{See also \citet[][]{hanaki10:_dynam_of_r_d_networ}, \citet[][]{Mele2010} and \citet[][]{Fafchamps2010}.} and $\gamma_0$ is a constant.
+
+The profit of firm $i$ from forming an R\&D collaboration with firm $j$ at time $t$, given the network $G_{t-1}$ at time $t-1$, is given by
+\begin{align*}
+\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) & = \frac{\xi}{2} y_i(G_{t-1},a_{ij,t}=1)^2 - \zeta_{ij,t},
+\end{align*}
+where, using Equation (\ref{eq:bonacich}), we have denoted $\mathbf{y}(G) = (\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})^{-1} \bm{\eta}$, and the collaboration cost $\zeta_{ij,t}$ is given by Equation (\ref{eq:link-cost}). The profit for firm $i$ from remaining idle is 
+\begin{align*}
+\Pi_{it}^{\text{ID}}(G_{t-1})  =  \frac{\xi}{2} y_i(G_{t-1})^2.
+\end{align*}
+The probability that $i$ wants to collaborate with $j$ is given by
+\begin{align}
+\mathbb{P}(i \xrightarrow{co} j|G_{t-1},\mathbf{y}_{t-1},\gamma)
+& =
+\mathbb{P}\left(
+\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+\varepsilon^{\text{R\&D}}_{ij,t}
+> 
+\Pi_{it}^{\text{ID}}(G_{t-1}) +
+\varepsilon^{\text{ID}}_{i,t}
+\right)   \notag \\
+& =
+\frac{e^{\Pi_{ijt}^{\text{R\&D}}(G_{t-1})}}{e^{\Pi_{ijt}^{\text{R\&D}}(G_{t-1})}
++
+e^{\Pi_{it}^{\text{ID}}(G_{t-1})}
+}.
+\label{eq:rnd-collab}
+\end{align}
+We assume that a collaboration between $i$ and $j$ requires mutual consent \citep[cf. e.g.][]{hanaki10:_dynam_of_r_d_networ}. The conditional likelihood taking into account the collaboration decisions of all pairs of firms at time $t$ is then given by
+\begin{align}
+\mathbb{P}(G_t | G_{t-1},\mathbf{y}_{t-1},\gamma) 
+% & = 
+% \prod_{i=1}^n \prod_{j \neq i}^n 
+% \mathbb{P}(\text{$i$ wants to collaborate with $j$})^{a_{ij,t}} \notag \\
+% & \times
+% [1-\mathbb{P}(\text{$i$ wants to collaborate with $j$})
+% \mathbb{P}(\text{$j$ wants to collaborate with $i$})
+% ]^{(1-a_{ij,t})/2} \notag \\
+& = 
+\prod_{i=1}^n \prod_{j=i+1}^n 
+[
+\mathbb{P}(i \xrightarrow{co} j|G_{t-1},\mathbf{y}_{t-1},\gamma)
+\mathbb{P}(j \xrightarrow{co} i|G_{t-1},\mathbf{y}_{t-1},\gamma)
+]^{a_{ij,t}} \notag \\
+& \times
+[1-\mathbb{P}(i \xrightarrow{co} j|G_{t-1},\mathbf{y}_{t-1},\gamma)
+\mathbb{P}(j \xrightarrow{co} i|G_{t-1},\mathbf{y}_{t-1},\gamma)
+]^{1-a_{ij,t}},
+\label{eq:logistic-rnd}
+\end{align}
+with the probability that $i$ wants to collaborate with $j$ given by Equation (\ref{eq:rnd-collab}). An R\&D collaboration is observed whenever it is beneficial to both parties involved, and not if it is detrimental to at least one of them. This corresponds to the ``double-hurdle'' model discussed, for example, in \citet{Paula2020} and the ``partially observable'' model introduced by \citet{Poirier1980}. \citet{Comola2012} analyzes partial observability in network formation games. Partial observability occurs when a positive
+outcome for one response variable is only observed if the other response variable is also
+positive. 
+% In our context, when $a_{ij,t}=1$ we know that $i$ wants to collaborate with $j$ and $j$ wants to collaborate with $i$, which happens when $\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{ijt}
+% > 
+% \Pi_{it}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{i,t}$ and $\Pi_{jit}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{jit}
+% > 
+% \Pi_{jt}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{j,t}$. Viceversa, when $a_{ij,t}=0$ we cannot distinguish between the three following cases: (i) $i$ does not want to collaborate with $j$ but $j$ wants to collaborate with $i$, which happens when $\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{ijt}
+% < 
+% \Pi_{it}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{i,t}$ and $\Pi_{jit}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{jit}
+% > 
+% \Pi_{jt}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{j,t}$. (ii) $i$ wants to collaborate with $j$ but $j$ does not want to collaborate with $i$, which happens when $\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{ijt}
+% >
+% \Pi_{it}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{it}$ and $\Pi_{jit}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{jit}
+% < 
+% \Pi_{jt}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{jt}$. (iii) Both, $i$ and $j$ do not want to collaborate with each other, which happens when $\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{ijt}
+% <
+% \Pi_{it}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{it}$ and $\Pi_{jit}^{\text{R\&D}}(G_{t-1}) +
+% \varepsilon^{\text{R\&D}}_{jit}
+% < 
+% \Pi_{jt}^{\text{ID}}(G_{t-1}) +
+% \varepsilon^{\text{ID}}_{jt}$.
+
+\paragraph{Second stage.} We next consider the second stage of the process where firms choose their output levels. After the network $G_{t}$ is formed, each firm $i$ takes $G_{t}$, $G_{t-1}$ and $\mathbf{y}_{t-1}$ as given, and chooses $y_{i,t}$ to maximize profits in Equation (\ref{eq:profit-simplified}). Recall that profits in Equation (\ref{eq:profit-simplified}) depend on firms' productivities ($\bm{\eta}_t$). Here we assume that a firm $i$'s productivity, $\eta_{it}$, evolves according to:%\footnote{See also the stochastic productivity growth models discussed in \citet[][]{Olley1996,Levinsohn2003,Peters2017}.% and the R\&D capital stock introduced in \citet[][]{Hall2000,Hall2010} that is computed using a perpetual inventory method based on the firms' past R\&D expenditures discounted with a given depreciation rate \citep[see also][]{Bloom2013, Konig2018}.
+%}
+\begin{equation}
+\eta_{it} = 
+x_{i,t-1} \beta
++
+\mu_i
++
+\tau_t
++
+v_{it}.
+\label{eq:prod-dyn}
+\end{equation}
+In Equation (\ref{eq:prod-dyn}),  
+$x_{i,t-1}$ is the lagged R\&D capital stock of firm $i$. We construct the R\&D capital stock using the perpetual inventory method with a depreciation rate of 15\% \citep[cf.][]{Hall2000,Hall2010,Bloom2013}. This means that the law of motion of the R\&D capital stock $x_{it}$ is given by 
+\begin{equation}
+x_{it} = R_{it} + (1-\delta) x_{i,t-1},
+\label{eq:rnd-accumulation}
+\end{equation}
+where $R_{it}$ is the R\&D investment of firm $i$ at time $t$ and $\delta = 0.15$. Moreover, $\mu_i$ in Equation (\ref{eq:prod-dyn}) is time-invariant firm-specific effect, $\tau_t$ is time-specific effect, and $v_{it}$ is an i.i.d. (across firms and time) error term.
+
+%\citep[cf.][]{Peters2017}:\footnote{See also the stochastic productivity growth models discussed in \citet[][]{Olley1996}, \citet[][]{Levinsohn2003}, and the R\&D
+%capital stock introduced in \citet[][]{Hall2000,Hall2010} that is computed using a perpetual inventory method based on the
+%firms' past R\&D expenditures discounted with a given depreciation rate \citep[see also][]{Bloom2013, Konig2018}.}
+%\begin{equation}
+%\eta_{it} = z_{it}
+%+
+%\nu y_{i,t-1} 
+%+ 
+%\omega \sum_{j=1}^{n} a_{ij,t-1} y_{j,t-1}
+%+
+%\mathbf{w}_{it} \bm{\mu}
+%+
+%v_{it}.
+%\label{eq:prod-dyn}
+%\end{equation}
+%In Equation (\ref{eq:prod-dyn}) past own R\&D investment, $y_{i,t-1}$, as well as past collaborators' R\&D investments, $\sum_{j=1}^{n} a_{ij,t-1}$ $ y_{j,t-1}$, impact current productivity, $\eta_{it}$.\footnote{Note that it is possible to extend Equation (\ref{eq:prod-dyn}) to allow for higher order time lags as in \citet[][]{Ductor2011} such that 
+%$
+%\eta_{it} = z_{it}
+%+
+% \sum_{s=1}^{t} \nu_s y_{i,s-1} 
+%+ 
+% \sum_{s=1}^{t} \omega_s \sum_{j=1}^{n} a_{ij,s-1} y_{j,s-1}
+%+
+%\mathbf{w}_{it} \bm{\mu}
+%+
+%v_{it}
+%$} Moreover, $\mathbf{w}_{it}$ is a vector of observable characteristics, the latent variable $z_{it}$ captures unobservable firm characteristics, and $v_{it}$ is an i.i.d. (across firms and time) error term. 
+
+From Equation (\ref{eq:output-br}), it then follows that a firm $i$'s best response function is given by
+$$
+y_{it}
+=
+\rho \sum_{j=1}^{n} a_{ij,t} y_{jt} 
+-
+\lambda \sum_{j=1}^{n} b_{ij,t} y_{jt} 
++ 
+x_{it} \beta
++
+\mu_i
++
+\tau_t
++
+v_{it}.
+$$
+In vector-matrix notation, this can be written as
+\begin{equation}
+\mathbf{y}_{t} = \rho \mathbf{A}_t \mathbf{y}_{t} - \lambda \mathbf{B}_t \mathbf{y}_{t} +  \mathbf{x}_{t}\beta  + \mu + \tau_t\ell + \mathbf{v}_{t},
+\label{eq:equilbrium_output}
+\end{equation}
+where $\ell$ is a vector of ones. 
+In the following, we denote by
+$$
+\mathbf{S}_t = \mathbf{I}_n - \rho \mathbf{A}_t + \lambda \mathbf{B}_t.
+$$
+If the inverse $\mathbf{S}_t^{-1}$ exists \citep[see e.g.][for sufficient conditions]{Konig2018}, we can write the reduced form as
+\begin{equation}
+\mathbf{y}_{t} = \mathbf{S}_t^{-1} (\mathbf{x}_{t} \beta + \mu + \tau_t\ell + \mathbf{v}_{t}).
+\label{eq:q-reduced}
+\end{equation}
+Assume that $\mathbf{v}_{t} \sim \mathcal{N}(\bm{0},  \sigma_v^2 \mathbf{I}_n)$. Then, $\mathbf{y}_{t}$ is an affine transformation of a multivariate normal distribution
+$
+\mathbf{y}_{t} \sim 
+\mathcal{N}(\mathbf{S}_t^{-1} (\mathbf{x}_{t} \beta + \mu + \tau_t\ell), \sigma_v^2 \mathbf{S}_t^{-2}).
+$
+The conditional likelihood of the effort levels $\mathbf{y}_{t}$ at time $t$ is thus given by
+\begin{align*}
+% & 
+\mathbb{P}(\mathbf{y}_t | G_{t-1},\mathbf{x}_t,\theta,\beta,\mu,\tau_t,\sigma^2_v) =
+(2 \pi  \sigma_v^2)^{-\frac{n}{2}} 
+|\mathbf{S}_t| 
+\exp \left(
+-\frac{1}{2 \sigma_v^2}
+\mathbf{v}_{t}^\top  
+\mathbf{v}_{t}
+\right),
+\end{align*}
+where 
+from Equation (\ref{eq:q-reduced}) we have that
+$
+\mathbf{v}_{t} =
+\mathbf{S}_t\mathbf{y}_t - \mathbf{x}_{t} \beta - \mu - \tau_t\ell
+$, and $\theta=(\rho,\lambda)$. 
+
+\paragraph{Joint likelihood.} We next construct the full likelihood of the model taking into account both, the formation of the network as well as the endogenous output choices. Assume the initial period $\mathbf{y}_0$ and $G_0$ are exogenously given. We denote unknown parameters by $\Theta=(\theta,\beta,\gamma,\mu,\tau,\sigma^2_v)$, the joint likelihood function of $\{G_t\}$ and $\{\mathbf{y}_t\}$ can be decomposed as follows:
+\begin{align}
+\mathbb{P}(\{\mathbf{y}_t\}, \{G_t\}|\{\mathbf{y}_{t-1}\}, \{G_{t-1}\},\Theta)
+&=
+\prod_{t=1}^T
+\mathbb{P}(\mathbf{y}_t | G_{t},\Theta)
+\mathbb{P}(G_t | G_{t-1}, \mathbf{y}_{t-1},\Theta) \notag \\
+&= 
+\prod_{t=1}^T
+|\mathbf{S}_t(G_t)|f(\mathbf{v}_t|G_t,\Theta)
+\mathbb{P}(G_t | G_{t-1}, \mathbf{y}_{t-1},\Theta) \notag \\
+% &=
+% \prod_{t=1}^T
+% |\mathbf{S}_t(G_t)|\mathbb{P}(\mathbf{v}_t,G_t|\mathbf{y}_{t-1},G_{t-1},\mathbf{z}_t,\Theta)
+% \notag \\
+% &=
+% \prod_{t=1}^T
+% |\mathbf{S}_t(G_t)|f(\mathbf{v}_t|\mathbf{y}_{t-1},G_{t-1},\mathbf{z}_t,\Theta)
+% \mathbb{P}(G_t|\mathbf{v}_t,G_{t-1},\mathbf{y}_{t-1},\Theta)
+\label{eq:joint_likelihood} 
+\end{align}
+where $\mathbf{S}_t(G_t)= \mathbf{I}_n  - \rho \mathbf{A}_t + \lambda \mathbf{B}_{t}$ and $\mathbf{v}_t=
+\mathbf{S}_t\mathbf{y}_t- \mathbf{x}_{t} \beta - \mu - \tau_t \ell$, and 
+$\mathbb{P}(G_t | G_{t-1},\mathbf{y}_{t-1},\Theta)$ is given   
+by Equation~(\ref{eq:logistic-rnd}).
+%then the joint likelihood function of $\{\mathbf{y}_t\}_{t=1}^T$ and $\{G_t\}_{t=1}^T$, is given by
+% $$
+% \mathbb{P}(\{\mathbf{y}_t\}, \{G_t\}| \{\mathbf{z}_t\})
+% =
+% \prod_{t=1}^T
+% \mathbb{P}(\mathbf{y}_t | G_{t-1},\mathbf{y}_{t-1},\mathbf{z}_t)
+% \mathbb{P}(G_t | G_{t-1}, \mathbf{y}_{t-1},\mathbf{z}_t).
+% $$
+% Integrating over the latent variables $\{\mathbf{z}_t\}$ yields the unconditional likelihood given by
+% \begin{equation}
+% \mathbb{P}(\{\mathbf{y}_t\}, \{G_t\})
+% =
+% \int
+% \mathbb{P}(\{\mathbf{y}_t\}, \{G_t\}| \{\mathbf{z}_t\}) d \mathbf{z}_t.
+% \label{eq:likelihood}
+% \end{equation}
+%The parameters can then be estimated via maximum likelihood as in the dynamic spatial panel regression model introduced in \citet{han2021spatial}. %In Appendix \ref{sec:foresighted} we discuss an extension of the model with foresighted firms. 
+Finally, note that we can test for time-varying spillover effects/externalities by incorporating time-varying coefficients, $\{\rho_t\}$ and $\{\lambda_t\}$, in the likelihood function of Equation (\ref{eq:joint_likelihood}) \citep[cf.][]{Gulati2010,Lucking2019}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{R\&D Network and M\&A Formation}
+\label{sec:dyn-rnd-mna}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We extend the previous model by introducing M\&As in the first stage of the model. In particular, similar to the previous section, we assume that in each time period $t=1,\ldots,T$ firms undergo a two-stage process \citep{phillips2013r,hsieh2020specification}:
+\begin{itemize}
+\item In the first stage, each pair of firms independently determines whether to form 
+\begin{itemize}
+\item[(i)] an R\&D collaboration, 
+\item[(ii)] a merger or 
+\item[(iii)] to remain idle, 
+\end{itemize}
+depending on which yields higher expected profits in the second stage, irrespective of the choices made by other pairs. 
+\item In the second stage, each firm takes the R\&D collaboration network and mergers formed in the first stage as given and chooses output to maximize profits by interacting with other firms non-cooperatively. 
+\end{itemize}
+%Between the two stages, firms have complete information, i.e., they know the productivities (characteristics) of all other firms and which R\&D collaboration links and mergers are formed in the first  stage. We also assume that firms are not myopic in the sense that they will take the potential benefit of interactions in the second stage into account when forming links in the first stage.
+
+\paragraph{First stage.} Firm profits from the formation of R\&D collaborations are identical to the previous section. For the profits from M\&As we assume that a merger between firms $i$ and $j$ creates a single firm $k$, i.e., a single node in the network \citep{phillips2013r,Bimpikis2019}. %We only allow for horizontal mergers between firms operating in the same market. 
+Firm $k$ inherits all the collaborations of firms $i$ and $j$ in the case of a merger. We assume that the cost for firm $i$ to merge firm $j$ is given by
+\begin{equation}
+\nu_{ij,t}
+= 
+\phantom{\sum_k} \hspace{-0.5cm}
+\kappa_0
++ 
+\mathbf{c}_{ij,t} \kappa_1
++
+\kappa_2 (y_{i,t-1}-y_{j,t-1})
++
+\kappa_3 (y_{i,t-1}-y_{j,t-1})^2
++
+\kappa_{4} a_{ij,t-1}
++
+\kappa_{5} \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}.
+\label{eq:mna-cost}
+\end{equation}
+Note that the existence of a collaboration between $i$ and $j$ in the past (indicated by $a_{ij,s}=1$ for $s=1,\ldots,t-1$) reduces the cost of a merger in Equation (\ref{eq:mna-cost}). After the merger, we assume that post-merger knowledge stock is given by the sum of the acquirer and target firms' knowledge stocks:
+\begin{align}
+x_{kt}  
+&= 
+x_{it} + x_{jt}, 
+\label{eq:prod-mna-alt}
+\end{align}
+where $i$ acquires $j$ and becomes $k$, and $x_{i,t}$ and $x_{j,t}$ are the pre-merger knowledge stocks. The productivity of the merged firm then follows from Equation (\ref{eq:prod-dyn}) with Equation (\ref{eq:prod-mna-alt}) as input and the knowledge stock of the merged firm in subsequent time periods evolves according to Equation (\ref{eq:rnd-accumulation}) with Equation (\ref{eq:prod-mna-alt}) as initialization.
+
+Moreover, we assume that firm $i$ proposes a merger to firm $j$ by making a take-it-or-leave-it (``TIOLI'') offer. The TIOLI bargaining protocol follows \citet{igami2020mergers} and implies that the acquisition price equals the target firm $j$'s outside option (i.e. staying independent). The profit of firm $i$ from acquiring firm $j$ forming firm $k$ at time $t$, given the network $G_{t-1}$ at time $t-1$, is given by
+\begin{align}
+\Pi_{ijt}^{\text{M\&A}}(G_{t-1})  =  \frac{\xi}{2} y_k(G_{t-1},\text{$i$ acquires $j$})^2 - \frac{\xi}{2} y_j(G_{t-1})^2 - \nu_{ij,t},
+\label{eq:profit-mna}
+\end{align}
+where, using Equation (\ref{eq:bonacich}), we have $\mathbf{y}(G) = (\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})^{-1} \bm{\eta}$, and the acquisition cost $\nu_{ij,t}$ is given by Equation (\ref{eq:mna-cost}). 
+\begin{figure}[tbp]
+\begin{center}
+\psscalebox{1.0 1.0}
+{
+\begin{pspicture}(0,-6.22)(8.14,1.78)
+\pscircle[linecolor=black, linewidth=0.04, dimen=outer](3.02,1.64){0.14}
+\pscircle[linecolor=black, linewidth=0.04, dimen=outer](0.14,-1.64){0.14}
+\pscircle[linecolor=black, linewidth=0.04, dimen=outer](5.58,-1.6){0.14}
+\pscircle[linecolor=black, linewidth=0.04, dimen=outer](2.84,-5.48){0.14}
+\pscircle[linecolor=black, linewidth=0.04, dimen=outer](8.0,-5.42){0.14}
+\psline[linecolor=black, linewidth=0.04](2.95,1.56)(0.22,-1.56)
+\psline[linecolor=black, linewidth=0.04](3.08,1.56)(5.48,-1.46)
+\psline[linecolor=black, linewidth=0.04](5.46,-1.7)(2.94,-5.36)
+\psline[linecolor=black, linewidth=0.04](5.68,-1.7)(7.94,-5.26)
+\rput[bl](-0.5,0.36){$i$ acquires $j$} %\rput[bl](-0.5,0.36){$i \xrightarrow{ac} j$} 
+\rput[bl](4.5,0.28){$i$ does not acquire $j$} %\rput[bl](4.5,0.28){$i \xcancel{\xrightarrow{ac}} j$} 
+\rput[bl](-0.5,-3.5){$i$ wants to collab. with $j$}
+\rput[bl](7.24,-3.5){$i$ does not want to collab. with $j$}
+\rput[bl](-1.5,-2.5){$\Pi_{ijt}^{\text{M\&A}}(G_{t-1})+
+\varepsilon^{\text{M\&A}}_{ij,t}$}
+\rput[bl](1.15,-6.3){$\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) +
+\varepsilon^{\text{R\&D}}_{ij,t}$}
+\rput[bl](6.75,-6.3){$\Pi_{it}^{\text{ID}}(G_{t-1})+
+\varepsilon^{\text{ID}}_{i,t}$}
+\end{pspicture}
+}
+\end{center}
+\caption{\label{fig:decision-tree} Decision tree of firm $i$ collaborating with or acquiring firm $j$.  In the 2nd stage, firms make output decisions, which takes into account the current network ($G_{t-1}$).}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\begin{threeparttable}
+\caption{\label{tab:outcomes-seq} Interaction outcomes for the sequential
+game illustrated in Figure \ref{fig:decision-tree}: decision paths and their outcomes. The acquisition
+decisions are taken first and treated as independent; the collaboration
+decision, which requires mutual consent, is reached only if neither firm
+acquires. A dash ($-$) denotes a decision not reached on the path.}
+\begin{tabular}{@{} c c c c l c @{}}
+\toprule
+\multicolumn{2}{c}{Acquisition} & \multicolumn{2}{c}{Collaboration} &
+\multirow{2}{*}{Outcome description} & \multirow{2}{*}{Indicator} \\
+\cmidrule(r){1-2} \cmidrule(r){3-4}
+$i \xrightarrow{\mathrm{ac}} j$ & $j \xrightarrow{\mathrm{ac}} i$ &
+$i \xrightarrow{\mathrm{co}} j$ & $j \xrightarrow{\mathrm{co}} i$ &  &  \\
+\midrule
+yes & no  & $-$ & $-$ & $i$ acquires $j$           & $m_{ij,t}=1$ \\
+no  & yes & $-$ & $-$ & $j$ acquires $i$           & $m_{ji,t}=1$ \\
+yes & yes & $-$ & $-$ & contest for control, breakdown   & \textit{idle} \\
+no  & no  & yes & yes & R\&D collaboration        & $a_{ij,t}=1$ \\
+no  & no  & yes & no  & no mutual consent         & \textit{idle} \\
+no  & no  & no  & yes & no mutual consent         & \textit{idle} \\
+no  & no  & no  & no  & mutual inaction           & \textit{idle} \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+
+When firm $i$ decides about collaborating, merging or remaining idle, we assume that the corresponding profits $\Pi_{ijt}^{\text{R\&D}}(G_{t-1})$, $\Pi_{ijt}^{\text{M\&A}}(G_{t-1})$ and $\Pi_{it}^{\text{ID}}(G_{t-1})$ experience additive shocks,  $\varepsilon^{\text{R\&D}}_{ij,t}$, $\varepsilon^{\text{M\&A}}_{ij,t}$ and $\varepsilon^{\text{ID}}_{i,t}$, which are identically and independently type I extreme value distributed \citep[][]{McFADDEN1974,train2009discrete}. These shocks are observed by the firm but not by the econometrician. Given these shocks, firm $i$ decides whether it wants to acquire firm $j$. If firm $i$ does not want to acquire firm $j$, it can form an R\&D collaboration with firm $j$. This is illustrated in the decision tree in Figure \ref{fig:decision-tree}.\footnote{In Online Appendix~\ref{app:equivalence} we show the equivalence between a simultaneous and a sequential setup for the M\&A and R\&D collaboration decisions.} Conditional on not wanting to acquire firm $j$ (corresponding to the lower level in the decision tree in Figure \ref{fig:decision-tree}), the probability that $i$ wants to collaborate with $j$ is given %by Equation (\ref{eq:rnd-collab}): 
+\begin{align}
+\mathbb{P}(i \xrightarrow{co} j|G_{t-1},\mathbf{y}_{t-1},\gamma) & = 
+\mathbb{P}\left(
+\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) + \varepsilon^{\text{R\&D}}_{ij,t} 
+>
+\Pi_{it}^{\text{ID}}(G_{t-1})+
+\varepsilon^{\text{ID}}_{i,t}
+\right) 
+\notag \\
+& = \frac{\exp\left(\Pi^{\rm R\&D}_{ij,t}(G_{t-1})\right)}{\exp\left(\Pi^{\rm R\&D}_{ij,t}(G_{t-1})\right)+\exp\left(\Pi^{\rm ID}_{it}(G_{t-1})\right)}.
+\label{eq:i-co-j}
+\end{align}
+Further, the probability that firm $i$ acquires firm $j$ (corresponding to the upper level in the decision tree in Figure \ref{fig:decision-tree}) is given by
+\begin{align}
+& \mathbb{P}(i \xrightarrow{ac} j|G_{t-1},\mathbf{y}_{t-1},\kappa) \notag \\
+& = 
+\mathbb{P}\left(
+\left\{
+\Pi_{ijt}^{\text{M\&A}}(G_{t-1}) + \varepsilon^{\text{M\&A}}_{ij,t}
+>
+\Pi_{ijt}^{\text{R\&D}}(G_{t-1}) + \varepsilon^{\text{R\&D}}_{ij,t}
+\right\}
+\text{and} 
+\left\{
+\Pi_{ijt}^{\text{M\&A}}(G_{t-1}) + \varepsilon^{\text{M\&A}}_{ij,t}
+>
+\Pi_{it}^{\text{ID}}(G_{t-1}) + \varepsilon^{\text{ID}}_{it}
+\right\}
+\right) 
+\notag \\
+& 
+=
+\frac{\exp\left(\Pi^{\rm M\&A}_{ij,t}(G_{t-1})\right)}{\exp\left(\Pi^{\rm M\&A}_{ij,t}(G_{t-1})\right)+\exp\left(\Pi^{\rm R\&D}_{ij,t}(G_{t-1})\right)+\exp\left(\Pi^{\rm ID}_{it}(G_{t-1})\right)}.
+\label{eq:i-ac-j}
+\end{align}
+Denoting by $p^{\mathrm{ac}}_{ij,t}$ the acquisition probability of
+Equation~(\ref{eq:i-ac-j}) and $q_{ij,t}$ the conditional collaboration probability of Equation~(\ref{eq:i-co-j}) we then can write
+\begin{align}
+\mathbb{P}(m_{ij,t}=1)
+  &= p^{\mathrm{ac}}_{ij,t}\bigl(1-p^{\mathrm{ac}}_{ji,t}\bigr), \; \mathbb{P}(m_{ji,t}=1)
+  = p^{\mathrm{ac}}_{ji,t}\bigl(1-p^{\mathrm{ac}}_{ij,t}\bigr),\,
+  \label{eq:pair-merger}\\[2pt]
+\mathbb{P}(a_{ij,t}=1)
+  &= \bigl(1-p^{\mathrm{ac}}_{ij,t}\bigr)\bigl(1-p^{\mathrm{ac}}_{ji,t}\bigr),\,
+     q_{ij,t}\,q_{ji,t},
+  \label{eq:pair-collab}\\[2pt]
+\mathbb{P}(\mathrm{idle}_{ij,t})
+  &= \bigl(1-p^{\mathrm{ac}}_{ij,t}\bigr)\bigl(1-p^{\mathrm{ac}}_{ji,t}\bigr)
+     \bigl(1-q_{ij,t}\,q_{ji,t}\bigr)
+     \;+\; p^{\mathrm{ac}}_{ij,t}\,p^{\mathrm{ac}}_{ji,t},
+  \label{eq:pair-idle}
+\end{align}
+where the last term of \eqref{eq:pair-idle} is the mass of the control-contest (both firms announce an acquisition simultaneously) that ends in breakdown (cf. Table \ref{tab:outcomes-seq}). The likelihood of the network $G_t$, conditional on $G_{t-1}$, $\mathbf{y}_{t-1}$, and parameters $\gamma=(\gamma_0,\gamma_1',\gamma_2,\gamma_3,\gamma_4,\gamma_5)$ and $\kappa=(\kappa_0,\kappa_1',\kappa_2,\kappa_3,\kappa_4,\kappa_5)$, 
+can then be written as follows
+\begin{align}
+\mathbb{P}\bigl(G_t, M_t \mid G_{t-1}, \mathbf{y}_{t-1}, \gamma, \kappa\bigr)
+& =
+\prod_{i=1}^{n}\prod_{j=i+1}^{n}
+  \mathbb{P}(m_{ij,t}=1)^{\,m_{ij,t}}\,
+  \mathbb{P}(m_{ji,t}=1)^{\,m_{ji,t}} \notag \\
+  & \times \mathbb{P}(a_{ij,t}=1)^{\,a_{ij,t}}\,
+  \mathbb{P}(\mathrm{idle}_{ij,t})^{\,I^{0}_{ij,t}},
+\label{eq:mna-rnd-joint}
+\end{align}
+where $I^{0}_{ij,t} \equiv I(m_{ij,t}=m_{ji,t}=a_{ij,t}=0)$ indicates an
+idle pair. The four
+outcomes of each unordered pair ($i$ acquires $j$, $j$ acquires $i$,
+an R\&D collaboration, and idleness) are mutually exclusive and their
+probabilities sum to one,\footnote{Let $a=p^{\mathrm{ac}}_{ij,t}$, $b=p^{\mathrm{ac}}_{ji,t}$ and
+$Q=q_{ij,t}q_{ji,t}$. Then $\mathbb{P}(m_{ij,t}=1) + \mathbb{P}(m_{ji,t}=1) + \mathbb{P}(a_{ij,t}=1) + \mathbb{P}(a_{ij,t}=0) + \mathbb{P}(\text{contest for control, breakdown}) $ $= a(1-b) + b(1-a) + (1-a)(1-b)Q+(1-a)(1-b)(1-Q) + ab $ $= (a+b-2ab)+(1-a-b+ab)+ab=1$, 
+and the four events in \eqref{eq:pair-merger}--\eqref{eq:pair-idle} are therefore
+mutually exclusive and exhaustive on the unordered pair $\{i,j\}$.} so that \eqref{eq:mna-rnd-joint} is a proper
+likelihood; the mass $p^{\mathrm{ac}}_{ij,t}\,p^{\mathrm{ac}}_{ji,t}$ of
+the event that both firms announce an acquisition is assigned to
+idleness, consistent with the breakdown of the control contest
+(Table~\ref{tab:outcomes-seq}).
+
+%Note that Eq. (\ref{eq:mna-rnd-joint}) can be approximated by
+%\begin{align}
+%& \mathbb{P}(G_t,M_t|G_{t-1},\mathbf{y}_{t-1},\gamma,\kappa) \notag \\
+%& \approx  \prod_{i=1}^{n}\prod_{\substack{j=1\\ j\neq i}}^{n}
+%  p^{\mathrm{ac}\,I(m_{ij,t}=1)}_{ij,t}
+%  \bigl(1-p^{\mathrm{ac}}_{ij,t}\bigr)^{I(m_{ij,t}=0)}  \prod_{i=1}^{n}\prod_{\substack{j=i+1\\ m_{ij,t}=m_{ji,t}=0}}^{n}
+%  (q_{ij,t}q_{ji,t})^{I(a_{ij,t}=1)}
+%  \bigl(1-q_{ij,t}q_{ji,t}\bigr)^{I(a_{ij,t}=0)} \notag \\
+%& = \prod_{i=1}^n \prod_{j \neq i}^n 
+%\mathbb{P}(i \xrightarrow{ac} j|G_{t-1},\mathbf{y}_{t-1},\kappa)^{I(m_{ij,t}=1)} 
+% \left(1-\mathbb{P}(i \xrightarrow{ac} j|G_{t-1},\mathbf{y}_{t-1},\kappa) \right)^{I(m_{ij,t}=0)}  \notag \\
+%& \hspace{1cm} \times \prod_{i=1}^n \prod_{j=i+1,m_{ij,t}=m_{ji,t}=0}^n
+%\left( \mathbb{P}(i \xrightarrow{co} j |G_{t-1},\mathbf{y}_{t-1},\gamma)\mathbb{P}(j \xrightarrow{co} i |G_{t-1},\mathbf{y}_{t-1},\gamma) \right)^{I(a_{ij,t}=1)} \notag \\
+%& \hspace{1cm} \times \left(1- \mathbb{P}(i \xrightarrow{co} j |G_{t-1},\mathbf{y}_{t-1},\gamma)\mathbb{P}(j \xrightarrow{co} i |G_{t-1},\mathbf{y}_{t-1},\gamma) \right)^{I(a_{ij,t}=0)}.
+%\label{eq:mna-rnd-joint-comp}
+%\end{align}
+%The composite likelihood in (\ref{eq:mna-rnd-joint-comp}) treats the two directed acquisition margins as
+%independent; Online Appendix~\ref{app:equivalence} shows that (\ref{eq:mna-rnd-joint-comp}) differs from the
+%coherent specification in \eqref{eq:mna-rnd-joint} only by a term of order
+%$p^{\mathrm{ac}}_{ij,t}\, p^{\mathrm{ac}}_{ji,t}$ per pair (cf. Proposition~\ref{prop:app:composite} in Online Appendix~\ref{app:equivalence}), which is negligible in our sample. 
+
+The second stage is identical to the previous section, and the joint likelihood of $\mathbf{y}_t$, $G_t$, and $M_t$ for $t=1,\cdots,T$, with parameter vector $\Theta=(\theta,\beta,\gamma,\kappa,\mu,\tau,\sigma^2_v)$ is given by 
+\begin{align}
+\mathbb{P}(\{\mathbf{y}_t\}, \{G_t\}, \{M_t\}|\{\mathbf{y}_{t-1}\}, \{G_{t-1}\},\Theta)
+&=
+\prod_{t=1}^T
+\mathbb{P}(\mathbf{y}_t | G_{t},\Theta)
+\mathbb{P}(G_t, M_t | G_{t-1}, \mathbf{y}_{t-1},\Theta) \notag \\
+&= 
+\prod_{t=1}^T
+|\mathbf{S}_t(G_t)|f(\mathbf{v}_t|G_t,\Theta)
+\mathbb{P}(G_t, M_t | G_{t-1}, \mathbf{y}_{t-1},\Theta).  
+\label{eq:joint_likelihood_full} 
+\end{align}
+Following \citet{Myerson1977,Myerson1991} and the literature on network
+formation under mutual consent \citep{JacksonWolinsky1996}, we model the first
+stage as an announcement game. Each firm announces, toward each potential
+partner, the governance mode with the highest perturbed payoff, and the pair's
+outcome is determined by a consent protocol. An acquisition requires only the
+acquirer's initiative: under TIOLI pricing the target is compensated at its
+outside option, so it accepts and, being indifferent, has no defensive motive
+to distort its own announcement. A collaboration forms if and only if both
+firms announce it. If both announce an acquisition, the resulting contest for
+control ends in breakdown; this event is never observed in our data, and Online
+Appendix~\ref{app:equivalence} shows its probability is of second order in the
+pairwise acquisition probabilities.
+
+We treat this announcement rule as a primitive of the model, i.e. a
+revealed-preference restriction on the governance mode each firm
+desires.\footnote{The same interpretation of announcements is standard in the
+literature on partially observed link formation
+\citep{Poirier1980,Comola2012}.} Every announcement profile then maps into a
+unique outcome, so the incompleteness and multiplicity problems of simultaneous
+discrete games
+\citep{tamer2003incomplete,bresnahan1991empirical,depaula2013econometric} do not
+arise, and the announcement probabilities in
+Equations~(\ref{eq:i-co-j}) and~(\ref{eq:i-ac-j}) determine the likelihood in
+Equation~(\ref{eq:mna-rnd-joint}). In the second stage, firms choose outputs in
+Nash equilibrium taking the first-stage network as given.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{From Collaboration to Consolidation: Model implications}
+\label{sec:model-implications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In the following we analyze the choice between the two alternative governance modes for internalizing technological complementarities in our model. An R\&D collaboration adds a bilateral spillover link while preserving the two firms as separate nodes (cf. Figure \ref{fig:rnd_collaboration}). An acquisition, by contrast, integrates the target into the acquirer: the acquirer inherits the target's knowledge stock and R\&D collaborations, while the target ceases to exist as an independent node in the network (cf. Figure \ref{fig:mna_operations}). Throughout this subsection, all payoffs are evaluated at the inherited network $G_{t-1}$, and we drop time subscripts whenever this causes no confusion.
+
+\paragraph{Katz-Bonacich centrality.} To better understand the drivers of R\&D collaboration and M\&A profits, we first derive a simple representation of the equilibrium kernel $\mathbf{M} = (\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$ in terms of the Katz-Bonacich centrality \citep[cf.][]{Katz1953,ballester06:_who_networ} in the special case of a uniform productivity vector $\bm{\eta}=\eta \mathbf{u}$ and a single-product market.
+In the single-product-market case, every firm competes symmetrically with all others, such that the market substitution matrix $\mathbf{B} = \mathbf{u}\mathbf{u}^\top - \mathbf{I}_n$. Let $\phi = \rho / (1-\lambda)$ and assume the spectral condition $\phi\lambda_{\max}(\mathbf{A})<1$. The Katz-Bonacich kernel is given by the inverse $\mathbf{H} = (h_{ij}) = (\mathbf{I}_n-\phi\mathbf{A})^{-1}$, which depends only on the adjacency matrix $\mathbf{A}$ of the R\&D collaboration network $G$. The elements $h_{ij}$ are the discounted sum of all walks in the R\&D network emanating from $i$ and ending at $j$, where walks of length $\ell$ receive weight $\phi^\ell$.\footnote{\label{foot:neumann}The Neumann expansion $\mathbf{H}=(\mathbf{I}_n-\phi\mathbf{A})^{-1}=\sum_{s\ge
+0}\phi^{s}\mathbf{A}^{s}$ gives $h_{ij}$ a spillover interpretation: a walk of
+length $s$ from $i$ to $j$ is a chain of collaborations along which knowledge
+is transmitted, each step attenuating the spillover by $\phi$, so that $h_{ij}$
+aggregates direct collaborations, common-partner channels, and arbitrarily long
+indirect routes, decaying geometrically in network distance. The diagonal term
+$h_{ii}\ge 1$ adds to the firm's own productivity the feedback loops through
+which its knowledge echoes back along closed collaboration cycles, and the row
+sum $c_i=\mathbf{e}_i^{\top}\mathbf{H}\mathbf{u}$ is $i$'s Katz--Bonacich
+centrality, measuring total exposure to the economy's knowledge pool. See Online Appendix \ref{sec:katz-bonacich} for further information.} The Katz-Bonacich centrality vector is $\mathbf{c}=(c_1,\ldots,c_n)^\top = \mathbf{H}\mathbf{u}$ with elements $c_i = \sum_{j=1}^n h_{ij}$. Under the uniform productivity assumption, the market share of firm $i$ simplifies to $y_i/\sum_j y_j = c_i/\sum_j c_j$.\footnote{See Equation (\ref{eq:nash-bonacich-single-market}) in Online Appendix \ref{sec:nash-katz}. Explicitly, $\mathbf{y} = \eta\mathbf{M}\mathbf{u} = \eta\,\mathbf{c}/\!\left(1+\lambda\left(\sum_k c_k - 1\right)\right)$, so output is strictly positive and proportional to centrality.} Consequently, firm $i$'s Katz-Bonacich centrality, $c_i$, is proportional to its market share.
+
+\paragraph{Marginal profits from R\&D collaborations.}
+
+\begin{figure}[tp]
+    \centering
+    \psset{unit=0.9cm}
+    \begin{pspicture}(0,-6.0)(11,2.5)
+
+    \newrgbcolor{firmicolor}{0.8 0.9 1.0}
+    \newrgbcolor{firmjcolor}{1.0 0.8 0.8}
+    \newrgbcolor{nodecolor}{0.9 0.9 0.9}
+    \newrgbcolor{newlink}{0.0 0.4 0.8}
+
+    % ==========================================
+    % PANEL 1: Pre-Collaboration
+    % ==========================================
+    % The \phantom{j} forces node i to have the exact same radius as node j
+    \cnodeput[fillstyle=solid,fillcolor=firmicolor](2,1){A1}{$i\hspace{-0.2cm}\phantom{j}$}
+    \cnodeput[fillstyle=solid,fillcolor=firmjcolor](2,-1){T1}{\scalebox{0.85}{$j$}}
+
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](0.5, 1.5){N11}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](3.5, 0){N12}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](0.5, -1.5){N13}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](3.5, -2){N14}{}
+
+    \ncline{A1}{N11}
+    \ncline{A1}{N12}
+    % Note: No direct link between i and j in the pre-collaboration stage
+    \ncline{T1}{N12}
+    \ncline{T1}{N13}
+    \ncline{T1}{N14}
+
+    % The candidate R&D alliance link (dashed to show intent/formation)
+    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.5pt]{A1}{T1}
+
+    \rput(2,-4.2){\footnotesize \begin{tabular}{c}
+        \textbf{(a) Pre-Collaboration} \\[0.15cm]
+        Adjacency Matrix: $\mathbf{A}$ \\[0.1cm]
+        Kernel: $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$
+    \end{tabular}}
+
+    % ==========================================
+    % PANEL 2: Post-Collaboration
+    % ==========================================
+    \cnodeput[fillstyle=solid,fillcolor=firmicolor](9,1){A2}{$i\hspace{-0.2cm}\phantom{j}$}
+    \cnodeput[fillstyle=solid,fillcolor=firmjcolor](9,-1){T2}{\scalebox{0.85}{$j$}}
+
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.5, 1.5){N21}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10.5, 0){N22}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.5, -1.5){N23}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10.5, -2){N24}{}
+
+    \ncline{A2}{N21}
+    \ncline{A2}{N22}
+    \ncline{T2}{N22}
+    \ncline{T2}{N23}
+    \ncline{T2}{N24}
+
+    % The new R&D alliance link (solid to show established)
+    \ncline[linestyle=solid, linecolor=newlink, linewidth=1.5pt]{A2}{T2}
+
+    \rput(9,-4.2){\footnotesize \begin{tabular}{c}
+        \textbf{(b) Post-Collaboration} \\[0.15cm]
+        Adjacency Matrix: $\mathbf{A}^{+ij} = \mathbf{A} + \mathbf{e}_i\mathbf{e}_j^\top + \mathbf{e}_j\mathbf{e}_i^\top$ \\[0.1cm]
+        Kernel: $\mathbf{M}^{+ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}^{+ij})^{-1}$
+    \end{tabular}
+    }
+
+    \end{pspicture}
+    \vspace{-0.5cm}
+    \caption{The left panel (a) shows the pre-collaboration network, with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$. Firms $i$ and $j$ are not directly linked; the dashed line denotes the candidate collaboration. The right panel (b) shows the new R\&D link, yielding $\mathbf{A}^{+ij}=\mathbf{A}+\mathbf{e}_i\mathbf{e}_j^\top+\mathbf{e}_j\mathbf{e}_i^\top$ and $\mathbf{M}^{+ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}^{+ij})^{-1}$. Output changes from $\mathbf{y}=\eta\mathbf{M}\mathbf{u}$ to $\mathbf{y}^{+ij}=\eta\mathbf{M}^{+ij}\mathbf{u}$, with profits gross of linking costs proportional to squared output (cf. Eq. (\ref{eq:profit-eq})).}
+%    \caption{The left panel (a) shows the pre-collaboration network (with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$). Firm $i$ and firm $j$ are connected indirectly through their local network structure but share no direct link; the dashed line indicates the candidate collaboration under consideration. The right panel (b) illustrates the formation of the new bilateral R\&D collaboration between firm $i$ and firm $j$ (solid blue line), resulting in the post-collaboration network (with adjacency matrix $\mathbf{A}^{+ij} = \mathbf{A} + \mathbf{e}_i\mathbf{e}_j^\top + \mathbf{e}_j\mathbf{e}_i^\top$ and equilibrium kernel $\mathbf{M}^{+ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A}^{+ij})^{-1}$). Profits, gross of linking costs, are proportional to the square of output (cf. Eq. (\ref{eq:profit-eq})), which is given by $\mathbf{y} = \eta\mathbf{M}\mathbf{u}$ before and $\mathbf{y}^{+ij} = \eta\mathbf{M}^{+ij}\mathbf{u}$ after the collaboration, respectively.}
+    \label{fig:rnd_collaboration}
+\end{figure}
+To build intuition for the drivers of R\&D collaboration incentives, we derive in the following proposition the post-collaboration output multiplier, $y_i^{+ij} / y_i$, of firm $i$ from establishing an R\&D collaboration with firm $j$ (as illustrated in Figure \ref{fig:rnd_collaboration}).
+\begin{proposition}
+\label{prop:multiplier}
+Consider a single product market ($\mathbf{B} = \mathbf{u}\mathbf{u}^\top - \mathbf{I}_n$) with uniform productivity $\bm{\eta} = \eta\mathbf{u}$, and let $\phi = \rho/(1-\lambda)$ satisfy the spectral condition $\phi\lambda_{\max}(\mathbf{A}) < 1$. Then the relative output gain of firm $i$ from forming the R\&D collaboration $(i,j)$ is
+\begin{equation}
+\frac{y_i^{+ij}}{y_i} = \frac{1 - \phi \left( h_{ij} - h_{ii}\frac{c_j}{c_i} \right)}{\left[ 1 - \phi \left( h_{ij} - \kappa c_i c_j \right) \right]^2 - \phi^2 \left( h_{ii} - \kappa c_i^2 \right) \left( h_{jj} - \kappa c_j^2 \right)},
+\label{eq:post-link-output-i-rel}
+\end{equation}
+where $h_{k\ell}$ and $c_k$ are the entries and row sums of the Katz--Bonacich kernel $\mathbf{H} = (\mathbf{I}_n - \phi \mathbf{A})^{-1}$ and we have denoted by $\kappa = \lambda /(1+\lambda\left(\sum_k c_k-1\right))$. 
+\end{proposition}
+\begin{proof}
+See Appendix \ref{app:proof-multiplier}.
+\end{proof}
+\noindent Equation \eqref{eq:post-link-output-i-rel} decomposes collaboration incentives into technological propagation through the R\&D network
+($h_{ij}$-terms)${}^{\ref{foot:neumann}}$ and offsetting product-market cannibalization ($\kappa c_i c_j$-terms). 
+
+We next characterize three polar configurations based on Proposition \ref{prop:multiplier}. Since $c_k \ge h_{kk} \ge 1$, centralities are bounded below by one: a \emph{peripheral} firm has centrality of order one, while a
+\emph{dominant hub} has centrality large relative to its partner's. The asymmetric cases are limits along sequences in which the centrality ratio diverges while $\kappa c_i c_j$ vanishes, which holds whenever no firm commands a nonvanishing share of aggregate centrality (in large networks).
+\begin{proposition}%[Boundary cases]
+\label{prop:boundary}
+Under the assumptions of Proposition \ref{prop:multiplier}:
+\begin{enumerate}
+\item[(i)] \textbf{Symmetric alliance:} If $c_i = c_j$ and $h_{ii} = h_{jj}$, then
+\begin{equation*}
+\frac{y_i^{+ij}}{y_i} = \frac{1}{1 - \phi\left( h_{ij} + h_{ii} \right) + 2\phi\kappa c_i^2}.
+\end{equation*}
+\item[(ii)] \textbf{Peripheral firm joining a dominant hub:} Along any sequence of configurations with $h_{ij}, h_{ii}, h_{jj}$ bounded, $c_j/c_i \to \infty$, $\kappa c_i c_j \to 0$, and $D_1 \equiv (1-\phi h_{ij})^2 - \phi^2 h_{ii}(h_{jj} - \kappa c_j^2)$ bounded away from zero,
+\begin{equation*}
+\frac{y_i^{+ij}}{y_i} = \frac{\phi h_{ii}}{D_1}\,\frac{c_j}{c_i}\,\bigl( 1 + o(1) \bigr).
+\end{equation*}
+\item[(iii)] \textbf{Dominant hub joining a peripheral firm:} Symmetrically, along any sequence with $h_{ij}, h_{ii}, h_{jj}$ bounded, $c_j/c_i \to 0$, $\kappa c_i c_j \to 0$, and $D_2 \equiv (1-\phi h_{ij})^2 - \phi^2 (h_{ii} - \kappa c_i^2) h_{jj}$ bounded away from zero,
+\begin{equation*}
+\frac{y_i^{+ij}}{y_i} = \frac{1 - \phi h_{ij}}{D_2}\,\bigl( 1 + o(1) \bigr).
+\end{equation*}
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+See Appendix \ref{app:proof-boundary}.
+\end{proof}
+\noindent The three cases admit the following economic interpretation.
+\begin{enumerate}
+    \item \textbf{Symmetric collaboration ($c_i \approx c_j$).} With no centrality advantage on either side, the link is governed by the balance between technological reinforcement, $h_{ij}+h_{ii}$, and cannibalization, $2\phi\kappa c_i^2$. Two central firms in a common market suffer a large market-overlap penalty; two similarly peripheral firms (with $c_i$ of order one) face a weak one, so their collaboration mainly reflects technological complementarity.
+    \item \textbf{Peripheral firm collaborating with a dominant hub ($c_j \gg c_i$).} The most favorable asymmetric case for the smaller firm: its own market footprint is limited, so its direct cannibalization is weak, while the link grants access to the hub's network environment, amplified by the local feedback term $h_{ii}$. The proportional gain is large when $c_j/c_i$ is large, though the hub's footprint still enters through $\kappa c_j^2$ -- overlap does not vanish, but attaches mainly to the dominant partner.
+        \item \textbf{Dominant hub collaborating with a peripheral firm ($c_i \gg c_j$).} Least attractive for the incumbent: a peripheral partner supplies little additional spillover, while the incumbent's own footprint enters the denominator through $\kappa c_i^2$ and reduces the multiplier. Any technological complementarity is thus offset by cannibalization and by the spillovers the link transmits to a rival.
+\end{enumerate}
+Collaboration incentives therefore depend not only on the technological
+spillovers a link creates but also on product-market rivalry: links from
+peripheral to central firms generate large proportional gains for the
+peripheral partner, whereas links involving dominant firms are more strongly
+disciplined by cannibalization.\footnote{See Online Appendix \ref{sec:rnd-example} for a
+three-firm example.}
+
+\paragraph{Marginal profits from M\&As.} We consider an acquisition in which firm $i$ acquires target
+firm $j$. The acquisition involves two distinct network operations. (i) First, the target's collaboration
+links are reassigned to the acquirer. (ii) Second, the target is removed as an independent
+node. The first operation creates new propagation paths through the merged entity,
+whereas the second operation removes paths that relied on the target as a distinct
+intermediary. This is schematically illustrated in Figure \ref{fig:mna_operations}.
+\begin{figure}[tp]
+    \centering
+    \psset{unit=0.9cm}
+    \begin{pspicture}(-2.5,-5.8)(13.5,2.5)
+
+    \newrgbcolor{acqcolor}{0.8 0.9 1.0}
+    \newrgbcolor{tgtcolor}{1.0 0.8 0.8}
+    \newrgbcolor{nodecolor}{0.9 0.9 0.9}
+    \newrgbcolor{newlink}{0.0 0.4 0.8}
+    \newrgbcolor{ghostgray}{0.6 0.6 0.6}
+
+    % ==========================================
+    % PANEL 1: Pre-Transaction
+    % ==========================================
+    \cnodeput[fillstyle=solid,fillcolor=acqcolor](-0.5,1){A1}{$i\hspace{-0.2cm}\phantom{j}$}
+    \cnodeput[fillstyle=solid,fillcolor=tgtcolor](-0.5,-1){T1}{\scalebox{0.85}{$j$}}
+
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](-2, 1.5){N11}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](1, 0){N12}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](-2, -1.5){N13}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](1, -2){N14}{}
+
+    \ncline{A1}{N11}
+    \ncline{A1}{N12}
+    \ncline{A1}{T1}
+    \ncline{T1}{N12}
+    \ncline{T1}{N13}
+    \ncline{T1}{N14}
+
+    \rput(-0.5,-4.2){\footnotesize \begin{tabular}{c}
+        \textbf{(a) Pre-Transaction} \\[0.15cm]
+        Adjacency Matrix: $\mathbf{A}$ \\[0.1cm]
+        Kernel: $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$
+    \end{tabular}}
+
+    % ==========================================
+    % PANEL 2: Link Reassignment
+    % ==========================================
+    \cnodeput[fillstyle=solid,fillcolor=acqcolor](5.5,1){A2}{$i\hspace{-0.2cm}\phantom{j}$}
+    \cnodeput[fillstyle=solid,fillcolor=tgtcolor](5.5,-1){T2}{\scalebox{0.85}{$j$}}
+
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](4.0, 1.5){N21}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7.0, 0){N22}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](4.0, -1.5){N23}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](7, -2){N24}{}
+
+    \ncline{A2}{N21}
+    \ncline{A2}{N22}
+    \ncline{A2}{T2}
+    \ncline{T2}{N22}
+    \ncline{T2}{N23}
+    \ncline{T2}{N24}
+
+    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.2pt]{A2}{N23}
+    \ncline[linestyle=dashed, linecolor=newlink, linewidth=1.2pt]{A2}{N24}
+
+    \rput(5.5,-4.2){\footnotesize \begin{tabular}{c}
+        \textbf{(b) Link Reassignment} \\[0.15cm]
+        Adjacency Matrix: $\widehat{\mathbf{A}}^{\,ij}$ \\[0.1cm]
+        $\widehat{\mathbf{M}}^{\,ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\widehat{\mathbf{A}}^{\,ij})^{-1}$
+    \end{tabular}}
+
+    % ==========================================
+    % PANEL 3: Node Removal
+    % ==========================================
+    \cnodeput[fillstyle=solid,fillcolor=acqcolor](11.5,1){A3}{$i\hspace{-0.2cm}\phantom{j}$}
+    \cnodeput[fillstyle=none,linestyle=dashed,linecolor=ghostgray](11.5,-1){T3}{\color{ghostgray}\scalebox{0.85}{$j$}}
+
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10, 1.5){N31}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](13, 0){N32}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](10, -1.5){N33}{}
+    \cnodeput[fillstyle=solid,fillcolor=nodecolor](13, -2){N34}.
+
+    \ncline{A3}{N31}
+    \ncline{A3}{N32}
+
+    \ncline[linecolor=newlink, linewidth=1.2pt]{A3}{N33}
+    \ncline[linecolor=newlink, linewidth=1.2pt]{A3}{N34}
+
+    \ncline[linestyle=dotted,linecolor=ghostgray]{A3}{T3}
+    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N32}
+    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N33}
+    \ncline[linestyle=dotted,linecolor=ghostgray]{T3}{N34}
+
+    \rput(11.5,-4.2){\footnotesize \begin{tabular}{c}
+        \textbf{(c) Post-Removal} \\[0.15cm]
+        Adjacency Matrix: $\widetilde{\mathbf{A}}^{\,ij}$ \\[0.1cm]
+        $\widetilde{\mathbf{M}}^{\,ij} = (\mathbf{I}_{n-1}+\lambda\widetilde{\mathbf{B}}^{\,ij}-\rho\widetilde{\mathbf{A}}^{\,ij})^{-1}$
+    \end{tabular}}
+
+    \end{pspicture}
+    \vspace{-0.25cm}
+    \caption{The left panel (a) shows the pre-merger network, with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$. The middle panel (b) reassigns target $j$'s non-redundant links to acquirer $i$, yielding $\widehat{\mathbf{A}}^{ij}$ and $\widehat{\mathbf{M}}^{,ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\widehat{\mathbf{A}}^{ij})^{-1}$. The right panel (c) removes $j$ from the collaboration and competition networks, yielding $\widetilde{\mathbf{A}}^{ij}$, $\widetilde{\mathbf{B}}^{ij}$, and $\widetilde{\mathbf{M}}^{ij}=(\mathbf{I}_{n-1}+\lambda\widetilde{\mathbf{B}}^{ij}-\rho\widetilde{\mathbf{A}}^{ij})^{-1}$. Output changes from $\mathbf{y}=\mathbf{M}\bm{\eta}$ to $\widetilde{\mathbf{y}}^{ij}=\widetilde{\mathbf{M}}^{ij}\bm{\eta}^{ac,ij}$, with profits gross of merger costs proportional to squared output (cf. Eq. (\ref{eq:profit-eq})).}
+%    \caption{The left panel (a) shows the pre-transaction network (with adjacency matrix $\mathbf{A}$ and equilibrium kernel $\mathbf{M}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\mathbf{A})^{-1}$). The middle panel (b) shows the reassignment of the target $j$'s non-redundant links (dashed blue lines) to the acquirer $i$ (with intermediate adjacency matrix $\widehat{\mathbf{A}}^{\,ij}$ and equilibrium kernel $\widehat{\mathbf{M}}^{\,ij}=(\mathbf{I}_n+\lambda\mathbf{B}-\rho\widehat{\mathbf{A}}^{\,ij})^{-1}$). The right panel (c) shows the removal (dotted gray lines) of the target node from the network, including from the competition matrix (with adjacency matrix $\widetilde{\mathbf{A}}^{\,ij}$, competition matrix $\widetilde{\mathbf{B}}^{\,ij}$, and equilibrium kernel $\widetilde{\mathbf{M}}^{\,ij} = (\mathbf{I}_{n-1}+\lambda\widetilde{\mathbf{B}}^{\,ij}-\rho\widetilde{\mathbf{A}}^{\,ij})^{-1}$). Profits, gross of merger costs, are proportional to the square of output (cf. Eq. (\ref{eq:profit-eq})), which is given by $\mathbf{y} = \mathbf{M}\bm{\eta}$ before and $\widetilde{\mathbf{y}}^{ij} = \widetilde{\mathbf{M}}^{ij} \bm{\eta}^{ac,ij} $ after the merger, respectively.}
+    \label{fig:mna_operations}
+\end{figure}
+
+\begin{proposition}%[Single-market M\&A payoff]
+\label{prop:mna-single-market}
+Suppose there is a single product market, and let
+$\widehat{\mathbf{H}}^{\,ij}=(\mathbf{I}_n-\phi\widehat{\mathbf{A}}^{\,ij})^{-1}$,
+$\widehat c_k^{\,ij}=\mathbf{e}_k^{\top}\widehat{\mathbf{H}}^{\,ij}\mathbf{u}$,
+and
+$\widehat\kappa=\lambda/\big(1+\lambda\big(\sum_{k=1}^n \widehat
+c_k^{\,ij}-1\big)\big)$. Then $\widehat\kappa<1$, and
+the post-merger payoff of the acquirer 
+can be written as
+\begin{equation}
+\Pi_{ij}^{\mathrm{M\&A}}
+=
+\frac{\xi}{2}
+\left[
+\widehat y_i^{\,ij}
++
+\frac{\widehat\kappa}{(1-\widehat\kappa)(1-\lambda)}
+\,\widehat c_i^{\,ij}
+\left(
+(1-\widehat\kappa)\,\eta_j^{ac,ij}
+-
+\widehat\kappa
+\sum_{\ell \neq j}
+\widehat c_\ell^{\,ij}\,\eta_\ell^{ac,ij}
+\right)
+\right]^2
+-
+\frac{\xi}{2}\,y_j^2
+-
+\nu_{ij},
+\label{eq:mna-profit-simplified-inserted}
+\end{equation}
+where the acquirer's intermediate output after link reassignment admits the
+single-market decomposition
+\begin{equation}
+\widehat y_i^{\,ij}
+=
+\frac{1}{1-\lambda}
+\sum_{\ell=1}^n
+\left(
+\widehat h_{i\ell}^{\,ij}
+-
+\widehat\kappa\,
+\widehat c_i^{\,ij}
+\widehat c_\ell^{\,ij}
+\right)
+\eta_\ell^{ac,ij}.
+\label{eq:yhat-i-single-market}
+\end{equation}
+\end{proposition}
+\begin{proof}
+See Appendix \ref{app:proof-mna-single-market}.
+\end{proof}
+Based on Proposition \ref{prop:mna-single-market} we can decompose the drivers of a profitable acquisition into three distinct economic forces:\footnote{An example with four firms can be found in Online Appendix \ref{sec:rnd-example}.}
+\begin{enumerate}
+\item \textbf{Technological synergy.}
+The first driver of value is the acquirer's intermediate output after link
+reassignment, $\widehat y_i^{\,ij}$ in Equation
+(\ref{eq:yhat-i-single-market}), which reflects three forces:
+$\widehat h_{i\ell}^{\,ij}$ captures pure technological propagation from firm
+$\ell$ to the acquirer in the post-reassignment network, $\eta_\ell^{ac,ij}$
+weights each inherited path by the corresponding post-acquisition
+productivity, and $\widehat\kappa\,\widehat c_i^{\,ij}\widehat c_\ell^{\,ij}$
+captures the product-market dampening from the overlap of the two firms'
+market centralities. A target therefore creates high technological synergy when
+its non-redundant links connect the acquirer to firms that are technologically
+close and highly productive, while exposing it to limited cannibalization.
+    \item \textbf{The isolated target's net market footprint.} The fractional term
+inside the squared bracket captures the product-market effect of deleting the
+target as a competitor, relative to the intermediate benchmark in which the
+technologically isolated target still competes. This strategic dividend
+reflects two opposing forces: $(1-\widehat\kappa)\eta_j^{ac,ij}$ is the
+target's standalone capacity, so removing a highly productive competitor
+vacates substantial demand, while the penalty
+$\widehat\kappa \sum_{\ell \neq j}\widehat c_\ell^{\,ij}\eta_\ell^{ac,ij}$
+measures the remaining rivals' capacity to absorb that space -- if they are
+structurally central or highly productive, they capture the abandoned share
+first. The acquirer secures the net vacated space only in proportion to its own
+topological dominance $\widehat c_i^{\,ij}$, so the merger is most lucrative
+when the target is highly productive but its surviving rivals are structurally
+weak.
+\item \textbf{Acquisition price and transaction cost.} The subtracted terms
+$\frac{\xi}{2}y_j^2$ and $\nu_{ij}$ are the acquisition price -- equal, under
+the take-it-or-leave-it protocol, to the target's pre-transaction standalone
+profit -- and the transaction cost. An efficient transaction requires the
+target's outside option to be low enough to avoid a prohibitive price.
+\end{enumerate}
+
+\paragraph{From R\&D collaborations to M\&As.} The choice between alliances and mergers is governed by a threshold comparison of their benefits and relative costs: M\&A dominates R\&D collaboration when the integrated output gain is large enough to compensate for the acquisition price and the additional transaction cost.
+%\begin{proposition}%[Governance threshold]
+%\label{prop:threshold}
+%Given the inherited network $G_{t-1}$, firm $i$ prefers acquiring firm $j$ to collaborating with it, $\Pi_{ijt}^{\text{M\&A}}(G_{t-1}) \ge \Pi_{ijt}^{\text{R\&D}}(G_{t-1})$, if and only if
+%\begin{equation}
+%\left( y_{it}^{ac,ij} \right)^2 - \left( y_{it}^{+ij} \right)^2 \;\ge\; y_{jt}^2 + \frac{2}{\xi} \left( \nu_{ij,t} - \zeta_{ij,t} \right).
+%\label{eq:rnd-mna-comp}
+%\end{equation}
+%\end{proposition}
+%\begin{proof}
+%See Appendix \ref{app:proof-threshold}.
+%\end{proof}
+%\noindent In Equation \eqref{eq:rnd-mna-comp}, the output $y_{it}^{+ij}$ for firm $i$ after forming an R\&D link with firm $j$ is given by Equation (\ref{eq:post-link-output-i}), and the acquirer's post-acquisition output is $y_{it}^{ac,ij} = \sum_{\ell} \widetilde m_{i\ell}^{\,ij} \eta_{\ell}^{ac,ij}$ from Equation (\ref{eq:mna-form-profit}), which in the single-market case equals the expression inside the square brackets in Equation (\ref{eq:mna-profit-simplified-inserted}). The condition in Equation (\ref{eq:rnd-mna-comp}) shows that acquisition is more attractive when the target has high transferable network value ($\left( y_{it}^{ac,ij} \right)^2 - \left( y_{it}^{+ij} \right)^2$) but a relatively low standalone outside option ($y_{jt}^2$). Conversely, R\&D collaboration is more attractive when a bilateral link already captures most of the technological complementarity, when the target is expensive to buy because $y_{jt}$ is large, or when preserving the target as an independent network node is itself valuable. Thus, the model predicts M\&A when control, link reassignment, and target removal create incremental value beyond what can be achieved through a collaboration link; it predicts R\&D collaboration when access to the target's knowledge is valuable but full consolidation adds little net benefit.
+
+With multiple product markets, technological proximity and product-market
+overlap become distinct dimensions of firm-pair heterogeneity, breaking the
+tight link between centrality and cannibalization of the single-market case.
+R\&D collaboration is then most attractive when firms are technologically close
+but product-market distant, creating strong spillovers with limited
+cannibalization. M\&A, by contrast, is most attractive when the target's links
+and knowledge stock are highly transferable \emph{and} product-market overlap
+makes removal valuable: consolidation internalizes both the target's network
+position and the effect of eliminating a competitor, provided the acquisition
+price does not absorb these gains.
+
+Finally, to understand the dynamic interplay between R\&D collaborations and M\&As, consider a comparison of their respective cost functions:
+\begin{align}
+\nu_{ij,t}-\zeta_{ij,t} = & (\kappa_0-\gamma_0)
++
+\mathbf{c}_{ij,t}(\kappa_1-\gamma_1)
++
+\kappa_2(y_{i,t-1}-y_{j,t-1})
++
+(\kappa_3-\gamma_3)(y_{i,t-1}-y_{j,t-1})^2
+\notag\\
+\qquad
+& -
+\gamma_2 |y_{i,t-1}-y_{j,t-1}|
++
+\underbrace{(\kappa_4-\gamma_4)a_{ij,t-1}}_{
+\text{prior collaboration}
+}
++
+\underbrace{(\kappa_5-\gamma_5)\sum_{r=1}^n a_{ir,t-1}a_{jr,t-1}.}_{
+\text{prior common collaborators}
+}
+\label{eq:mna_rnd_cost-diff}
+\end{align}
+The coefficients $(\kappa_4-\gamma_4)$ and $(\kappa_5-\gamma_5)$ capture how a
+prior alliance and prior common collaborators shift the relative cost of
+acquisition. When negative, past collaboration and shared network experience
+make acquisition cheaper than continued arm's-length collaboration, so that
+alliances serve as a stepping stone to integration: firms first collaborate to
+learn about technological fit and the value of the partner's knowledge, and
+later consolidate when the surplus from integration exceeds the value of a
+separate link. 
+%The difference is also asymmetric in size: the signed term
+%$\kappa_2(y_{i,t-1}-y_{j,t-1})$ enters only the acquisition cost, so -- other
+%things equal -- only the acquisition margin distinguishes the direction of the
+%transaction within a pair. 
+Since firms substitute between alliances and
+mergers, shocks to one margin propagate to the other, making this substitution
+central for the aggregate effects of innovation policy and market structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{R\&D Collaboration and M\&A Data} %Automated Alliance Extraction}
+\label{sec:data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Our network panel dataset of R\&D collaborations is generated by natural language processing (NLP) text mining a large number of news articles and training our algorithm with an LLM model to extract R\&D alliances. We give a short overview in the following of how the algorithm was trained and the collection of news articles that it was applied to. We then complement the R\&D alliance data with information on M\&A activities from the Thomson SDC Platinum database and information on firm characteristics and performance measures from the S\&P Compustat and Bureau van Dijk's Orbis databases. A more detailed explanation and discussion of how our text mining algorithm and how the data has been extracted and our LLM model has been trained can be found in Appendices \ref{sec:text-mining} and \ref{sec:app-data}.\footnote{Supplementary information including all codes for reducibility of the results presented in this paper are available at \url{https://github.com/jakob-ra/financial_news}.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Automated Extraction of Collaborative Agreements}
+\label{sec:extract-news}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To generate our data set, we trained a text mining algorithm to extract mentions of collaborative agreements between two or more firms. An example is given in Figure \ref{fig:problem}. Given a news article with an alliance announcement, we extract the names of the involved firms and flag the type of agreement made. This is done via the pre-trained language model LUKE\footnote{LUKE improves on the more widely used RoBERTa model \citep{liu2019roberta} by adding entity embeddings and entity-aware self-attention, which makes it a good choice for relation extraction.} \citep{yamada2020luke}, which was fine-tuned to our joint entity and relation extraction task using manually annotated data from the Refinitiv (formerly Thomson Financial) SDC Platinum Joint Venture/Strategic Alliance database. The training data includes around 186,000 positive examples - that is, news articles containing an alliance announcement between firms - which we augment with the same number of negative examples - mentions of two or more firms that \textit{do not} contain a relationship that we are interested in. The negative examples are drawn from a separate corpus of Bloomberg and Reuters news articles released by \citet{ding2014using}, which is disjoint from the LexisNexis collection to which we apply the trained algorithm. The trained algorithm reaches an F1-score of 83\% on the extraction of R\&D collaborations.
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.55\textwidth]{./Figures/problem_statement.png} 
+\caption{Joint entity and relationship extraction.} 
+\label{fig:problem}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{R\&D Collaborations from the LexisNexis News Database}
+\label{sec:news}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We applied the text mining algorithm to articles from LexisNexis data lab, which provides millions of business news articles per day, going back to 1980. We select 1.5 million candidate articles by filtering articles on a list of keywords. In particular, to obtain articles that could contain alliance announcements, we applied a set of filters to LexisNexis' collection of news articles. We selected English language articles tagged as business news from news wires and press releases, newspapers, web-based publications, or industry trade press.  Additional information and details regarding the text mining algorithm and the news data can be found in Online Appendix \ref{sec:text-mining}. %Appendices \ref{sec:relationship_extraction_pipeline}, \ref{sec:knowledge_base} and \ref{sec:performance}.
+
+Our resulting R\&D alliance database is much more comprehensive than other currently available databases. For R\&D collaborations, SDC Platinum, the de facto only comprehensive data set, contains only 14,832 such relations, while our data set contains around 52,445 and is less biased towards North American firms. %Time trends for the 5 most important industries and countries are plotted in Figures \ref{fig:top5-industries} and \ref{fig:top5-countries}, respectively. Figure \ref{fig:alliances_world_map} shows the locations (at the city level) and collaborations of the firms accumulated over all years (1980 to 2021). 
+We complement the network data with information about firms' balance sheet information, locations, industries and patent activities. Online Appendix \ref{sec:app-data} provides further details including various descriptive statistics of the R\&D collaboration network. An illustration can be seen in Figure \ref{fig:2020_cc_graph}.
+
+\begin{figure}[tbp]
+%\begin{center}
+%Year: 2020
+%\end{center}
+\vspace{-0.5cm}
+\centering
+\centerline{ \scalebox{0.75}{\includegraphics{./Figures/2020_cc_graph_5.png}}}
+\caption{The largest connected component in the  network of R\&D
+collaborations in the year 2020. The color of a node and its size scale with the number of R\&D collaborations, with the names of the $8$ largest firms mentioned
+in the graph. The number of links is $3,307$, and the number of firms in the largest connected component is $1,826$.}
+\label{fig:2020_cc_graph}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Text-Based Industry Classification and Accounting Data}
+\label{sec:industry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We identify the competition matrix $\mathbf{B}=(b_{ij,t})_{1 \le i,j \le n}$ using the matrix of Text-based Network Industry Classifications (TNIC) constructed by \citet{hoberg2016} from 10k filings of publicly listed firms.\footnote{See also: \url{https://hobergphillips.tuck.dartmouth.edu/}.} Since the bottom half of the TNIC pairwise similarity scores are small (less than 0.05), we define $b_{ij,t}=1$ if the corresponding TNIC similarity score is higher than the median, and $b_{ij,t}=0$ otherwise. Firms' sales and R\&D expenditures were obtained from the Compustat North America and Global Fundamentals databases as well as  Bureau van Dijk's Orbis database \citep{kalemli2024construct}. We compute a firm's output by dividing sales with the producer price index from the Bureau of Labor Statistics (at the NAICS 6-digit level where available and aggregated at the 4-digit level in the remaining cases). To measure a firm's productivity, we use the one-period lag of the firm's log R\&D capital stock. The R\&D capital stock is computed using a perpetual inventory method with 15\% depreciation rate \citep[][]{Bloom2013}.\footnote{Following the approach of \citet[][]{Hall2000} and \citet[][]{Bloom2013}, R\&D expenditures are used to compute R\&D capital stocks using the perpetual inventory method, with a depreciation rate of 15\%. %Specifically, the R\&D stock in year $t$ is given by $G_t = R_t +(1-\delta)G_{t-1}$, where $G_t$ is the R\&D stock in year $t$, $R_t$ is the R\&D flow expenditure in year $t$, and $\delta = 0.15$ represents the depreciation rate.
+} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample Selection and Summary Statistics}
+\label{sec:Sample_selection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To study how technology spillovers change over time, we divide the years from 2001 to 2020 into four segments, each spanning five years. As a result, we will estimate the proposed model separately for four periods: 2001-2005, 2006-2010, 2011-2015, and 2016-2020. To construct the sample for estimation, we employ the following sample selection procedure: We begin with a total of 34,102 U.S. firms in the Compustat data. Then, for the samples in each period, we drop firms that contain missing values on either output or R\&D stock.\footnote{To mitigate the loss of firm observations due to missing values, we use linear interpolation to fill in missing values at certain years for the same firm.} Output has been computed using the Producer Price Index (PPI) of the US Bureau of Labor Statistics\footnote{See: \url{https://www.bls.gov/ppi/}.} matched to the year and NAICS code reported in the Compsutat sales item (in USD). Basic summary statistics can be found in Table~\ref{tab:summarystatistics_compustat}. The M\&A deals considered in our sample are summarized in Table \ref{tab:mna-data}.
+       
+\begin{center}
+\singlespacing
+\begin{threeparttable}[tp]
+  \caption{Summary statistics.}
+    \begin{tabular}{ccccccccccc}
+    \toprule
+          & \multicolumn{3}{c}{Output} & \multicolumn{3}{c}{Log R\&D Stock } & \multicolumn{3}{c}{Cost per Sale} & \multirow{ 2}{*}{\# of Firms} \\
+    \cmidrule{2-4}\cmidrule{5-7}\cmidrule{8-10}  
+          & Mean  & s.d.  & Max   & Mean  & s.d.  & Max   & Mean  & s.d. & Max   &  \\
+    \midrule 
+    2001-2005 & 6.56  & 36.28 & 934.08 & 2.31  & 2.36  & 9.85  & -0.30 & 1.15  & 8.63 & 1453 \\
+    2006-2010 & 8.42  & 35.24 & 776.09 & 2.42  & 2.53  & 9.65  & -0.35 & 1.21  & 9.47 & 1332 \\
+    2011-2015 & 11.12 & 44.90 & 999.73 & 2.56  & 2.66  & 9.44  & -0.40 & 1.18  & 9.23 & 1129 \\
+    2016-2020 & 11.54 & 48.92 & 887.51 & 2.55  & 2.68  & 9.55  & -0.37 & 1.34  & 8.35 & 1143 \\
+\midrule
+    \bottomrule
+    \end{tabular}
+\begin{tablenotes}[flushleft]
+\item \small \textbf{Notes:} Output is computed using the Producer Price Index (PPI) of the US Bureau of Labor Statistics matched to the year and the 6-digit level NAICS code reported in the Compsutat sales item (in USD), and is measured in millions. R\&D stock is measured in million USD.
+\end{tablenotes}  
+\label{tab:summarystatistics_compustat}%
+\end{threeparttable}
+\end{center}
+
+\begin{center}
+\singlespacing
+\begin{threeparttable}[tp]
+\caption{\label{tab:rnd-data} Number of R\&D collaborations.}
+    \begin{tabular}{lccccc}    
+    \toprule
+    & Year 1 & Year 2 & Year 3 & Year 4 & Year 5  \\
+    \midrule
+    2001-2005 & 65    & 67    & 70     & 77  & 81 \\
+    2006-2010 & 35    & 40    & 45     & 46  & 43 \\
+    2011-2015 & 24    & 25    & 21     & 13  & 16 \\
+    2016-2020 & 15    & 14    & 18     & 22  & 26 \\   
+    \bottomrule  
+    \end{tabular}%
+  \label{tab:addlabel}%
+\end{threeparttable}
+\end{center}
+
+\begin{center}
+\singlespacing
+\begin{threeparttable}[tp]
+\caption{\label{tab:mna-data} Number of M\&A deals.}
+    \begin{tabular}{lccccc}    
+    \toprule
+    & Year 1 & Year 2 & Year 3 & Year 4 & Year 5  \\
+    \midrule
+    2001-2005 & 31    & 14    & 17     & 15  & 20 \\
+    2006-2010 & 24    & 28    & 24     & 15  & 21 \\
+    2011-2015 & 20    & 17    & 15     & 13  & 17 \\
+    2016-2020 & 19    & 12    & 12     & 11  & 12 \\     
+    \bottomrule  
+    \end{tabular}%
+  \label{tab:addlabel}%
+\end{threeparttable}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estimation Algorithm}
+\label{sec:estimation-algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We apply a Bayesian MCMC approach for estimating the unknown parameter vector $\Theta=(\theta,\beta,\gamma,\kappa,\mu,\tau,\sigma^2_v)$. After dividing $\Theta$ into blocks, we adopt the Metropolis-Hastings-within-Gibbs sampling procedure to simulate draws with the conditional posterior distribution derived in Equation (\ref{eq:joint_likelihood_full}).
+
+Note that the estimation algorithm requires repeatedly computing the matrix inverse $(\mathbf{I}_n + \lambda \mathbf{B} - \rho \mathbf{A})^{-1}$ in Equation (\ref{eq:bonacich}) after altering the network $G$ (and consequently its associated adjacency matrix $\mathbf{A}$), e.g., due to the formation or dissolution of an R\&D collaboration (adding or removing a link from the network) or a merger (swapping the links from the target node to the acquirer and removing the target from the network). Online Appendix \ref{sec:mat-perturb} provides a computationally efficient way to update the equilibrium output vector $\mathbf{y}$ after the addition or removal of a link in the network without recalculating the full matrix inverse.%\footnote{Online Appendix \ref{sec:br-part} provides a computationally efficient way to obtain an approximation to the Nash equilibrium output levels that is valid in sparse networks (as it is the case in the data).}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estimation Results}
+\label{sec:results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Based on our theoretical model derived in Section \ref{sec:dyn-rnd} we estimate the following equation:
+\begin{equation}
+y_{i,t}= \rho \sum_{j=1}^{n}a_{ij,t} y_{j,t} - \lambda \sum_{j=1}^{n}b_{ij,t} y_{j,t} + \beta x_{i,t-1} + \mu_i + \tau_t+ v_{i,t},
+\end{equation}
+where $\mathbf{y}_t = (y_{1,t},\ldots,y_{n,t})^\top$ denotes output~(measured in a million units), $\mathbf{x}_t=(x_{1t},\ldots,x_{nt})$ denotes the R\&D capital stock, $\mathbf{A}_t=(a_{ij,t})_{1 \le i,j \le n}$ is the adjacency matrix of R\&D collaborations, and $\mathbf{B}=(b_{ij,t})_{1 \le i,j \le n}$ is the competition matrix based on TNIC with granularity at the 3-digit SIC code level. 
+
+%The estimation results for the R\&D network formation model outlined in Section \ref{sec:dyn-rnd} can be found in Table \ref{tab:result_output_US_compustat_NAICS_6_mna}. Model (1) corresponds to the estimation of Equation (\ref{eq:equilbrium_output}). Model (2) corresponds to the joint estimation of the output and R\&D collaboration decisions in Equation (\ref{eq:joint_likelihood}). We find that the spillover effect, $\rho$, is significant with the expected signs across all sample periods and specifications considered. Moreover, comparing the estimates for Models (1) and (2), there is an upward bias correction on the estimate of $\rho$ after controlling for network formation. This bias typically stems from unobserved firm-specific correlated effects that affect both the output of a firm and the R\&D collaborations it forms. Comparing the different sample periods we further find a cyclical pattern in the estimated spillover coefficient $\rho$. Moreover, product or market similarity (TNIC) tends to reduce the R\&D collaboration cost. Besides, past R\&D collaborations as well as having common R\&D collaboration partners in the past both reduce the cost of R\&D collaborations.
+
+%\begin{table}[tbp]
+% \small
+%  \centering
+%    \begin{center}
+%    \begin{adjustbox}{max width=\textwidth,max totalheight=\textheight,keepaspectratio}
+%\begin{threeparttable}
+%\caption{\label{tab:result_output_US_compustat_NAICS_6} Estimation results for US publicly listed firms in the Compustat sample. {\red (This table is outdated) }  }
+%    \begin{tabular}{llcccccccc}
+%    \toprule
+%          & & \multicolumn{2}{c}{2001-2005} & \multicolumn{2}{c}{2006-2010} & \multicolumn{2}{c}{2011-2015} & \multicolumn{2}{c}{2016-2020} \\
+%          \cmidrule{3-10}
+%          & & (1)  & (2) & (1)  & (2) & (1)  & (2) & (1)  & (2) \\
+%    \midrule
+%     \multicolumn{6}{l}{\bf Output} \\
+%    \vspace{-0.25cm}\\
+%   R\&D Spillover & ($\rho$)       & 0.3569   & 0.3120   & 0.1886   & 0.1841   & 0.3257   & 0.3168    & 0.2860    & 0.2799 \\
+%   &              & (0.0064) & (0.0080) & (0.0058) & (0.0052) & (0.0107) & (0.0080)  & (0.0095)  & (0.0062) \\
+%   Competition &  ($\lambda$)    & 0.0077   & 0.0083   & -0.0004  & -0.0005  & 0.0058   & 0.0059    & 0.0061    & 0.0060 \\
+%     &              & (0.0018) & (0.0017) & (0.0018) & (0.0018) & (0.0030) & (0.0031)  &  (0.0031)  & (0.0030) \\
+%   Productivity & ($\beta$)      & 2.7701   & 2.8332   & 4.2044   & 4.2204   & 5.3203   & 5.3357    & 5.7674    & 5.7893 \\
+%    &              & (0.0997) & (0.0934) & (0.1121) & (0.1086) & (0.1523) & (0.1516)  & (0.2021)  & (0.1964) \\
+%   Error Variance &  ($\sigma_v^2$) & 34.4858  & 31.3157  & 49.6113  & 49.5285  & 399.2705 & 397.7822  & 1108.2000 & 1109.0559 \\
+%     &            & (0.8347) & (0.6235) & (1.1706) & (1.1626) & (22.3486)& (23.2114) & (30.1000) & (30.4574) \\   
+%    \vspace{-0.25cm}\\
+%\hdashline[0.4pt/2pt]
+%\vspace{-0.25cm}\\
+%    \multicolumn{6}{l}{\bf R\&D Collaboration Cost} \\   
+%    \vspace{-0.25cm}\\
+%    Constant & ($\gamma_0$)    &       & 6.1761    &       & 6.8030   &       & 6.7468   &       & 6.8541 \\
+%    &              &       & (0.0970)  &       & (0.1541) &       & (0.2022) &       & (0.2233) \\
+%    TNIC Similarity & ($\gamma_1$)    &       & -10.6231  &       & -10.9140 &       & -10.7475 &       & -8.3180 \\
+%     &             &       & (1.1403)  &       & (1.0507) &       & (1.4031) &       & (1.3134) \\
+%    Diff. Production & ($\gamma_2$)    &       & -0.0150   &       & -0.0256  &       & -0.0083  &       & -0.0097 \\
+%     &             &       & (0.0019)  &       & (0.0048) &       & (0.0028) &       & (0.0019) \\
+%    Diff. Production${}^{2}$ & ($\gamma_3$)    &       & 2.94E-05  &       & 9.38E-05 &       & 1.13E-05 &       & 9.79E-06 \\
+%     &             &       & (7.00E-06)&       & (2.57E-05) &     & (6.41E-06) &     & (3.24E-06) \\
+%    Past R\&D Collab. & ($\gamma_4$)    &       & -7.9829   &       & -13.4429 &       & -15.3902 &       & -14.1500 \\
+%     &             &       & (0.1871)  &       & (1.7307) &       & (2.7478) &       & (2.4338) \\
+%    R\&D Triangle Effect & ($\gamma_5$)    &       & -1.4348   &       & -2.3288  &       & -4.5298  &       & -2.2428 \\
+%      &            &       &  (0.6488) &       & (0.6123) &       & (0.7163) &       & (1.1674) \\
+%    % Scaling Factor & ($\delta$)      &       & -12.2093  &       & -9.7412  &       & -16.7175 &       & -13.4104 \\
+%    %  &              &       & (0.1941)  &       & (0.1273) &       & (0.3867) &       & (0.4670) \\
+%\midrule
+%     \# of Firms &  ($n$)  & \multicolumn{2}{c}{1533} & \multicolumn{2}{c}{1394} & \multicolumn{2}{c}{1192} & \multicolumn{2}{c}{1215} \\
+%\midrule
+%    \bottomrule
+%    \end{tabular}
+%\begin{tablenotes}[flushleft]
+%\item \small \textbf{Notes:} Model (1) corresponds to the estimation of Equation (\ref{eq:equilbrium_output}). Model (2) corresponds to the joint estimation of the output and R\&D collaboration decisions in Equation (\ref{eq:joint_likelihood}). Output is computed using NAICS 6-digit price indices from the BLS. The competition matrix $\textbf{B}$ is defined based on the TNIC data calibrated to be as granular as the three-digit SIC codes. The R\&D collaboration cost is specified as $\zeta_{ij,t}= 
+%\phantom{\sum_k} \hspace{-0.5cm}
+%\gamma_0
+%+ \mathbf{c}_{ij,t} \gamma_1
+%+
+%\gamma_2 |y_{i,t-1}-y_{j,t-1}|
+%+
+%\gamma_3 |y_{i,t-1}-y_{j,t-1}|^2
+%+
+%\gamma_4 a_{ij,t-1}
+%+
+%\gamma_5 \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}.$
+%\end{tablenotes}
+%\end{threeparttable}
+%    \end{adjustbox}
+%\end{center}
+%\end{table}
+
+Table \ref{tab:result_output_US_compustat_NAICS_6_mna} presents the estimation results for the model outlined in Section \ref{sec:dyn-rnd-mna} where we control for both, the formation of R\&D collaborations and M\&As. Model (1) corresponds to the estimation Equation (\ref{eq:equilbrium_output}). Model (2) corresponds to the joint estimation of the output and R\&D collaboration decisions in Equation (\ref{eq:joint_likelihood_full}). For the estimates of the spillover coefficient, $\rho$, in Table \ref{tab:result_output_US_compustat_NAICS_6_mna}, we observe a cyclical pattern across the observation periods and some upward biases when failing to control for the endogeneity of R\&D collaborations and M\&As. Moreover, we find that market concentration (TNIC Similarity $\times$ TNIC HHI) leads to higher M\&A  costs, possibly due to barriers from antitrust policy regulations. Further, technological similarity, higher vertical relatedness, and a higher patent stock of the acquirer lead to lower M\&A costs. Notably, past R\&D collaborations significantly reduces the M\&A cost, and similarly, having more past common R\&D collaboration partners (R\&D triangle effect) decrease the M\&A cost. This supports the narrative of Section \ref{sec:model-implications} (cf. Eq. (\ref{eq:mna_rnd_cost-diff})) which identified R\&D collaborations as a stepping stone towards future M\&A integration. The significance and magnitudes of the cost-reducing effect of R\&D collaborations on M\&As, as well as the bias in the coefficients $\rho$ and $\lambda$ in Model (1), show the importance of jointly controlling for R\&D collaboration and M\&As in estimating technology spillover effects.
+\begin{table}[tbp]
+  \small
+  \centering
+    \begin{center}
+        \begin{adjustbox}{max width=\textwidth,max totalheight=\textheight,keepaspectratio}
+\begin{threeparttable}
+\caption{\label{tab:result_output_US_compustat_NAICS_6_mna} Estimation results for US publicly listed firms in the Compustat sample.}
+    \begin{tabular}{llcccccccc}
+    \toprule
+          & & \multicolumn{2}{c}{2001-2005} & \multicolumn{2}{c}{2006-2010} & \multicolumn{2}{c}{2011-2015} & \multicolumn{2}{c}{2016-2020} \\
+          \cmidrule{3-10}
+          & & (1)  & (2) & (1)  & (2) & (1)  & (2) & (1)  & (2) \\
+    \midrule
+    \multicolumn{6}{l}{\bf Output} \\
+    \vspace{-0.25cm}\\
+ R\&D Spillover  & ($\rho$)      & 0.3344   & 0.2998    & 0.1950   & 0.1863   & 0.3356   & 0.3142    & 0.2832    & 0.2758   \\
+                    &               & (0.0053) & (0.0013)  & (0.0058) & (0.0023) & (0.0130) & (0.0014)  & (0.0097)  & (0.0035) \\
+    Competition     & ($\lambda$)   & 0.0083   & 0.0081    & -0.0006  & -0.0008  & 0.0096   & 0.0084    & 0.005     & 0.0045   \\ 
+                    &               & (0.0020) & (0.0015)  & (0.0018) & (0.0016) & (0.0034) & (0.0021)  & (0.0036)  & (0.0029) \\
+    Log R\&D stock  & ($\beta_1$)   & 2.9838   & 3.0207    & 4.3529   & 4.3616   & 5.4424   & 5.4072    & 5.8651    & 5.8591   \\
+                    &               & (0.1075) & (0.1194)  & (0.1103) & (0.0971) & (0.1637) & (0.1940)  & (0.2083)  & (0.1659) \\
+    Log cost ratio  & ($\beta_2$)   & -0.2198  & -0.1997   & -0.2292  & -0.2559  & -0.7760  & -0.8619   & -1.0167   & -1.1289  \\
+                    &               & (0.1149) & (0.1089)  & (0.1433) & (0.1215) & (0.3274) & (0.2656)  & (0.4017)  & (0.2525) \\
+    Error Variance & ($\sigma_v^2$) & 32.9052  & 30.5319   & 52.7175  & 52.7423  & 510.9221 & 509.4280  & 1245.7000 & 1247.9125 \\
+                    &               & (0.8090) & (0.6308)  & (1.3287) & (1.2609) & (23.9044)& (23.5688) & (33.1000) & (34.0170) \\
+        \vspace{-0.25cm}\\
+\hdashline[0.4pt/2pt]
+\vspace{-0.25cm}\\
+    \multicolumn{6}{l}{\bf R\&D Collaboration Cost} \\
+    \vspace{-0.25cm}\\
+Constant                 & ($\gamma_0$)  &  &        6.0700            &  & 6.6629   &  &          6.6319   &  &        6.6824   \\
+                             &               &  &       (0.0708) &  &           (0.1509) &  &          (0.1942) &  &        (0.2043) \\
+    TNIC Similarity          & ($\gamma_1$)  &  &        -5.9933  &  &           -6.6903  &  &          -4.3878  &  &        -5.3433  \\
+                             &               &  &        (0.2886) &  &           (0.7959) &  &          (0.7634) &  &        (1.1814) \\
+    TNIC Vertical Relatedness     & ($\gamma_2$)  &  &        -8.6669  &  &           -8.9939  &  &          -11.6004 &  &        -9.8753  \\
+                             &               &  &        (1.3227) &  &           (1.9552) &  &          (4.2037) &  &        (4.5018) \\
+    Patent Tech Similarity   & ($\gamma_3$)  &  &        -7.4095  &  &           -7.0657  &  &          -7.1227  &  &        -15.7681 \\
+                             &               &  &       (0.1415) &  &           (0.1636) &  &          (0.2932) &  &        (2.0659) \\ 
+    Diff. Production         & ($\gamma_4$)  &  &        -0.0138  &  &           -0.0183  &  &          0.0020   &  &        -0.0082  \\
+                             &               &  &        (0.0018) &  &           (0.0033) &  &          (0.0035) &  &        (0.0016) \\
+    Diff. Production${}^{2}$ & ($\gamma_5$)  & &        3.05e-5  & &           5.49e-5  &  &        -2.68e-6 &   &     9.16e-6   \\
+                             &               &  &      (8.75e-6)&     &      (1.38e-5)&     &     (6.46e-6)&   &     (3.05e-6) \\
+    Past R\&D Collab.        & ($\gamma_6$)  &  &      -0.3136  &   &        -2.5327  &   &       -3.0999  &   &     -1.6632  \\
+                             &               &  &      (0.2479) &  &         (0.4974) &  &        (0.7892) & &       (0.9669) \\
+    R\&D Triangle Effect     & ($\gamma_7$)  &   &     -1.5333  &    &       -1.9032  &    &      -1.7946  &  &      -1.6098  \\
+                             &               &  &      (0.1823) &   &        (0.2060) &      &    (0.2875) &     &   (0.2742) \\ 
+\vspace{-0.25cm}\\
+\hdashline[0.4pt/2pt]
+\vspace{-0.25cm}\\
+    \multicolumn{6}{l}{\bf M\&A Cost} \\
+    \vspace{-0.25cm}\\
+Constant                 & ($\kappa_0$)  &  &     12.3712  &  &     12.7767  & &       13.4370  &  &      13.8160  \\ 
+                             &               &    &   (0.1886) & &      (0.1993) & &       (0.2927) &   &     (0.3195) \\
+    TNIC Similarity          & ($\kappa_1$)  &   &    1.7960   &  &     1.4459   &     &   0.0881   &     &   1.9493   \\
+                             &               &    &   (0.4222) &     &  (1.2950) &    &   (1.3753) &       & (1.6964) \\
+    TNIC Similarity $\times$ TNIC HHI & ($\kappa_2$) &    &  1.0875   &    &   2.2304   &    &    4.7950   &    &    4.9632   \\
+                             &               &    &   (0.5975) &  &     (0.7429) &     &   (0.8863) &     &   (2.8031) \\
+    TNIC Vertical Relatedness     & ($\kappa_3$)  &  &     -1.7120  &  &     -3.2584  &    &    -2.0389  &      &  -3.7848  \\
+                             &               &    &   (0.8887) &   &    (1.4800) &     &   (0.2910) &     &   (2.1744) \\
+    Patent Tech Similarity   & ($\kappa_4$)  &    &   -4.1065  &     &  -3.8706  &      &  -4.2306  &    &    -4.2618  \\
+                             &               &     &  (0.2794) &   &    (0.2795) &  &      (0.2985) &    &    (0.2971)  \\
+    Patent Stock~(Acquirer)  & ($\kappa_5$)  &    &   -0.1604  &    &   -0.3448  &   &     -0.2655  &    &    -0.3067   \\
+                             &               &    &   (0.0476) &  &     (0.0501) &   &     (0.0737) &      &  (0.0856)  \\
+    Patent Stock~(Target)    & ($\kappa_6$)  &   &    0.0766   &   &    0.0910   &   &     -0.1227  &    &    -0.2104   \\
+                             &               &    &   (0.0601) &    &   (0.0513) &      &  (0.0629) &     &   (0.0779)  \\
+    Diff. Production         & ($\kappa_7$)  &    &   -0.0134  &   &    -0.0254  &   &     -0.0490  &     &   -0.0434   \\
+                             &               &   &    (0.0034) &    &   (0.0060) &   &     (0.0116) &      &  (0.0105)  \\
+    Diff. Production${}^{2}$ & ($\kappa_8$)  &     &   2.53e-5 &    &    1.40e-5 &     &    3.82e-4 &     &    3.11e-4    \\
+                             &               &   &    (1.00e-5)&     &  (3.61e-5)& &       (1.01e-4)&   &     (1.01e-4)  \\
+    Past R\&D Collab.        & ($\kappa_9$)  &     &  -3.8038  &   &    -2.7467  &   &     -2.2055  &     &   -9.7494   \\
+                             &               &   &    (0.2590) &   &    (0.4754) &   &     (0.9534) &    &    (1.0926)  \\
+    R\&D Triangle Effect     & ($\kappa_{10}$) &     &  -2.1274  &  &     -3.2707  &   &     -2.4508  &    &    -1.9453   \\
+                             &               &    &   (0.3874)    &    &(0.8247) &   &     (0.8618) &     &   (1.2058)  \\ 
+\midrule
+    \# of Firms &  ($n$)     & \multicolumn{2}{c}{1453} & \multicolumn{2}{c}{1332} & \multicolumn{2}{c}{1129} & \multicolumn{2}{c}{1143} \\
+\midrule
+    \bottomrule
+    \end{tabular}
+\begin{tablenotes}[flushleft]
+\item \small \textbf{Notes:} Model (1) corresponds to the estimation  Equation (\ref{eq:equilbrium_output}). Model (2) corresponds to the joint estimation of the output and R\&D collaboration decisions in Equation (\ref{eq:joint_likelihood_full}). Output is computed using NAICS 6-digit price indices from the BLS. The competition matrix $\textbf{B}$ is defined based on the TNIC data calibrated to be as granular as the three-digit SIC codes. The R\&D collaboration cost is specified as $\zeta_{ij,t}=
+\phantom{\sum_k} \hspace{-0.5cm}
+\gamma_0
++ \mathbf{c}_{ij,t} \gamma_1
++
+\mathbf{p}_{ij,t}\gamma_2
++
+\mathbf{v}_{ij,t}\gamma_3
++
+\mathbf{d}_{ij,t}\gamma_4 
++
+\gamma_5 a_{ij,t-1}
++
+\gamma_6 \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}
++
+\gamma_7 |y_{i,t-1}-y_{j,t-1}|
++
+\gamma_8 |y_{i,t-1}-y_{j,t-1}|^2.$
+The M\&A cost is specified as $\nu_{ij,t}
+=
+\phantom{\sum_k} \hspace{-0.5cm}
+\kappa_0
++
+\mathbf{c}_{ij,t} \kappa_1
++
+\mathbf{c}_{ij,t}{\rm HHI}_{i,t} \kappa_2
++
+\mathbf{p}_{ij,t}\kappa_3
++
+\mathbf{v}_{ij,t}\kappa_4
++
+\mathbf{d}_{ij,t}\kappa_5
++
+\mathbf{s}_{i,t} \kappa_6
++
+\mathbf{s}_{j,t} \kappa_7
++
+\kappa_{8} a_{ij,t-1}
++
+\kappa_{9} \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}
++
+\kappa_{10} (y_{i,t-1}-y_{j,t-1})
++
+\kappa_{11} (y_{i,t-1}-y_{j,t-1})^2.$
+\end{tablenotes}
+\end{threeparttable}
+    \end{adjustbox}
+\end{center}
+\end{table}
+
+% \begin{table}[tbp]
+%   \small
+%   \centering
+%     \begin{center}
+%         \begin{adjustbox}{max width=\textwidth,max totalheight=\textheight,keepaspectratio}
+% \begin{threeparttable}
+% \caption{\label{tab:result_output_US_compustat_NAICS_6_mna} Estimation results for US publicly listed firms in the Compustat sample.}
+%     \begin{tabular}{llcccccccc}
+%     \toprule
+%           & & \multicolumn{2}{c}{2001-2005} & \multicolumn{2}{c}{2006-2010} & \multicolumn{2}{c}{2011-2015} & \multicolumn{2}{c}{2016-2020} \\
+%           \cmidrule{3-10}
+%           & & (1)  & (2) & (1)  & (2) & (1)  & (2) & (1)  & (2) \\
+%     \midrule
+%     \multicolumn{6}{l}{\bf Output} \\
+%     \vspace{-0.25cm}\\
+%     R\&D Spillover  & ($\rho$)      & 0.2993   & 0.2893    & 0.1950   & 0.1911   & 0.3338   & 0.3242    & 0.2833    & 0.2745   \\
+%                     &               & (0.0018) & (0.0017)  & (0.0058) & (0.0061) & (0.0100) & (0.0078)  & (0.0093)  & (0.0099) \\
+%     Competition     & ($\lambda$)   & 0.0089   & 0.0088    & -0.0006  & -0.0004  & 0.0098   & 0.0096    & 0.0053    & 0.0039   \\ 
+%                     &               & (0.0018) & (0.0018)  & (0.0018) & (0.0017) & (0.0035) & (0.0033)  & (0.0034)  & (0.0013) \\
+%     Log R\&D stock  & ($\beta_1$)   & 3.0857   & 3.0792    & 4.3529   & 4.3502   & 5.4385   & 5.4328    & 5.8748    & 5.8411   \\
+%                     &               & (0.1073) & (0.1053)  & (0.1103) & (0.1121) & (0.1629) & (0.1610)  & (0.2075)  & (0.2053) \\
+%     Log cost ratio  & ($\beta_2$)   & -0.1994  & -0.1964   & -0.2292  & -0.2230  & -0.7795  & -0.7780   & -1.0355   & -1.0387  \\
+%                     &               & (0.1114) & (0.1107)  & (0.1433) & (0.1421) & (0.3306) & (0.3258)  & (0.4038)  & (0.4000) \\
+%     Error Variance & ($\sigma_v^2$) & 30.5161  & 30.5180   & 52.7175  & 52.9210  & 513.7557 & 513.2189  & 1247.0000 & 1248.5000 \\
+%                     &               & (0.6458) & (0.6421)  & (1.3287) & (1.2930) & (24.2116)& (23.5051) & (34.1000) & (33.7000) \\
+%         \vspace{-0.25cm}\\
+% \hdashline[0.4pt/2pt]
+% \vspace{-0.25cm}\\
+%     \multicolumn{6}{l}{\bf R\&D Collaboration Cost} \\
+%     \vspace{-0.25cm}\\
+% Constant                  & ($\gamma_0$)   &  & 6.3498    &           & 7.1763    &           & 7.2800    &       & 6.9424 \\    
+%                           &                &  & (0.0977)  &           & (0.2576)  &           & (0.3179)  &       & (0.1871) \\  
+% TNIC Similarity           & ($\gamma_1$)   &  & -5.6160   &           & -8.8227   &           & -5.6590   &       & -5.4382 \\   
+%                           &                &  & (0.5601)  &           & (1.1424)  &           & (0.9819)  &       & (1.2406) \\  
+% Vertical Relatedness      & ($\gamma_2$)   &  & -10.4084  &           & -28.5234  &           & -9.2044   &       & -8.8420 \\   
+%                           &                &  & (6.5636)  &           & (3.9547)  &           & (2.9543)  &       & (1.4322) \\  
+% Patent Tech Similarity    & ($\gamma_3$)   &  & -1.9752   &           &  -2.4504  &           & -1.3543   &       & -1.6633 \\   
+%                           &                &  & (0.1921)  &           & (0.3347)  &           & (0.5530)  &       & (0.3174) \\  
+% Diff. Production          & ($\gamma_4$)   &  & -0.0143   &           & -0.0257   &           & -0.0272   &       & -0.0095 \\   
+%                           &                &  & (0.0021)  &           & (0.0058)  &           & (0.0097)  &       & (0.0018) \\  
+% Diff. Production${}^{2}$  & ($\gamma_5$)   &  & 2.82E-05  &           & 9.83E-05  &           & 1.11E-04  &       & 1.05E-05 \\  
+%                           &                &  &(8.52E-06) &           &(2.99E-05) &           &(5.26E-05) &       &(3.52E-06)\\  
+% Past R\&D Collab.         & ($\gamma_6$)   &  & -7.4064   &           & -7.1245   &           & -21.3128  &       & -22.4870 \\  
+%                           &                &  & (0.2568)  &           & (0.3347)  &           & (1.0029)  &       & (0.6165) \\  
+% R\&D Triangle Effect      & ($\gamma_7$)   &  & 0.8761    &           & -4.1772   &           & 0.2223    &       & -14.7044 \\  
+%                           &                &  & (0.4670)  &           & (0.5125)  &           & (0.5238)  &       & (2.0567) \\  
+%                                  \vspace{-0.25cm}\\
+% \hdashline[0.4pt/2pt]
+% \vspace{-0.25cm}\\
+%     \multicolumn{6}{l}{\bf M\&A Cost} \\
+%     \vspace{-0.25cm}\\
+%     Constant                    & ($\kappa_0$)   &    & 12.4999 &       & 12.5312 &       & 13.1444 &       & 14.0927 \\        
+%                                 &                &    & (0.2310) &       & (0.1997) &       & (0.2068) &       & (0.0685) \\    
+%     TNIC Similarity             & ($\kappa_1$)   &    & -7.2195 &       & -12.1910 &       & -11.1752 &       & -7.9324 \\      
+%                                 &                &    & (1.0250) &       & (0.9397) &       & (0.3670) &       & (0.3271) \\    
+%     TNIC Similarity*TNIC HHI    &  ($\kappa_2$)  &    & 12.9779 &       & 19.3016 &       & 12.5339 &       & 10.7897 \\        
+%                                 &                &    & (0.6565) &       & (0.2781) &       & (0.3851) &       & (0.0868) \\    
+%     vertical relatedness        & ($\kappa_3$)   &    & -9.9782 &       & -6.2604 &       & -6.7211 &       & -7.8529 \\        
+%                                 &                &    & (0.8677) &       & (1.1745) &       & (0.1025) &       & (0.1636) \\    
+%     Patent Tech Similarity      & ($\kappa_4$)   &    & -3.7101 &       & -3.0660 &       & -3.7269 &       & -3.6400 \\        
+%                                 &                &    & (0.3133) &       & (0.2957) &       & (0.0920) &       & (0.1770) \\    
+%     Patent Stock -- Acquirer    & ($\kappa_5$)   &    & -0.1912 &       & -0.2958 &       & -0.1651 &       & -0.3549 \\        
+%                                 &                &    & (0.0652) &       & (0.0541) &       & (0.0652) &       & (0.0725) \\    
+%     Patent Stock -- Target      & ($\kappa_6$)   &    & 0.0797 &       & 0.1018 &       & -0.1089 &       & -0.2391 \\          
+%                                 &                &    & (0.0664) &       & (0.0564) &       & (0.0475) &       & (0.0467) \\    
+%     Diff. Production            & ($\kappa_7$)   &    & -0.0131 &       & -0.0250 &       & -0.0619 &       & -0.0432 \\        
+%                                 &                &    & (0.0046) &       & (0.0071) &       & (0.0095) &       & (0.0086) \\    
+%     Diff. Production Square     & ($\kappa_8$)   &    & 2.53E-05 &       & 1.26E-04 &       & 4.56E-04 &       & 2.93E-04 \\    
+%                                 &                &    &(1.31E-05) &       &(4.28E-05) &      &(9.25E-05) &       &(7.44E-05) \\ 
+%     Past R\&D Collaboration     & ($\kappa_9$)   &    & -2.5831 &       & -4.4666 &       & -7.6501 &       & -1.4406 \\        
+%                                 &                &    & (0.3063) &       & (0.5475) &       & (0.2543) &       & (0.2965) \\    
+%     R\&D Triangle Effect        & ($\kappa_{10}$)  &    & -0.4449 &       & 16.4429 &       & 3.9830 &       & 4.3191 \\          
+%                                 &                &    & (0.7490) &       & (1.0315) &       & (0.1466) &       & (0.2453) \\    
+%     % Scaling Factor           & ($\delta$)    &       & -18.7076 &       & -11.7912 &       & -13.4278 &       & -16.0926 \\
+%     %                          &               &       & (0.2649) &       & (0.8819) &       & (0.4261) &       & (0.5697) \\
+% \midrule
+%     \# of Firms &  ($n$)     & \multicolumn{2}{c}{1453} & \multicolumn{2}{c}{1332} & \multicolumn{2}{c}{1129} & \multicolumn{2}{c}{1143} \\
+% \midrule
+%     \bottomrule
+%     \end{tabular}
+% \begin{tablenotes}[flushleft]
+% \item \small \textbf{Notes:} Model  (1) corresponds to the estimation  Equation (\ref{eq:equilbrium_output}). Model  (2) corresponds to the joint estimation of the output and R\&D collaboration decisions in Equation (\ref{eq:joint_likelihood_full}). Output is computed using NAICS 6-digit price indices from the BLS. The competition matrix $\textbf{B}$ is defined based on the TNIC data calibrated to be as granular as the three-digit SIC codes.
+% The R\&D collaboration cost is specified as $\zeta_{ij,t}=
+% \phantom{\sum_k} \hspace{-0.5cm}
+% \gamma_0
+% + \mathbf{c}_{ij,t} \gamma_1
+% +
+% \mathbf{v}_{ij,t}\gamma_2
+% +
+% \mathbf{p}_{ij,t}\gamma_3
+% +
+% \gamma_4 |y_{i,t-1}-y_{j,t-1}|
+% +
+% \gamma_5 |y_{i,t-1}-y_{j,t-1}|^2
+% +
+% \gamma_6 a_{ij,t-1}
+% +
+% \gamma_7 \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}.$
+% The M\&A cost is specified as $\nu_{ij,t}
+% =
+% \phantom{\sum_k} \hspace{-0.5cm}
+% \kappa_0
+% +
+% \mathbf{c}_{ij,t} \kappa_1
+% +
+% \mathbf{c}_{ij,t}*{\rm HHI}_{i,t} \kappa_2
+% +
+% \mathbf{v}_{ij,t}\kappa_3
+% +
+% \mathbf{p}_{ij,t}\kappa_4
+% +
+% \mathbf{s}_{i,t} \kappa_5
+% +
+% \mathbf{s}_{j,t} \kappa_6
+% +
+% \kappa_7 (y_{i,t-1}-y_{j,t-1})
+% +
+% \kappa_8 (y_{i,t-1}-y_{j,t-1})^2
+% +
+% \kappa_{9} a_{ij,t-1}
+% +
+% \kappa_{10} \sum_{k=1}^n a_{ik,t-1} a_{jk,t-1}.$
+% \end{tablenotes}
+% \end{threeparttable}
+%     \end{adjustbox}
+% \end{center}
+% \end{table}
+
+% \begin{table}[tbp]
+%   \small
+%   \centering
+%     \begin{center}
+%         \begin{adjustbox}{max width=\textwidth,max totalheight=\textheight,keepaspectratio}
+% \begin{threeparttable}
+% \caption{Marginal Effects on R\&D Collaboration and M\&A }
+% \begin{tabular}{llcccc}
+% \hline
+%  &  & 2001--2005 & 2006--2010 & 2011--2015 & 2016--2020 \\
+% Variable & $\Delta X$ (unit) & $\Delta$ Prob (\%) & $\Delta$ Prob (\%) & $\Delta$ Prob (\%) & $\Delta$ Prob (\%) \\
+% \hline
+
+% \multicolumn{6}{l}{\textbf{R\&D Collaboration}} \\
+
+% TNIC Similarity 
+% & one s.d. 
+% & 3.52E-04 & 3.19E-04 & 3.76E-05 & 0.0001 \\
+% & 
+% & (0.0180) & (0.0228) & (0.0009) & (0.0040) \\
+
+% Past R\&D Collaboration 
+% & 0 to 1 
+% & 59.7690 & 32.8000 & 99.9950 & 99.9966 \\
+% & 
+% & (7.8377) & (13.5280) & (0.6873) & (0.5331) \\
+
+% R\&D Triangle Effect 
+% & increase by one 
+% & -2.93E-03 & 0.8761 & -0.0001 & 99.9256 \\
+% & 
+% & (0.2102) & (2.6094) & (0.0030) & (0.5493) \\
+
+% Patent Tech Similarity 
+% & one s.d. 
+% & 0.0009 & 0.0007 & 0.0001 & 0.0003 \\
+% & 
+% & (0.0415) & (0.0419) & (0.0003) & (0.0066) \\
+
+% Vertical Relatedness 
+% & one s.d. 
+% & 1.40E-04 & 0.0002 & 1.09E-05 & 2.69E-05 \\
+% & 
+% & (0.0073) & (0.0149) & (0.0000) & (0.0005) \\
+
+% Diff.\ Production 
+% & increase by 50\% 
+% & 0.0004 & 0.0001 & 4.69E-05 & 8.64E-05 \\
+% & 
+% & (0.0252) & (0.0779) & (0.0015) & (0.0023) \\
+
+% \multicolumn{6}{l}{\textbf{M\&A }} \\
+
+% TNIC Similarity 
+% & one s.d. 
+% & 5.43E-05 & 0.0001 & 0.0002 & 1.21E-04 \\
+% & 
+% & (0.0002) & (0.0006) & (0.0018) & (0.0014) \\
+
+% TNIC HHI 
+% & one s.d. 
+% & -4.73E-05 & -6.93E-05 & -0.0001 & -8.60E-05 \\
+% & 
+% & (0.0032) & (0.0060) & (0.0111) & (0.0058) \\
+
+% Past R\&D Collaboration 
+% & 0 to 1 
+% & 0.0009 & 0.0284 & -0.0027 & -0.0008 \\
+% & 
+% & (0.0027) & (0.0281) & (0.0406) & (0.0084) \\
+
+% R\&D Triangle Effect 
+% & increase by one 
+% & 0.0005 & -0.0011 & -0.0011 & -0.0008 \\
+% & 
+% & (0.0039) & (0.0039) & (0.0132) & (0.0073) \\
+
+% Patent Tech Similarity 
+% & one s.d. 
+% & 0.0004 & 0.0005 & 0.0008 & 0.0006 \\
+% & 
+% & (0.0015) & (0.0015) & (0.0119) & (0.0054) \\
+
+% Vertical Relatedness 
+% & one s.d. 
+% & 2.78E-05 & 2.13E-05 & 2.43E-05 & 2.14E-05 \\
+% & 
+% & (0.0001) & (0.0001) & (0.0004) & (0.0002) \\
+
+% Patent Stock -- Acquiror 
+% & increase by 50\% 
+% & 0.0003 & 0.0010 & 0.0005 & 0.0011 \\
+% & 
+% & (0.0028) & (0.0080) & (0.0081) & (0.0222) \\
+
+% Patent Stock -- Target 
+% & increase by 50\% 
+% & -0.0001 & -0.0001 & 0.0002 & 0.0003 \\
+% & 
+% & (0.0005) & (0.0006) & (0.0036) & (0.0063) \\
+
+% Diff.\ Production 
+% & increase by 50\% 
+% & 3.83E-05 & 1.06E-05 & 4.98E-05 & 6.33E-06 \\
+% & 
+% & (0.0005) & (0.0012) & (0.0046) & (0.0038) \\
+
+% \hline
+% \end{tabular}
+% \end{threeparttable}
+%     \end{adjustbox}
+% \end{center}
+% \end{table}
+
+%\begin{table}[tbp]
+%  \small
+%  \centering
+%    \begin{center}
+%        \begin{adjustbox}{max width=\textwidth,max totalheight=\textheight,keepaspectratio}
+%\begin{threeparttable}
+%\caption{\label{tab:result_output_international_compustat_NAICS_6_mna} Estimation results for international publicly listed firms in the Compustat sample.}
+%    \begin{tabular}{llcccc}
+%    \toprule
+%          & & \multicolumn{1}{c}{2001-2005} & \multicolumn{1}{c}{2006-2010} & \multicolumn{1}{c}{2011-2015} & \multicolumn{1}{c}{2016-2020} \\
+%    \midrule
+%    \multicolumn{6}{l}{\bf Output} \\
+%    \vspace{-0.25cm}\\
+%    R\&D Spillover  & ($\rho$)      &   &  &   & 0.0683        \\
+%                    &               &   &  &   & (0.0025)     \\
+%    Competition     & ($\lambda$)   &   &  &   & 5.18e-5      \\ 
+%                    &               &   &  &   & (2.8e-5)    \\
+%    Log R\&D stock  & ($\beta_1$)   &   &  &   & 3.6996       \\
+%                    &               &   &  &   & (0.0559)     \\
+%    Log labor prod. & ($\beta_2$)   &   &  &   & 3.7104       \\
+%                    &               &   &  &   & (0.1594)    \\
+%    Error Variance & ($\sigma_v^2$) &   &  &   & 54.5289      \\
+%                    &               &   &  &   & (1.0698)    \\
+%\midrule
+%    \# of Firms &  ($n$)     & \multicolumn{1}{c}{ } & \multicolumn{1}{c}{ } & \multicolumn{1}{c}{ } & \multicolumn{1}{c}{3643} \\
+%\midrule
+%    \bottomrule
+%    \end{tabular}
+%\begin{tablenotes}[flushleft]
+%\item \small \textbf{Notes:} Output is computed using NAICS 6-digit price indices from the BLS. The competition matrix $\textbf{B}$ is constructed based on the company website product descriptions.
+%\end{tablenotes}
+%\end{threeparttable}
+%    \end{adjustbox}
+%\end{center}
+%\end{table}
+
+\FloatBarrier
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Counterfactuals}
+\label{sec:counterfactual}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We use the structural estimates reported in Table \ref{tab:result_output_US_compustat_NAICS_6_mna} to evaluate the role of organizational choice in innovation through a set of counterfactual simulations. The key objective is to quantify how aggregate output responds to restrictions on alternative governance modes for internalizing technological complementarities.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Counterfactual Design}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We consider three counterfactual scenarios:
+\begin{enumerate}
+    \item \textbf{No M\&A:} all merger and acquisition (M\&A) links are removed;
+    \item \textbf{No alliances:} all R\&D collaboration links are removed;
+    \item \textbf{No M\&A and no alliances:} both governance margins are shut down.
+\end{enumerate}
+In the first scenario, we undo all observed M\&A deals and restore merged firms to their pre-merger identities.\footnote{The accounting decomposition undoes the observed deals mechanically,
+splitting each merged entity into its pre-transaction constituents and
+recomputing outputs from Equation~(\ref{eq:bonacich}) along the observed
+collaboration path. The re-equilibrated counterfactual instead re-simulates
+network formation with the acquisition alternative removed from each pair's
+choice set, which by IIA reallocates the suppressed merger probability to
+collaboration and idleness in proportion to their conditional probabilities
+(Online Appendix~\ref{app:equivalence}). The difference isolates the
+substitution channel.} In the second scenario, we remove all links in the R\&D collaboration network. In the combined scenario, we simultaneously eliminate both governance channels. To recover counterfactual firm productivity when M\&A deals are removed, we estimate Eq.~(\ref{eq:prod-dyn}) using firms not involved in M\&A activity,\footnote{Productivity is not autonomous in the model: by
+Equation~(\ref{eq:prod-dyn}), $\eta_{it}$ depends on the R\&D capital stock
+accumulating under Equation~(\ref{eq:rnd-accumulation}), so de-merging a firm
+requires an imputed R\&D path. We impute $R_{it}$ for counterfactually
+surviving targets from the projection
+$
+  \log R_{it}
+  =
+  \varphi_1 \log R_{i,t-1}
+  + \varphi_2 \log x_{i,t-1}
+  + \tilde\mu_i + \tilde\tau_t + u_{it},
+$ 
+estimated on firm-years not involved in any M\&A transaction, initialized at
+the target's last pre-transaction observation with $\tilde\mu_i$ fixed at its
+pre-transaction estimate. Using never-merging firms avoids post-transaction
+outcomes of treated firms, at the cost of a selection caveat: if targets'
+counterfactual R\&D trajectories differ, the imputation inherits that
+difference. We therefore re-compute the counterfactuals under the alternative
+rule that de-merged firms maintain their pre-transaction R\&D-to-knowledge-stock
+ratio. Given $\{R_{it}\}$, stocks follow
+Equation~(\ref{eq:rnd-accumulation}), the acquirer's stock is reduced by the
+target's contribution from Equation~(\ref{eq:prod-mna-alt}), and productivities
+follow Equation~(\ref{eq:prod-dyn}) at the estimated parameters.} and use the estimated law of motion to impute the missing productivity paths of affected firms. Because the AR specification requires lagged productivity, the counterfactual analysis is restricted to the periods 2006--2010, 2011--2015, and 2016--2020. We evaluate the effects of these counterfactuals on aggregate output, defined as the sum of firm-level equilibrium outputs, using the observed economy as the benchmark.
+
+All counterfactual quantities are computed by posterior predictive
+simulation. For each of $S$ draws
+$\Theta^{(s)} \sim \pi(\Theta \mid \mathrm{data})$ from the MCMC output
+of Section~\ref{sec:results}, we simulate the counterfactual path ---
+including, in the re-equilibrated exercise, the first-stage network
+draws and compute the outcome of interest. Figures~\ref{fig:counterfactual_aggregate}
+and~\ref{fig:counterfactual_firm} report the pointwise posterior median together with $90\%$ posterior
+predictive intervals; the intervals therefore reflect both parameter
+uncertainty and, where applicable, the simulation noise of the
+counterfactual network draws.
+
+%The counterfactuals translate directly into welfare statements using
+%the objects defined in Section~\ref{sec:model-profits}. 
+%Producer surplus is the sum of profits,
+%$\Pi_t = \frac{\xi}{2}\sum_i y_{it}^2$ net of collaboration costs, and
+%consumer surplus is the quadratic form
+%$U_t = \frac{\psi}{2}\sum_i y_{it}^2 + \frac{\lambda}{2}\sum_i
+%\sum_{j\neq i} b_{ij} y_{it} y_{jt}$, both computable at the factual and
+%counterfactual output paths for every posterior draw. One parameter
+%requires care: the demand curvature $\psi$ enters only consumer surplus
+%and not the firms' first-order conditions, and is therefore not
+%identified by our estimation. Appendix~\ref{sec:micro-cost} implies the lower bound
+%$\psi \ge \tfrac{1}{2}$, with equality when the R\&D-effort feedback is
+%absent ($\alpha = 0$): the micro-foundation defines
+%$\nu \equiv \psi - \alpha^2/(4\gamma)$ in
+%Equation~\eqref{eq:profit-pi-app-3}, and the normalization $\nu =
+%\tfrac{1}{2}$ used there to recover Equations~\eqref{eq:profit-simplified}
+%and~\eqref{eq:output-br} therefore gives
+%$\psi = \tfrac{1}{2} + \alpha^2/(4\gamma)$. Since
+%$\Delta U_t$ is linear in $\psi$ given the output paths, we report the
+%change in producer surplus exactly, the change in consumer surplus at
+%the boundary value $\psi = \tfrac{1}{2}$, and the break-even curvature
+%$\psi^{*}$ at which the total welfare change
+%$\Delta W_t = \Delta U_t + \Delta \Pi_t$ switches sign; %readers preferring a different curvature can rescale the own-output component of $\Delta U_t$ accordingly. 
+%Alongside $\Delta W_t$ we report the
+%change in the Herfindahl--Hirschman index of
+%Equation~(\ref{eq:herfindahl}), 
+%which summarizes the market-structure consequences of the M\&A ban
+%without requiring knowledge of $\psi$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Aggregate Counterfactual Effects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[tbp]
+\begin{minipage}{0.31\linewidth}
+\centering
+\qquad 2006-2010
+\includegraphics[width=5.25cm,angle=0]{./Figures/2006_2010_aggregated_2.png}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+\centering
+\qquad 2011-2015
+\includegraphics[width=5.5cm,angle=0]{./Figures/2011_2015_aggregated_2.png}
+\end{minipage}
+\begin{minipage}{0.32\linewidth}
+\centering
+\qquad 2016-2020
+\includegraphics[width=5.25cm,angle=0]{./Figures/2016_2020_aggregated_2.png}
+\end{minipage}
+%
+%
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=5.25cm,angle=0]{./Figures/2006_2010_ratio_rnd_ma_2.png}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+\centering
+\includegraphics[width=5.5cm,angle=0]{./Figures/2011_2015_ratio_rnd_ma_2.png}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+\centering
+\includegraphics[width=5.5cm,angle=0]{./Figures/2016_2020_ratio_rnd_ma_2.png}
+\end{minipage}
+\caption{The top panels report counterfactual simulation results for the three sample periods showing the aggregate output under the benchmark and different counterfactual scenarios. The bottom panels display the ratio of the number of R\&D alliances to the number of M\&A deals. Solid lines: posterior medians; shaded areas: 90\% posterior predictive intervals across $S$ posterior draws (and network simulation draws in the re-equilibrated scenario).
+}
+\label{fig:counterfactual_aggregate}
+\end{figure}
+Figure~\ref{fig:counterfactual_aggregate} shows that the aggregate output loss from banning M\&A is large in 2006--2010 but substantially smaller in later periods, while removing R\&D alliances leads to persistently large losses throughout. At the same time, the bottom panels indicate that the intensity of collaborations relative to M\&A activity is higher in the early period. Taken together, these patterns reflect the payoff complementarity of Section~\ref{sec:model-implications}: accumulated alliance capital raises the surplus from consolidation, so periods of dense collaboration are followed by intense M\&A activity, even though, on the choice margin, each transaction is executed as a merger instead of an alliance. It also shows that when firms are embedded in dense collaboration networks, mergers can internalize and scale existing complementarities, resulting in large aggregate gains. As collaboration intensity per deal declines over time, there is less relational capital to internalize, reducing the marginal contribution of M\&A and explaining the smaller output losses from banning mergers in later periods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deal-Level Counterfactual Effects}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[tbp]
+\begin{minipage}{0.32\linewidth}
+\centering
+\qquad 2006-2010
+\includegraphics[width=5.25cm,angle=0]{./Figures/2006_2010_deal_level_2.png}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+\centering
+\qquad 2011-2015
+\includegraphics[width=5.75cm,angle=0]{./Figures/2011_2015_deal_level_2.png}
+\end{minipage}
+\begin{minipage}{0.3\linewidth}
+\centering
+\qquad 2016-2020
+\includegraphics[width=5.25cm,angle=0]{./Figures/2016_2020_deal_level_2.png}
+\end{minipage}
+%\begin{minipage}{0.32\linewidth}
+%\centering
+%\includegraphics[width=5.6cm,angle=0]{./Figures/2006_2010_deal_level_no_RND_2.png}
+%\end{minipage}
+%\begin{minipage}{0.33\linewidth}
+%\centering
+%\includegraphics[width=5.5cm,angle=0]{./Figures/2011_2015_deal_level_no_RND_2.png}
+%\end{minipage}
+%\begin{minipage}{0.33\linewidth}
+%\centering
+%\includegraphics[width=5.6cm,angle=0]{./Figures/2016_2020_deal_level_no_RND_2.png}
+%\end{minipage}
+\caption{Individual merger-level counterfactual simulation results for the three sample periods when individual M\&A deals are prohibited. Solid lines: posterior medians; shaded areas: 90\% posterior predictive intervals across $S$ posterior draws (and network simulation draws in the re-equilibrated scenario).}
+\label{fig:counterfactual_firm}
+\end{figure}
+Figure~\ref{fig:counterfactual_firm} highlights substantial heterogeneity in merger-level effects, with both positive and negative contributions reflecting variation in underlying complementarities across deals. The distribution is shifted upward in 2006--2010, indicating large average gains from M\&A, but becomes increasingly compressed around zero in later periods, pointing to weaker marginal effects. This pattern is consistent with differences in the surrounding collaboration environment: in the early period, a higher intensity of R\&D alliances per M\&A deal reported in the bottom panels in Figure~\ref{fig:counterfactual_aggregate} implies that firms are embedded in richer networks, allowing mergers to internalize and amplify existing complementarities \citep[][]{friedmann2026knowledge}. As the relative prevalence of alliances declines over time, the scope for such gains diminishes, leading to smaller and more dispersed merger effects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sectoral Variation: ICT and Semiconductors vs. Biotech and Pharmaceuticals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Geographic Variation: United States vs. Europe}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\FloatBarrier
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+\label{sec:conclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We estimate an R\&D network formation model using a novel dataset on R\&D collaborations extracted using natural language processing (NLP) from news articles over several decades. We find that technology spillovers in R\&D collaborations have changed over time. %The changing pattern in technology spillovers motivates us to include M\&A activities in our estimation framework. 
+Our results indicate that the changing pattern in technology spillovers is due to firms substituting R\&D collaborations with M\&A,\footnote{Throughout the paper, the relation between R\&D collaborations and
+M\&As involves two distinct notions that it is important to keep apart.
+On the \emph{ex-ante choice margin}, the two governance modes are
+substitutes by construction: for a given pair and period, acquiring,
+collaborating, and remaining idle are mutually exclusive alternatives
+in the discrete choice of Section~\ref{sec:dyn-rnd-mna}, and the
+threshold condition in Equation~(\ref{eq:rnd-mna-comp}) determines
+which mode is selected. Any factor that raises the relative
+attractiveness of one mode mechanically lowers the probability of the
+other; in particular, removing the acquisition alternative reallocates
+its choice probability to collaboration and idleness
+(Online Appendix~\ref{app:equivalence}). In the \emph{payoff structure},
+by contrast, the two modes are dynamic complements: a prior alliance
+and common collaboration partners lower the cost of a subsequent
+acquisition when $\kappa_{9} < \gamma_{5}$ and
+$\kappa_{10} < \gamma_{6}$ in
+Equation~(\ref{eq:mna_rnd_cost-diff}), 
+and the target's alliance portfolio is part of the transferable network
+value that makes it worth acquiring
+(Equation~(\ref{eq:mna-form-profit})). Alliance capital accumulated
+today therefore raises the surplus from consolidation tomorrow --- the
+stepping-stone mechanism --- even though, at the moment of choice, one
+mode is always selected \emph{instead of} the other. When we speak of
+firms ``substituting collaborations with M\&As'' we refer to the choice
+margin; when we speak of alliances and M\&As as ``complements'' we
+refer to the payoff structure. The two notions are not in tension: it
+is precisely because alliance capital raises merger surplus that, over
+time, activity shifts along the choice margin from collaboration
+toward consolidation.} emphasizing the close connection between R\&D collaborations and M\&A activities. Moreover, a counterfactual analysis indicates that banning M\&As unanimously reduce aggregate firm output, while R\&D alliances increase aggregate firm output. %We acknowledge that mergers may also have positive benefits by reducing ex post hold-up costs. We are extending the model to allow for mergers to also benefit firms by reducing duplicative R\&D costs and by allowing firms to reduce ex post holdup costs as in \cite{williamson1998institutions} through integrating.  
+
+\end{spacing}
+
+\singlespacing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{spacing}{0.75}
+\bibliographystyle{apalike}
+\bibliography{references}
+\end{spacing}
+
+\clearpage
+
+\input{appendix.tex}
+
+\clearpage
+
+\input{online_appendix.tex}
+
+\end{document}
